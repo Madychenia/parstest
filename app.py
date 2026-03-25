@@ -114,8 +114,6 @@ st.markdown("""<style>
     table { margin: 0 auto; border-collapse: collapse; width: auto !important; }
     th, td { padding: 4px 10px !important; border: 1px solid #eee !important; font-size: 0.85em; text-align: center !important; }
     tbody tr th { background-color: #f8f9fa !important; font-weight: bold; text-align: left !important; border-right: 2px solid #ddd !important; }
-    thead tr:nth-child(2) { display: none; }
-    thead tr:first-child th:first-child { background-color: #f8f9fa !important; color: transparent !important; }
     .uah { color: #1a1a1a; font-weight: 800; display: block; }
     .usd { color: #FF4B4B; font-weight: 700; font-size: 0.9em; }
     .log-line { font-family: monospace; font-size: 0.95em; margin: 2px 0; }
@@ -152,7 +150,8 @@ for i, tab_ui in enumerate(tabs):
         
         if items:
             df_tab = pd.DataFrame(items)
-            cats = sorted(df_tab['Категория'].unique())
+            # УБРАНА СОРТИРОВКА: Берем категории в порядке появления в файле
+            cats = df_tab['Категория'].unique() 
             sel_cat = st.selectbox("Категория:", cats, key=f"cat_{tag_key}")
             f_df = df_tab[df_tab['Категория'] == sel_cat].copy().sort_values('order')
             
@@ -165,12 +164,13 @@ for i, tab_ui in enumerate(tabs):
                 st.markdown("---")
                 with st.expander("Отслеживание цены"):
                     hc1, hc2, hc3 = st.columns(3)
-                    with hc1: h_cat = st.selectbox("Выбор категории:", cats, key=f"hc_{tag_key}")
+                    # УБРАНА СОРТИРОВКА для выпадающих списков внизу
+                    with hc1: h_cat = st.selectbox("Категория:", cats, key=f"hc_{tag_key}")
                     h_mod_df = df_tab[df_tab['Категория'] == h_cat].sort_values('order')
-                    with hc2: h_mod = st.selectbox("Выбор модели:", h_mod_df['M'].unique(), key=f"hm_{tag_key}")
+                    with hc2: h_mod = st.selectbox("Модель:", h_mod_df['M'].unique(), key=f"hm_{tag_key}")
                     with hc3:
-                        h_shop_list = sorted(df_tab[(df_tab['Категория'] == h_cat) & (df_tab['M'] == h_mod)]['S'].unique())
-                        h_shop = st.selectbox("Выбор продавца:", h_shop_list, key=f"hs_{tag_key}")
+                        h_shop_list = df_tab[(df_tab['Категория'] == h_cat) & (df_tab['M'] == h_mod)]['S'].unique()
+                        h_shop = st.selectbox("Продавец:", h_shop_list, key=f"hs_{tag_key}")
                     
                     hist_key = f"{h_mod} | {h_shop} | {tag_key}"
                     if hist_key in db:
