@@ -27,7 +27,6 @@ st.title("📱 Мониторинг цен")
 # --- ПАНЕЛЬ УПРАВЛЕНИЯ ---
 col1, col2, col3 = st.columns([2, 2, 6])
 with col1:
-    # Теперь изменение этого поля не вызывает повторный парсинг сайтов
     user_rate = st.number_input("Курс для расчета ($):", value=44.55, step=0.01)
 with col2:
     if st.button("♻️ ОБНОВИТЬ ЦЕНЫ"):
@@ -43,7 +42,7 @@ except:
 
 st.write(f"Обновлено (Киев): **{time_str}**")
 
-# --- ШАГ 1: ТОЛЬКО ПАРСИНГ (Чистые данные в грн) ---
+# --- ШАГ 1: ПАРСИНГ ---
 @st.cache_data(ttl=3600)
 def get_raw_prices(file_name):
     try:
@@ -76,15 +75,17 @@ def get_raw_prices(file_name):
         return pd.DataFrame(results)
     except: return pd.DataFrame()
 
-# --- ШАГ 2: ПРИМЕНЕНИЕ КУРСА И ФОРМАТИРОВАНИЕ ---
+# --- ШАГ 2: БЕЗОПАСНЫЙ ПЕРЕСЧЕТ ---
 def format_data(df, rate):
     formatted = df.copy()
     def process_row(p_uah):
-        if p_uah:
-            p_usd = round(p_uah / rate) # Округляем до целого, чтобы не было .0
-            # Форматируем с запятыми: 26,988 ₴ и 606 $
-            val = f'<span class="uah">{p_uah:,} ₴</span><br><span class="usd">{p_usd:,} $</span>'
-            return val
+        # Проверяем, что p_uah — это число и оно не пустое
+        if pd.notnull(p_uah) and isinstance(p_uah, (int, float)) and rate > 0:
+            try:
+                p_usd = int(round(p_uah / rate)) # Убираем .0 через int()
+                return f'<span class="uah">{int(p_uah):,} ₴</span><br><span class="usd">{p_usd:,} $</span>'
+            except:
+                return "—"
         return "—"
     
     formatted['Цена'] = formatted['Цена_ГРН'].apply(process_row)
@@ -94,13 +95,9 @@ def format_data(df, rate):
 tab_used, tab_new = st.tabs(["Used (Б/У)", "New (Новые)"])
 
 def show_tab_content(file_name):
-    # Тянем сырые данные (кэшируется на час)
     raw_data = get_raw_prices(file_name)
-    
     if not raw_data.empty:
-        # Применяем курс МГНОВЕННО (не кэшируется, работает на лету)
         display_data = format_data(raw_data, user_rate)
-        
         cat_list = raw_data['Категория'].unique().tolist()
         selected_cat = st.selectbox(f"Выберите категорию:", cat_list, key=file_name)
         
@@ -108,11 +105,13 @@ def show_tab_content(file_name):
         original_order = filtered['Модель'].unique().tolist()
         
         pivot = filtered.drop_duplicates(subset=['Модель', 'Магазин']).pivot(
-            index='Модель', 
+            index='Model', # Используем внутреннее имя для индекса
             columns='Магазин', 
             values='Цена'
         ).fillna("—")
         
+        # Переименовываем индекс для красоты
+        pivot.index.name = 'Модель'
         pivot = pivot.reindex(original_order)
         st.write(pivot.to_html(escape=False), unsafe_allow_html=True)
     else:
