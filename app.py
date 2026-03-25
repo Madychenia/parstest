@@ -17,14 +17,8 @@ st.markdown("""
     .usd { color: #FF4B4B; font-weight: bold; }
     td { text-align: center !important; padding: 10px !important; }
     th { background-color: #f0f2f6 !important; text-align: center !important; }
-    
-    /* Компактные поля и выравнивание кнопки */
-    [data-testid="stNumberInput"], [data-testid="stSelectbox"] {
-        max-width: 250px;
-    }
-    div.stButton {
-        margin-top: 28px;
-    }
+    [data-testid="stNumberInput"], [data-testid="stSelectbox"] { max-width: 250px; }
+    div.stButton { margin-top: 28px; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -39,7 +33,6 @@ with col2:
         st.cache_data.clear()
         st.rerun()
 
-# Настройка правильного времени (Киев)
 try:
     kiev_tz = pytz.timezone('Europe/Kyiv')
     now_kiev = datetime.now(kiev_tz)
@@ -85,30 +78,46 @@ def fetch_prices(file_name, rate):
         return pd.DataFrame(results)
     except: return pd.DataFrame()
 
+# --- ВСПОМОГАТЕЛЬНАЯ ФУНКЦИЯ СОРТИРОВКИ ПАМЯТИ ---
+def sort_by_memory(model_name):
+    # Ищем числа рядом с ГБ, GB или ТБ, TB
+    size = re.findall(r'(\d+)\s*(?:ГБ|GB|ТБ|TB|tb|gb)', str(model_name), re.IGNORECASE)
+    if not size:
+        return 0
+    val = int(size[0])
+    # Если это Терабайты (1, 2), умножаем на 1024 для правильного веса
+    if 'ТБ' in str(model_name).upper() or 'TB' in str(model_name).upper() or val < 10:
+        return val * 1024
+    return val
+
 # --- ВКЛАДКИ ---
 tab_used, tab_new = st.tabs(["Used (Б/У)", "New (Новые)"])
 
 def show_category_table(file_name):
     data = fetch_prices(file_name, user_rate)
     if not data.empty:
-        # Берем уникальные категории из твоего CSV
         cat_list = sorted(data['Категория'].unique())
-        
-        # Выпадающий список (теперь компактный)
         selected_cat = st.selectbox(f"Выберите категорию ({file_name}):", cat_list, key=file_name)
         
-        filtered = data[data['Категория'] == selected_cat]
+        filtered = data[data['Категория'] == selected_cat].copy()
         
-        # Строим сводную таблицу
+        # Создаем временную колонку для правильной сортировки моделей
+        filtered['mem_rank'] = filtered['Модель'].apply(sort_by_memory)
+        filtered = filtered.sort_values(by='mem_rank')
+        
+        # Строим таблицу
         pivot = filtered.drop_duplicates(subset=['Модель', 'Магазин']).pivot(
             index='Модель', 
             columns='Магазин', 
             values='Цена'
         ).fillna("—")
         
+        # Чтобы pivot не сбросил нашу сортировку моделей
+        pivot = pivot.reindex(filtered['Модель'].unique())
+        
         st.write(pivot.to_html(escape=False), unsafe_allow_html=True)
     else:
-        st.info(f"Файл {file_name} пуст или не найден. Добавьте его в репозиторий.")
+        st.info(f"Файл {file_name} не найден.")
 
 with tab_used:
     show_category_table('links.csv')
