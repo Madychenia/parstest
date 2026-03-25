@@ -27,9 +27,10 @@ st.title("📱 Мониторинг цен")
 # --- ПАНЕЛЬ УПРАВЛЕНИЯ ---
 col1, col2, col3 = st.columns([2, 2, 6])
 with col1:
+    # Теперь изменение этого поля не вызывает повторный парсинг сайтов
     user_rate = st.number_input("Курс для расчета ($):", value=44.55, step=0.01)
 with col2:
-    if st.button("♻️ ОБНОВИТЬ"):
+    if st.button("♻️ ОБНОВИТЬ ЦЕНЫ"):
         st.cache_data.clear()
         st.rerun()
 
@@ -42,9 +43,9 @@ except:
 
 st.write(f"Обновлено (Киев): **{time_str}**")
 
-# --- ФУНКЦИЯ ПАРСИНГА ---
+# --- ШАГ 1: ТОЛЬКО ПАРСИНГ (Чистые данные в грн) ---
 @st.cache_data(ttl=3600)
-def fetch_prices(file_name, rate):
+def get_raw_prices(file_name):
     try:
         df = pd.read_csv(file_name, sep=None, engine='python', encoding='utf-8-sig')
         df.columns = [str(c).strip().lower() for c in df.columns]
@@ -66,51 +67,59 @@ def fetch_prices(file_name, rate):
                         if digits: p_uah = int(digits)
                 except: pass
             
-            p_usd = round(p_uah / rate, 1) if p_uah else 0
-            val = f'<span class="uah">{p_uah:,} ₴</span><br><span class="usd">{p_usd}$</span>' if p_uah else "—"
-            
             results.append({
                 'Модель': row.get('модель', '—'), 
                 'Магазин': row.get('магазин', '—'), 
-                'Цена': val,
+                'Цена_ГРН': p_uah,
                 'Категория': row.get('категория', 'Без категории') 
             })
         return pd.DataFrame(results)
     except: return pd.DataFrame()
 
+# --- ШАГ 2: ПРИМЕНЕНИЕ КУРСА И ФОРМАТИРОВАНИЕ ---
+def format_data(df, rate):
+    formatted = df.copy()
+    def process_row(p_uah):
+        if p_uah:
+            p_usd = round(p_uah / rate) # Округляем до целого, чтобы не было .0
+            # Форматируем с запятыми: 26,988 ₴ и 606 $
+            val = f'<span class="uah">{p_uah:,} ₴</span><br><span class="usd">{p_usd:,} $</span>'
+            return val
+        return "—"
+    
+    formatted['Цена'] = formatted['Цена_ГРН'].apply(process_row)
+    return formatted
+
 # --- ВКЛАДКИ ---
 tab_used, tab_new = st.tabs(["Used (Б/У)", "New (Новые)"])
 
-def show_category_table(file_name):
-    data = fetch_prices(file_name, user_rate)
-    if not data.empty:
-        # Получаем уникальные категории в том порядке, в котором они появились в CSV
-        cat_list = data['Категория'].unique().tolist()
+def show_tab_content(file_name):
+    # Тянем сырые данные (кэшируется на час)
+    raw_data = get_raw_prices(file_name)
+    
+    if not raw_data.empty:
+        # Применяем курс МГНОВЕННО (не кэшируется, работает на лету)
+        display_data = format_data(raw_data, user_rate)
         
+        cat_list = raw_data['Категория'].unique().tolist()
         selected_cat = st.selectbox(f"Выберите категорию:", cat_list, key=file_name)
         
-        # Фильтруем данные по категории
-        filtered = data[data['Категория'] == selected_cat].copy()
-        
-        # Запоминаем исходный порядок моделей в этой категории
+        filtered = display_data[display_data['Категория'] == selected_cat].copy()
         original_order = filtered['Модель'].unique().tolist()
         
-        # Строим сводную таблицу
         pivot = filtered.drop_duplicates(subset=['Модель', 'Магазин']).pivot(
             index='Модель', 
             columns='Магазин', 
             values='Цена'
         ).fillna("—")
         
-        # ПРИНУДИТЕЛЬНО возвращаем порядок моделей из исходного списка
         pivot = pivot.reindex(original_order)
-        
         st.write(pivot.to_html(escape=False), unsafe_allow_html=True)
     else:
         st.info(f"Файл {file_name} не найден.")
 
 with tab_used:
-    show_category_table('links.csv')
+    show_tab_content('links.csv')
 
 with tab_new:
-    show_category_table('links_new.csv')
+    show_tab_content('links_new.csv')
