@@ -117,7 +117,9 @@ last_run = load_data(LAST_RUN_FILE)
 
 c1, c2, c3, c4 = st.columns([1,1.5,1,1])
 with c1: user_rate = st.number_input("Курс $:", value=44.55) 
-with c2: st.write(f"Обновлено: **{last_run.get('time', '—')}**")
+with c2: 
+    st.write(f"Обновлено: **{last_run.get('time', '—')}**")
+    st.write(f"Курс Минфина (продажа): **{minfin_rate}**")
 with c3: 
     if st.button("♻️ ОБНОВИТЬ"): 
         run_parsing()
@@ -136,30 +138,30 @@ for i, t_tag in enumerate(tags):
         for k, logs in db.items():
             if logs and logs[-1].get('type') == t_tag:
                 p = k.split(" | ")
-                items.append({'M': p[0], 'S': p[1], 'P': logs[-1]['price'], 'C': logs[-1]['cat'], 'O': logs[-1].get('order', 999)})
+                items.append({'Модель': p[0], 'Магазин': p[1], 'Цена': logs[-1]['price'], 'Категория': logs[-1]['cat'], 'order': logs[-1].get('order', 999)})
         
         df_tab = pd.DataFrame(items)
         if not df_tab.empty:
-            sel_cat = st.selectbox(f"Категория:", df_tab['C'].unique(), key=f"s_{t_tag}")
-            f_df = df_tab[df_tab['C'] == sel_cat].copy().sort_values('O')
+            sel_cat = st.selectbox(f"Выбор категории:", df_tab['Категория'].unique(), key=f"s_{t_tag}")
+            f_df = df_tab[df_tab['Категория'] == sel_cat].copy().sort_values('order')
             if not f_df.empty:
-                f_df['Display'] = f_df['P'].apply(lambda x: f'<span class="uah">{x:,} ₴</span><span class="usd">{int(x/user_rate):,} $</span>')
-                pivot = f_df.pivot_table(index='M', columns='S', values='Display', aggfunc='first', sort=False).fillna('—')
+                f_df['Display'] = f_df['Цена'].apply(lambda x: f'<span class="uah">{x:,} ₴</span><span class="usd">{int(x/user_rate):,} $</span>')
+                pivot = f_df.pivot_table(index='Модель', columns='Магазин', values='Display', aggfunc='first', sort=False).fillna('—')
                 st.markdown(f'<div class="table-container">{pivot.to_html(escape=False)}</div>', unsafe_allow_html=True)
         
-        with st.expander(f"📜 История ({'Б/У' if t_tag=='u' else 'Новые'})"):
+        with st.expander(f"📜 История изменений"):
             h_list = []
             for k, logs in db.items():
                 if logs and logs[-1].get('type') == t_tag:
                     p = k.split(" | ")
-                    h_list.append({'M': p[0], 'S': p[1], 'C': logs[-1]['cat']})
+                    h_list.append({'Модель': p[0], 'Магазин': p[1], 'Категория': logs[-1]['cat']})
             
             if h_list:
                 h_df = pd.DataFrame(h_list)
                 f1, f2, f3 = st.columns(3)
-                with f1: hc = st.selectbox("Категория", h_df['C'].unique(), key=f"hc_{t_tag}")
-                with f2: hm = st.selectbox("Модель", h_df[h_df['C'] == hc]['M'].unique(), key=f"hm_{t_tag}")
-                with f3: hs = st.selectbox("Магазин", h_df[(h_df['C'] == hc) & (h_df['M'] == hm)]['S'].unique(), key=f"hs_{t_tag}")
+                with f1: hc = st.selectbox("Категория", h_df['Категория'].unique(), key=f"hc_{t_tag}")
+                with f2: hm = st.selectbox("Модель", h_df[h_df['Категория'] == hc]['Модель'].unique(), key=f"hm_{t_tag}")
+                with f3: hs = st.selectbox("Магазин", h_df[(h_df['Категория'] == hc) & (h_df['Модель'] == hm)]['Магазин'].unique(), key=f"hs_{t_tag}")
                 
                 h_key = f"{hm} | {hs} | {t_tag}"
                 if h_key in db:
