@@ -18,7 +18,6 @@ KIEV_TZ = pytz.timezone('Europe/Kyiv')
 
 st.set_page_config(page_title="Мониторинг цен", layout="wide")
 
-# Стили для таблиц и логов
 st.markdown("""
     <style>
     .block-container { padding: 1rem !important; }
@@ -36,21 +35,20 @@ st.markdown("""
 
 # --- ФУНКЦИИ ---
 def get_live_rate():
-    """Парсинг курса доллара с Минфина"""
     try:
         url = "https://minfin.com.ua/currency/"
         r = requests.get(url, headers={'User-Agent': 'Mozilla/5.0'}, timeout=10)
         soup = BeautifulSoup(r.text, 'html.parser')
-        # Ищем средний курс продажи в обменниках
-        rate_el = soup.find('div', {'class': 'sc-1x32wa2-9'}) 
-        if not rate_el: # Запасной вариант если верстка сменится
-            rate_el = soup.select_one('span.mfm-pos-relative')
+        # Ищем курс продажи доллара
+        rate_el = soup.select_one('span.mfm-pos-relative')
+        if not rate_el:
+            rate_el = soup.find('div', {'class': 'sc-1x32wa2-9'})
         
         rate_text = rate_el.text.replace(',', '.')
         rate = float(re.findall(r"\d+\.\d+", rate_text)[0])
         return rate
     except:
-        return 44.55 # Запасной курс если сайт упал
+        return 44.55
 
 def load_data(file):
     if os.path.exists(file):
@@ -106,12 +104,10 @@ def run_parsing():
 # --- ИНТЕРФЕЙС ---
 st.title("📱 Мониторинг")
 
-# Получаем актуальный курс
 current_rate = get_live_rate()
 
 c1, c2, c3 = st.columns([1, 1, 1])
 with c1:
-    # Показываем спарсенный курс, но даем возможность подправить вручную
     rate = st.number_input("Курс $ (Минфин):", value=current_rate, step=0.01)
 with c2:
     st.write(f"Обновлено: **{load_data(LAST_RUN_FILE).get('time', '—')}**")
@@ -134,7 +130,13 @@ if db:
             for k, logs in db.items():
                 if logs and logs[-1].get('type') == t_tag:
                     m, s = k.split(" | ")
-                    rows.append({'Модель': m, 'Магазин': s, 'Цена_ГРН': logs[-1]['price'], 'Кат': logs[-1].get('cat', '1'), 'Key': k})
+                    rows.append({
+                        'Модель': m, 
+                        'Магазин': s, 
+                        'Цена_ГРН': logs[-1]['price'], 
+                        'Кат': logs[-1].get('cat', '1'), 
+                        'Key': k
+                    })
             
             df_tab = pd.DataFrame(rows)
             
@@ -146,14 +148,14 @@ if db:
                 pivot = f_df.pivot_table(index='Модель', columns='Магазин', values='Цена', aggfunc='first').fillna('—')
                 st.markdown(f'<div class="table-container">{pivot.to_html(escape=False)}</div>', unsafe_allow_html=True)
                 
-                # 2. ЛОГИ (С КУРСОМ $)
+                # 2. ИСТОРИЯ (ЛОГИ)
                 st.markdown("<br>", unsafe_allow_html=True)
                 with st.expander(f"📜 История изменений ({tab_names[i]})", expanded=True):
                     f1, f2, f3 = st.columns(3)
                     with f1:
                         l_cat = st.selectbox("1. Категория поиска", sorted(df_tab['Кат'].unique()), key=f"log_cat_{t_tag}")
                     with f2:
-                        models_in_cat = df_tab[df_tab['Cat'] == l_cat]['Модель'].unique() if 'Cat' in df_tab else df_tab[df_tab['Кат'] == l_cat]['Модель'].unique()
+                        models_in_cat = df_tab[df_tab['Кат'] == l_cat]['Модель'].unique()
                         l_mod = st.selectbox("2. Модель", sorted(models_in_cat), key=f"log_mod_{t_tag}")
                     with f3:
                         shops_for_mod = df_tab[(df_tab['Кат'] == l_cat) & (df_tab['Модель'] == l_mod)]['Магазин'].unique()
@@ -163,10 +165,10 @@ if db:
                     if final_key in db:
                         st.divider()
                         for e in reversed(db[final_key]):
-                            price_uah = e['price']
-                            price_usd = int(price_uah / rate)
-                            # Вывод даты и цены с выделением доллара красным в кавычках
-                            st.markdown(f"{e['time']} — **{price_uah:,} ₴** <span class="log-usd">({price_usd:,} $)</span>", unsafe_allow_html=True)
+                            p_uah = e['price']
+                            p_usd = int(p_uah / rate)
+                            # Использование одинарных кавычек внутри f-строки
+                            st.markdown(f"{e['time']} — **{p_uah:,} ₴** <span class='log-usd'>({p_usd:,} $)</span>", unsafe_allow_html=True)
             else:
                 st.info("Нет данных")
 else:
