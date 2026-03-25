@@ -2,7 +2,7 @@ name: Hourly Price Check
 
 on:
   schedule:
-    - cron: '0 * * * *'  # Запуск в 00 минут каждого часа
+    - cron: '0 * * * *'  # Запуск ровно в 00 минут каждого часа
   workflow_dispatch:      # Кнопка для ручного запуска
 
 jobs:
@@ -19,7 +19,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install pandas requests beautifulsoup4 pytz lxml
+          pip install pandas requests beautifulsoup4 pytz lxml streamlit
 
       - name: Run parser
         run: python app.py --parse
