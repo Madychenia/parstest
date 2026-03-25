@@ -6,32 +6,45 @@ import time
 import re
 from datetime import datetime
 
-st.set_page_config(page_title="Price Monitor PRO", layout="wide")
+# Настройка страницы (убираем меню и отступы)
+st.set_page_config(page_title="Price Monitor PRO", layout="wide", initial_sidebar_state="collapsed")
 
-# Стиль для компактности и цветов
+# Продвинутый CSS: скрываем боковое меню, красим цены, ровняем кнопки
 st.markdown("""
     <style>
+    [data-testid="stSidebar"] { display: none; }
     .uah { color: black; font-weight: bold; }
     .usd { color: #FF4B4B; font-weight: bold; }
-    .last-update { font-size: 14px; color: gray; }
-    div[data-testid="stColumn"] { display: flex; align-items: center; }
+    .update-text { font-size: 14px; color: gray; line-height: 1.2; }
+    /* Центрируем таблицу и кнопки */
+    .stButton button { width: 100%; margin-top: 25px; }
+    table { width: 100% !important; border-radius: 10px; overflow: hidden; }
+    th { background-color: #f0f2f6 !important; }
     </style>
     """, unsafe_allow_html=True)
 
 st.title("📱 Мониторинг цен")
 
-# --- ВЕРХНЯЯ ПАНЕЛЬ (Курс и Время) ---
-col1, col2 = st.columns([1, 2])
-with col1:
-    user_rate = st.number_input("Курс ($):", value=44.55, step=0.05)
-with col2:
-    # Показываем время прямо сейчас
-    now = datetime.now().strftime("%d.%m.%Y %H:%M:%S")
-    st.markdown(f"<p class='last-update'>Последняя проверка цен:<br><b>{now}</b> (обновление раз в сутки)</p>", unsafe_allow_html=True)
+# --- ВЕРХНЯЯ ПАНЕЛЬ ---
+col_rate, col_time, col_btn = st.columns([1.5, 2.5, 1.5])
 
-# --- ФУНКЦИЯ ПАРСИНГА (с кэшем на 24 часа) ---
-@st.cache_data(ttl=86400) # 86400 секунд = 24 часа
-def fetch_all_prices(file_name, rate):
+with col_rate:
+    user_rate = st.number_input("Курс ($):", value=44.55, step=0.01)
+
+with col_time:
+    # Показываем время последнего захода/обновления
+    now = datetime.now().strftime("%H:%M:%S")
+    today = datetime.now().strftime("%d.%m.%Y")
+    st.markdown(f"<p class='update-text'>Дата: <b>{today}</b><br>Проверка в: <b>{now}</b></p>", unsafe_allow_html=True)
+
+with col_btn:
+    if st.button("♻️ ОБНОВИТЬ СЕЙЧАС"):
+        st.cache_data.clear()
+        st.rerun()
+
+# --- ФУНКЦИЯ ПАРСИНГА (кэш на 24 часа) ---
+@st.cache_data(ttl=86400)
+def fetch_prices(file_name, rate):
     try:
         df = pd.read_csv(file_name, sep=None, engine='python', encoding='utf-8-sig')
         df.columns = [str(c).strip().lower() for c in df.columns]
@@ -44,47 +57,40 @@ def fetch_all_prices(file_name, rate):
             selector = row.get('селектор')
             price_uah = None
             
-            if url and not pd.isna(url):
+            if url and not pd.isna(url) and str(url).startswith('http'):
                 try:
                     r = requests.get(url, headers=headers, timeout=10)
                     soup = BeautifulSoup(r.text, 'html.parser')
                     element = soup.select_one(selector)
                     if element:
-                        clean_price = re.sub(r'\D', '', element.text.strip())
-                        price_uah = int(clean_price)
-                except:
-                    pass
+                        price_uah = int(re.sub(r'\D', '', element.text.strip()))
+                except: pass
 
             if price_uah:
                 price_usd = round(price_uah / rate, 1)
-                display_val = f'<span class="uah">{price_uah:,} ₴</span> / <span class="usd">{price_usd}$</span>'
+                val = f'<span class="uah">{price_uah:,} ₴</span> / <span class="usd">{price_usd}$</span>'
             else:
-                display_val = "—"
+                val = "—"
 
             results.append({
                 'Модель': row.get('модель', '—'),
                 'Магазин': row.get('магазин', '—'),
-                'Цена': display_val
+                'Цена': val
             })
-            time.sleep(0.2) # Небольшая пауза, чтобы не забанили
+            time.sleep(0.1)
             
         res_df = pd.DataFrame(results)
         return res_df.pivot_table(index='Модель', columns='Магазин', values='Цена', aggfunc='first')
     except Exception as e:
-        return pd.DataFrame([{"Ошибка": str(e)}])
+        return pd.DataFrame([{"Ошибка": "Проверьте файлы CSV"}])
 
-# --- ВКЛАДКИ ---
-tab1, tab2 = st.tabs(["📦 ОПТ", "🛍️ РОЗНИЦА"])
+# --- ТАБЛИЦЫ ---
+tab_opt, tab_roz = st.tabs(["📦 ОПТ", "🛍️ РОЗНИЦА"])
 
-with tab1:
-    data_opt = fetch_all_prices('links.csv', user_rate)
-    st.write(data_opt.to_html(escape=False), unsafe_allow_html=True)
+with tab_opt:
+    with st.spinner('Парсинг ОПТ...'):
+        st.write(fetch_prices('links.csv', user_rate).to_html(escape=False), unsafe_allow_html=True)
 
-with tab2:
-    data_roz = fetch_all_prices('links_r.csv', user_rate)
-    st.write(data_roz.to_html(escape=False), unsafe_allow_html=True)
-
-# Кнопка для принудительного сброса кэша (если вдруг надо обновить прямо сейчас)
-if st.sidebar.button("♻️ Обновить принудительно"):
-    st.cache_data.clear()
-    st.rerun()
+with tab_roz:
+    with st.spinner('Парсинг РОЗНИЦА...'):
+        st.write(fetch_prices('links_r.csv', user_rate).to_html(escape=False), unsafe_allow_html=True)
