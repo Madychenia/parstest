@@ -7,6 +7,7 @@ from datetime import datetime
 import pytz
 import json
 import os
+import time
 
 # --- КОНФИГ ---
 TELEGRAM_TOKEN = "8673005085:AAG-vDGUu4buhPHmMYoJt1a7UueVIywvAyQ"
@@ -17,7 +18,7 @@ KIEV_TZ = pytz.timezone('Europe/Kyiv')
 
 st.set_page_config(page_title="Мониторинг", layout="wide")
 
-# СТИЛИ: Красный доллар и скрытые заголовки
+# СТИЛИ
 st.markdown("""
     <style>
     .block-container { padding: 1rem !important; }
@@ -53,19 +54,34 @@ def run_parsing():
     now = datetime.now(KIEV_TZ).strftime('%d.%m %H:%M')
     mapping = {'links.csv': 'u', 'links_new.csv': 'n'}
     
+    # Считаем общее кол-во строк для прогресс-бара
+    total_tasks = 0
+    tasks = []
     for f_name, tag in mapping.items():
-        if not os.path.exists(f_name): continue
-        # Читаем CSV строго по порядку
-        df = pd.read_csv(f_name, sep=';', engine='python', encoding='utf-8-sig')
+        if os.path.exists(f_name):
+            tdf = pd.read_csv(f_name, sep=';', engine='python', encoding='utf-8-sig')
+            total_tasks += len(tdf)
+            tasks.append((f_name, tag, tdf))
+
+    if total_tasks == 0: return
+    
+    progress_bar = st.progress(0)
+    status_text = st.empty()
+    current_step = 0
+
+    for f_name, tag, df in tasks:
         df.columns = [c.strip().lower() for c in df.columns]
-        
         for idx, row in df.iterrows():
+            current_step += 1
             m = str(row.get('модель','')).strip()
             s = str(row.get('магазин','')).strip()
             u = str(row.get('ссылка','')).strip()
             sel = str(row.get('селектор','')).strip()
             c = str(row.get('категория','')).strip()
             
+            status_text.text(f"⏳ Проверяю ({current_step}/{total_tasks}): {m} — {s}")
+            progress_bar.progress(current_step / total_tasks)
+
             if u.startswith('http') and sel and sel != 'nan':
                 try:
                     r = requests.get(u, headers={'User-Agent': 'Mozilla/5.0'}, timeout=10)
@@ -74,16 +90,20 @@ def run_parsing():
                     if el:
                         price_val = clean_price(el.text)
                         if price_val:
-                            # Ключ теперь уникален для типа, чтобы не было путаницы
                             key = f"{m} | {s} | {tag}"
-                            history[key] = history.get(key, [])
+                            if key not in history: history[key] = []
                             history[key].append({
                                 'time': now, 'price': price_val, 'cat': c, 
                                 'type': tag, 'order': idx
                             })
                 except: pass
+    
     save_data(HISTORY_FILE, history)
     save_data(LAST_RUN_FILE, {'time': now})
+    status_text.success(f"✅ Обновление завершено в {now}")
+    time.sleep(1)
+    status_text.empty()
+    progress_bar.empty()
 
 # --- ИНТЕРФЕЙС ---
 st.title("📱 Мониторинг")
@@ -102,7 +122,7 @@ with c4:
     if st.button("🗑 СБРОСИТЬ БАЗУ"):
         if os.path.exists(HISTORY_FILE): 
             os.remove(HISTORY_FILE)
-            st.success("База очищена! Нажмите ОБНОВИТЬ")
+        st.cache_data.clear()
         st.rerun()
 
 tabs = st.tabs(["Used (Б/У)", "New (Новые)"])
@@ -121,16 +141,12 @@ for i, t_tag in enumerate(tags):
         
         df_tab = pd.DataFrame(items)
         if not df_tab.empty:
-            # Сохраняем порядок категорий как в файле
             cats = df_tab['C'].unique() 
             sel_cat = st.selectbox("Категория:", cats, key=f"s_{t_tag}")
-            
             f_df = df_tab[df_tab['C'] == sel_cat].copy()
             if not f_df.empty:
-                # Сортируем модели по их порядку в CSV
                 f_df = f_df.sort_values('O')
                 f_df['Display'] = f_df['P'].apply(lambda x: f'<span class="uah">{x:,} ₴</span><span class="usd">{int(x/user_rate):,} $</span>')
-                
                 pivot = f_df.pivot_table(index='M', columns='S', values='Display', aggfunc='first', sort=False).fillna('—')
                 pivot.index.name = None
                 pivot.columns.name = None
@@ -149,7 +165,6 @@ with st.expander("📜 История изменений (Used)"):
         with f1: h_cat = st.selectbox("1. Категория", h_df['C'].unique(), key="h_cat")
         with f2: h_mod = st.selectbox("2. Модель", h_df[h_df['C'] == h_cat]['M'].unique(), key="h_mod")
         with f3: h_shop = st.selectbox("3. Поставщик", h_df[(h_df['C'] == h_cat) & (h_df['M'] == h_mod)]['S'].unique(), key="h_shop")
-        
         h_key = f"{h_mod} | {h_shop} | u"
         if h_key in db:
             for e in reversed(db[h_key]):
