@@ -106,6 +106,10 @@ st.markdown("""<style>
     table { margin: 0 auto; border-collapse: collapse; }
     th, td { padding: 4px 6px !important; border: 1px solid #eee !important; font-size: 0.85em; text-align: center !important; }
     tbody tr th { background-color: #f8f9fa !important; font-weight: bold; border-right: 2px solid #ddd !important; }
+    
+    /* СКРЫВАЕМ ПУСТУЮ ВЕРХНЮЮ СТРОКУ (ТЕ САМЫЕ ЯЧЕЙКИ) */
+    thead tr:nth-child(1) { display: none; }
+    
     .uah { color: #1a1a1a; font-weight: 800; display: block; }
     .usd { color: #FF4B4B; font-weight: 700; font-size: 0.9em; }
     .log-usd { color: #FF4B4B; font-weight: bold; }
@@ -118,7 +122,7 @@ last_run = load_data(LAST_RUN_FILE)
 
 c1, c2, c3, c4 = st.columns([1,1.5,1,1])
 with c1: 
-    # УБРАЛИ СЛОВО "КУРС"
+    # Поле ввода курса без текста "Курс $:"
     user_rate = st.number_input("", value=44.55, label_visibility="collapsed") 
 with c2: 
     st.write(f"Обновлено: **{last_run.get('time', '—')}**")
@@ -151,7 +155,7 @@ for i, t_tag in enumerate(tabs):
             
             if not f_df.empty:
                 f_df['Display'] = f_df['Цена'].apply(lambda x: f'<span class="uah">{x:,} ₴</span><span class="usd">{int(x/user_rate):,} $</span>')
-                # ПУСТЫЕ ЗАГОЛОВКИ В ТАБЛИЦЕ
+                # Формируем таблицу без лишних названий
                 pivot = f_df.pivot_table(index='M', columns='S', values='Display', aggfunc='first', sort=False).fillna('—')
                 pivot.index.name = ""
                 pivot.columns.name = ""
