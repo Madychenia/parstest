@@ -3,7 +3,7 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 import re
-from datetime import datetime, timedelta
+from datetime import datetime
 import pytz
 import json
 import os
@@ -17,7 +17,6 @@ KIEV_TZ = pytz.timezone('Europe/Kyiv')
 
 st.set_page_config(page_title="Мониторинг цен PRO", layout="wide")
 
-# CSS для мобильных (фиксация первой колонки)
 st.markdown("""
     <style>
     .block-container { padding: 1rem !important; }
@@ -34,10 +33,12 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- ФУНКЦИИ ХРАНЕНИЯ ---
+# --- ФУНКЦИИ ---
 def load_history():
     if os.path.exists(HISTORY_FILE):
-        with open(HISTORY_FILE, 'r', encoding='utf-8') as f: return json.load(f)
+        try:
+            with open(HISTORY_FILE, 'r', encoding='utf-8') as f: return json.load(f)
+        except: return {}
     return {}
 
 def save_history(data):
@@ -46,7 +47,9 @@ def save_history(data):
 
 def get_last_run():
     if os.path.exists(LAST_RUN_FILE):
-        with open(LAST_RUN_FILE, 'r') as f: return json.load(f).get('time', 'Никогда')
+        try:
+            with open(LAST_RUN_FILE, 'r') as f: return json.load(f).get('time', 'Никогда')
+        except: return "Никогда"
     return "Никогда"
 
 def update_last_run():
@@ -59,20 +62,25 @@ def send_tg(msg):
         requests.post(url, data={"chat_id": CHAT_ID, "text": msg, "parse_mode": "HTML"}, timeout=5)
     except: pass
 
-# --- ПАРСЕР (ФОНОВЫЙ) ---
+# --- ПАРСЕР ---
 def run_parsing():
     history = load_history()
     now_kiev = datetime.now(KIEV_TZ).strftime('%d.%m %H:%M')
     
-    for f_name in ['links.csv', 'links_new.csv']:
+    # Помечаем в истории, из какого файла пришел товар (u - used, n - new)
+    config = {'links.csv': 'u', 'links_new.csv': 'n'}
+    
+    for f_name, tag in config.items():
         if not os.path.exists(f_name): continue
         df = pd.read_csv(f_name, sep=None, engine='python')
         df.columns = [c.strip().lower() for c in df.columns]
         
         for _, row in df.iterrows():
-            model, shop = str(row.get('модель', '')), str(row.get('магазин', ''))
-            url, sel = str(row.get('ссылка', '')), str(row.get('селектор', ''))
-            cat = str(row.get('категория', 'Без категории'))
+            model = str(row.get('модель', '')).strip()
+            shop = str(row.get('магазин', '')).strip()
+            url = str(row.get('ссылка', '')).strip()
+            sel = str(row.get('селектор', '')).strip()
+            cat = str(row.get('категория', 'Без категории')).strip()
             key = f"{model} | {shop}"
             
             if url.startswith('http'):
@@ -87,12 +95,12 @@ def run_parsing():
                         last = history[key][-1] if history[key] else None
                         if not last or last['price'] != price:
                             if last: send_tg(f"🔔 <b>{model}</b>\n{shop}: <b>{price:,} ₴</b>")
-                            history[key].append({'time': now_kiev, 'price': price, 'cat': cat})
+                            history[key].append({'time': now_kiev, 'price': price, 'cat': cat, 'type': tag})
                         else:
-                            # Обновляем категорию, если она изменилась в CSV
+                            # Обновляем метаданные
                             history[key][-1]['cat'] = cat
+                            history[key][-1]['type'] = tag
                 except: pass
-    
     save_history(history)
     update_last_run()
 
@@ -110,33 +118,31 @@ with c2:
             st.rerun()
 with c3:
     if st.button("🔔 ТЕСТ ТГ", use_container_width=True):
-        send_tg("✅ Связь с ботом установлена!")
+        send_tg("✅ Связь установлена!")
         st.toast("Отправлено")
 
-# ОСНОВНОЙ ВЫВОД
 hist_db = load_history()
 
 if hist_db:
     t1, t2 = st.tabs(["Used (Б/У)", "New (Новые)"])
+    tags = ['u', 'n']
     
-    # Собираем данные для таблиц
     for i, tab in enumerate([t1, t2]):
         with tab:
             items = []
             for key, logs in hist_db.items():
                 if not logs: continue
                 last = logs[-1]
-                mod, shp = key.split(" | ")
-                # Фильтр по файлам: упрощенно, если в links.csv - Used, в links_new - New
-                # Для точности используем категории из логов
-                items.append({
-                    'Модель': mod, 'Магазин': shp, 
-                    'Цена_ГРН': last['price'], 'Категория': last.get('cat', 'Без категории')
-                })
+                # Проверяем метку типа (Used/New)
+                if last.get('type') == tags[i]:
+                    mod, shp = key.split(" | ")
+                    items.append({
+                        'Модель': mod, 'Магазин': shp, 
+                        'Цена_ГРН': last['price'], 'Категория': last.get('cat', 'Без категории')
+                    })
             
             df = pd.DataFrame(items)
             if not df.empty:
-                # Фильтр категорий
                 cats = sorted(df['Категория'].unique())
                 sel_cat = st.selectbox("Категория:", cats, key=f"sel_{i}")
                 
@@ -146,19 +152,19 @@ if hist_db:
                     return f'<span class="uah">{int(v):,} ₴</span><span class="usd">{int(round(v/rate)):,} $</span>'
 
                 f_df['Цена'] = f_df['Цена_ГРН'].apply(make_cell)
-                pivot = f_df.pivot(index='Model', columns='Shop', values='Price') # Исправлено на правильные ключи
-                # Но лучше использовать безопасный pivot:
-                pivot = f_df.pivot_table(index='Модель', columns='Магазин', values='Цена', aggfunc='first').fillna('—')
                 
+                # Исправленный Pivot без ошибок
+                pivot = f_df.pivot_table(index='Модель', columns='Магазин', values='Цена', aggfunc='first').fillna('—')
                 st.markdown(f'<div class="table-container">{pivot.to_html(escape=False)}</div>', unsafe_allow_html=True)
+            else:
+                st.info("В этой категории пока нет данных.")
 
-    # --- ИСТОРИЯ ЦЕН ВНИЗУ ---
     st.markdown("---")
     with st.expander("📜 История изменений (Логи)"):
         all_keys = sorted(hist_db.keys())
         sel_key = st.selectbox("Выберите устройство:", all_keys)
         if sel_key in hist_db:
             for e in reversed(hist_db[sel_key]):
-                st.write(f"📅 {e['time']} — **{e['price']:,} ₴**")
+                st.write(f"📅 {e['time']} — **{e['price']:,} ₴** ({e.get('cat', '—')})")
 else:
-    st.warning("База данных пуста. Нажми 'ОБНОВИТЬ ВСЁ', чтобы собрать цены в первый раз.")
+    st.warning("База пуста. Нажми 'ОБНОВИТЬ ВСЁ'.")
