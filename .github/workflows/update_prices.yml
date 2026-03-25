@@ -1,52 +1,33 @@
-name: Update Prices & Take Screenshots
+name: Hourly Price Check
 
 on:
   schedule:
-    - cron: '*/10 * * * *'
-  push:
-    branches: [ main ]
-  workflow_dispatch:
-
-permissions:
-  contents: write
+    - cron: '0 * * * *'  # Ровно в 00 минут каждого часа
+  workflow_dispatch:      # Чтобы можно было запустить кнопкой вручную
 
 jobs:
-  update:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+        uses: actions/checkout@v3
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.9'
 
       - name: Install dependencies
         run: |
-          pip install pandas requests beautifulsoup4 pytz streamlit
+          pip install pandas requests beautifulsoup4 pytz
 
       - name: Run parser
-        run: |
-          python app.py --parse
+        run: python app.py --parse
 
       - name: Commit and push changes
         run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          
-          # Забираем только файлы базы данных, чтобы не конфликтовать с кодом
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add price_history.json last_run.json
-          
-          # Если изменений в ценах нет — просто выходим
-          if git diff --staged --quiet; then
-            echo "No price changes to commit"
-            exit 0
-          fi
-          
-          git commit -m "Auto-update prices [skip ci]"
-          
-          # Силовой метод: если обычный push не идет, делаем pull и пробуем снова
-          git push origin main || (git pull origin main --rebase && git push origin main)
+          git commit -m "Hourly price update" || echo "No changes to commit"
+          git push
