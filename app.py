@@ -19,14 +19,13 @@ KIEV_TZ = pytz.timezone('Europe/Kyiv')
 
 st.set_page_config(page_title="Мониторинг", layout="wide")
 
+# Стили (скрываем заголовки Модель/Магазин)
 st.markdown("""
     <style>
     .block-container { padding: 1rem !important; }
     .table-container { overflow-x: auto; width: 100%; border: 1px solid #eee; }
     th, td { padding: 8px !important; border: 1px solid #eee !important; font-size: 0.85em; text-align: center !important; }
-    /* Скрываем заголовки индексных осей для чистоты */
-    .blank { display: none; }
-    .index_name { display: none; }
+    .blank, .index_name { display: none !important; }
     td:first-child, th:first-child { 
         position: sticky; left: 0; background: #f8f9fa; z-index: 2; 
         font-weight: bold; border-right: 2px solid #ddd !important; 
@@ -39,7 +38,6 @@ st.markdown("""
     """, unsafe_allow_html=True)
 
 # --- ФУНКЦИИ ---
-@st.cache_data(ttl=3600)
 def get_minfin_sell_rate():
     try:
         url = "https://minfin.com.ua/currency/"
@@ -50,7 +48,7 @@ def get_minfin_sell_rate():
             rate_text = rates[1].text.replace(',', '.')
             val = float(re.findall(r"\d+\.\d+", rate_text)[0])
             return val
-        return 44.15
+        return 44.15 #
     except:
         return 44.15
 
@@ -73,35 +71,15 @@ def clean_price(text):
         return val if val > 1000 else None
     except: return None
 
-def send_excel_to_tg(df_pivot, cat_name, user_rate, minfin_rate):
-    try:
-        output = io.BytesIO()
-        clean_df = df_pivot.copy()
-        for col in clean_df.columns:
-            clean_df[col] = clean_df[col].apply(lambda x: re.sub('<[^<]+?>', ' ', str(x)) if x != '—' else x)
-        with pd.ExcelWriter(output, engine='openpyxl') as writer:
-            clean_df.to_excel(writer, sheet_name='Цены')
-        output.seek(0)
-        now = datetime.now(KIEV_TZ).strftime('%d.%m %H:%M')
-        caption = f"📄 Таблица: {cat_name}\n📅 Дата: {now}\n👤 Ваш курс: {user_rate}\n🏦 Минфин: {minfin_rate}"
-        url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendDocument"
-        files = {'document': (f"prices_{cat_name}_{now}.xlsx", output)}
-        data = {'chat_id': CHAT_ID, 'caption': caption}
-        requests.post(url, files=files, data=data)
-        st.success("✅ Отправлено!")
-    except Exception as e:
-        st.error(f"Ошибка: {e}")
-
 def run_parsing():
     history = load_data(HISTORY_FILE)
     errors = []
-    is_first = len(history) == 0
     now = datetime.now(KIEV_TZ).strftime('%d.%m %H:%M')
     mapping = {'links.csv': 'u', 'links_new.csv': 'n'}
     
     for f_name, tag in mapping.items():
         if not os.path.exists(f_name): continue
-        # Пытаемся определить разделитель автоматом
+        # Читаем CSV с авто-определением разделителя
         df = pd.read_csv(f_name, sep=None, engine='python', encoding='utf-8-sig')
         df.columns = [c.strip().lower() for c in df.columns]
         
@@ -110,7 +88,7 @@ def run_parsing():
             s = str(row.get('магазин', '—')).strip()
             u = str(row.get('ссылка', '')).strip()
             sel = str(row.get('селектор', '')).strip()
-            c = str(row.get('категория', '1')).strip()
+            c = str(row.get('категория', '1')).strip() # Берем категорию из файла
             key = f"{m} | {s}"
             
             if u.startswith('http'):
@@ -124,7 +102,7 @@ def run_parsing():
                         if key not in history: history[key] = []
                         last = history[key][-1] if history[key] else None
                         if not last or last['price'] != price:
-                            if last and not is_first:
+                            if last:
                                 msg = f"🔔 <b>{m}</b>\n{s}: <b>{price:,} ₴</b>"
                                 requests.post(f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage", 
                                               data={"chat_id": CHAT_ID, "text": msg, "parse_mode": "HTML"})
@@ -141,7 +119,7 @@ def run_parsing():
 st.title("📱 Мониторинг")
 
 minfin_rate = get_minfin_sell_rate()
-last_run = load_data(LAST_RUN_FILE)
+last_run = load_data(LAST_RUN_FILE) # Читаем без кэша
 
 c1, c2, c3 = st.columns([1, 1, 1])
 with c1:
@@ -151,12 +129,12 @@ with c2:
     st.caption(f"Курс Минфина: {minfin_rate}")
 with c3:
     if st.button("♻️ ОБНОВИТЬ ВСЁ"):
-        with st.spinner("Обновляю..."):
+        with st.spinner("Синхронизация..."):
             run_parsing()
             st.rerun()
 
 if last_run.get('errors'):
-    with st.expander("⚠️ Ошибки парсинга"):
+    with st.expander("⚠️ Проблемы"):
         for err in last_run['errors']:
             st.markdown(f'<p class="status-error">{err}</p>', unsafe_allow_html=True)
 
@@ -186,25 +164,18 @@ if db:
             
             if not df_tab.empty:
                 cat_list = sorted(df_tab['Кат'].unique())
-                col_sel, col_btn = st.columns([3, 1])
+                col_sel, _ = st.columns([3, 1])
                 with col_sel:
                     sel_cat = st.selectbox("Категория:", cat_list, key=f"s_{t_tag}")
                 
                 f_df = df_tab[df_tab['Кат'] == sel_cat].copy()
                 
                 if not f_df.empty:
+                    # ТВОЙ КУРС ДЛЯ ТАБЛИЦЫ
                     f_df['Цена'] = f_df['Цена_ГРН'].apply(lambda x: f'<span class="uah">{x:,} ₴</span><span class="usd">{int(x/user_rate):,} $</span>')
-                    
-                    # Таблица БЕЗ названий индексов (чисто модель и магазины)
                     pivot = f_df.pivot_table(index='Модель', columns='Магазин', values='Цена', aggfunc='first').fillna('—')
                     pivot.index.name = None
                     pivot.columns.name = None
-                    
-                    with col_btn:
-                        st.write("") 
-                        if st.button("📊 Excel", key=f"b_{t_tag}"):
-                            send_excel_to_tg(pivot, sel_cat, user_rate, minfin_rate)
-
                     st.markdown(f'<div class="table-container">{pivot.to_html(escape=False)}</div>', unsafe_allow_html=True)
                 
                 st.markdown("<br>", unsafe_allow_html=True)
@@ -213,7 +184,7 @@ if db:
                     with f1:
                         l_cat = st.selectbox("1. Категория", cat_list, key=f"lc_{t_tag}")
                     with f2:
-                        mods = sorted(df_tab[df_tab['Кат'] == l_cat]['Модель'].unique())
+                        mods = sorted(df_tab[df_tab['Kat'] == l_cat]['Модель'].unique()) if 'Kat' in df_tab else sorted(df_tab[df_tab['Кат'] == l_cat]['Модель'].unique())
                         l_mod = st.selectbox("2. Модель", mods, key=f"lm_{t_tag}")
                     with f3:
                         shps = sorted(df_tab[(df_tab['Кат'] == l_cat) & (df_tab['Модель'] == l_mod)]['Магазин'].unique())
@@ -223,15 +194,14 @@ if db:
                     if final_key in db:
                         for e in reversed(db[final_key]):
                             p_uah = e['price']
+                            # КУРС МИНФИНА ДЛЯ ИСТОРИИ
                             p_usd_mf = int(p_uah / minfin_rate)
                             st.markdown(f"{e['time']} — **{p_uah:,} ₴** <span class='log-usd'>({p_usd_mf:,} $)</span>", unsafe_allow_html=True)
             else:
                 st.info("Пусто")
-else:
-    st.warning("Нет базы данных.")
 
-# ОТЛАДКА (скрой потом, если мешает)
-with st.expander("🛠 Отладка: Все ключи в базе"):
+# Отладка видна, чтобы мы проверили 13 128
+with st.expander("🛠 База данных (ключи)"):
     st.write(list(db.keys()))
 
 if __name__ == "__main__":
