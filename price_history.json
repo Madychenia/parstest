@@ -1,1 +1,154 @@
-{}
+{
+  "iPh 13 128 | Anika": [
+    {
+      "time": "25.03 15:43",
+      "price": 16524,
+      "cat": "1",
+      "type": "n"
+    }
+  ],
+  "iPh 13 256 | Anika": [
+    {
+      "time": "25.03 15:43",
+      "price": 20012,
+      "cat": "iPh 13",
+      "type": "u"
+    }
+  ],
+  "iPh 13 Pro 128 | Anika": [
+    {
+      "time": "25.03 15:43",
+      "price": 21756,
+      "cat": "iPh 13",
+      "type": "u"
+    }
+  ],
+  "iPh 13 Pro 256 | Anika": [
+    {
+      "time": "25.03 15:43",
+      "price": 24372,
+      "cat": "iPh 13",
+      "type": "u"
+    }
+  ],
+  "iPh 13 Pro 512 | Anika": [
+    {
+      "time": "25.03 15:43",
+      "price": 26988,
+      "cat": "iPh 13",
+      "type": "u"
+    }
+  ],
+  "iPh 13 Pro 1TB | Anika": [
+    {
+      "time": "25.03 15:43",
+      "price": 29604,
+      "cat": "iPh 13",
+      "type": "u"
+    }
+  ],
+  "iPh 13 Pro Max 128 | Anika": [
+    {
+      "time": "25.03 15:43",
+      "price": 24372,
+      "cat": "iPh 13",
+      "type": "u"
+    }
+  ],
+  "iPh 13 Pro Max 256 | Anika": [
+    {
+      "time": "25.03 15:43",
+      "price": 26988,
+      "cat": "iPh 13",
+      "type": "u"
+    }
+  ],
+  "iPh 13 Pro Max 512 | Anika": [
+    {
+      "time": "25.03 15:43",
+      "price": 30040,
+      "cat": "iPh 13",
+      "type": "u"
+    }
+  ],
+  "iPh 13 Pro Max 1TB | Anika": [
+    {
+      "time": "25.03 15:43",
+      "price": 32656,
+      "cat": "iPh 13",
+      "type": "u"
+    }
+  ],
+  "iPh 14 128 eSim | Anika": [
+    {
+      "time": "25.03 15:43",
+      "price": 19576,
+      "cat": "iPh 14 eSim",
+      "type": "u"
+    }
+  ],
+  "iPh 14 256 eSim | Anika": [
+    {
+      "time": "25.03 15:43",
+      "price": 21756,
+      "cat": "iPh 14 eSim",
+      "type": "u"
+    }
+  ],
+  "iPh 14 512 eSim | Anika": [
+    {
+      "time": "25.03 15:43",
+      "price": 26116,
+      "cat": "iPh 14 eSim",
+      "type": "u"
+    }
+  ],
+  "iPh 14 128 EU | Anika": [
+    {
+      "time": "25.03 15:43",
+      "price": 19576,
+      "cat": "iPh 14 EU",
+      "type": "u"
+    }
+  ],
+  "iPh 14 256 EU | Anika": [
+    {
+      "time": "25.03 15:43",
+      "price": 21756,
+      "cat": "iPh 14 EU",
+      "type": "u"
+    }
+  ],
+  "iPh 14 512 EU | Anika": [
+    {
+      "time": "25.03 15:43",
+      "price": 26116,
+      "cat": "iPh 14 EU",
+      "type": "u"
+    }
+  ],
+  "iPh 13 2561 | iStories": [
+    {
+      "time": "25.03 15:43",
+      "price": 16524,
+      "cat": "2",
+      "type": "n"
+    }
+  ],
+  "iPh 13 512 | Anika": [
+    {
+      "time": "25.03 15:43",
+      "price": 16524,
+      "cat": "3",
+      "type": "n"
+    }
+  ],
+  "iPh 13 2563 | iStories": [
+    {
+      "time": "25.03 15:43",
+      "price": 16524,
+      "cat": "4",
+      "type": "n"
+    }
+  ]
+}
