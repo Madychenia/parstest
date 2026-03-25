@@ -8,35 +8,39 @@ import pytz
 import json
 import os
 
-# --- НАСТРОЙКИ TELEGRAM (Данные применены) ---
+# --- НАСТРОЙКИ ---
 TELEGRAM_TOKEN = "8673005085:AAG-vDGUu4buhPHmMYoJt1a7UueVIywvAyQ"
 CHAT_ID = "258388401"
+HISTORY_FILE = 'price_history.json'
 
 st.set_page_config(page_title="Мониторинг цен PRO", layout="wide", initial_sidebar_state="collapsed")
 
-# Стили оформления
+# Улучшенный CSS для ровности и красоты
 st.markdown("""
     <style>
     [data-testid="stSidebar"] { display: none; }
-    .uah { color: black; font-weight: bold; font-size: 1.1em; }
-    .usd { color: #FF4B4B; font-weight: bold; }
+    .uah { color: black; font-weight: bold; font-size: 1.05em; line-height: 1.2; }
+    .usd { color: #FF4B4B; font-weight: bold; font-size: 0.95em; }
     .price-up { color: #d32f2f; font-weight: bold; }
     .price-down { color: #388e3c; font-weight: bold; }
-    td { text-align: center !important; padding: 12px !important; }
-    th { background-color: #f8f9fb !important; text-align: center !important; }
+    
+    /* Делаем таблицу ровной */
+    table { width: 100% !important; border-collapse: collapse; }
+    td { text-align: center !important; padding: 12px 8px !important; border: 1px solid #f0f2f6 !important; min-width: 100px; }
+    th { background-color: #f8f9fb !important; text-align: center !important; padding: 10px !important; }
+    
+    /* Компактные селекторы */
+    .stSelectbox, .stNumberInput { max-width: 300px; }
     </style>
     """, unsafe_allow_html=True)
 
 st.title("📱 Мониторинг цен PRO")
 
-# --- РАБОТА С ИСТОРИЕЙ (JSON) ---
-HISTORY_FILE = 'price_history.json'
-
+# --- ФУНКЦИИ ---
 def load_history():
     if os.path.exists(HISTORY_FILE):
         try:
-            with open(HISTORY_FILE, 'r', encoding='utf-8') as f:
-                return json.load(f)
+            with open(HISTORY_FILE, 'r', encoding='utf-8') as f: return json.load(f)
         except: return {}
     return {}
 
@@ -51,15 +55,19 @@ def send_telegram(message):
     except: pass
 
 # --- ПАНЕЛЬ УПРАВЛЕНИЯ ---
-col1, col2, col3 = st.columns([2, 2, 6])
-with col1:
-    user_rate = st.number_input("Рабочий курс ($):", value=44.55, step=0.01)
-with col2:
-    if st.button("♻️ ОБНОВИТЬ ВСЁ"):
+col_rate, col_btn, col_test = st.columns([2, 1.5, 1.5])
+with col_rate:
+    user_rate = st.number_input("Курс ($):", value=44.55, step=0.01)
+with col_btn:
+    if st.button("♻️ ОБНОВИТЬ ВСЁ", use_container_width=True):
         st.cache_data.clear()
         st.rerun()
+with col_test:
+    if st.button("🔔 ТЕСТ ТГ", use_container_width=True):
+        send_telegram("✅ <b>Связь установлена!</b>\nБот готов присылать изменения цен.")
+        st.toast("Тестовое сообщение отправлено!")
 
-# --- ОСНОВНОЙ ПРОЦЕСС ---
+# --- ПАРСИНГ ---
 @st.cache_data(ttl=3600)
 def fetch_and_track(file_name):
     history = load_history()
@@ -68,14 +76,14 @@ def fetch_and_track(file_name):
         df.columns = [str(c).strip().lower() for c in df.columns]
         results = []
         headers = {'User-Agent': 'Mozilla/5.0'}
-        
         kiev_tz = pytz.timezone('Europe/Kyiv')
-        now_str = datetime.now(kiev_tz).strftime('%d.%m %H:%M:%S')
+        now_str = datetime.now(kiev_tz).strftime('%d.%m %H:%M')
         
         for _, row in df.iterrows():
             p_uah = None
             model = str(row.get('модель', '—')).strip()
             shop = str(row.get('магазин', '—')).strip()
+            cat = str(row.get('категория', 'Без категории')).strip()
             item_id = f"{model} | {shop}"
             
             url = str(row.get('ссылка', '')).strip()
@@ -93,90 +101,86 @@ def fetch_and_track(file_name):
 
             if p_uah:
                 if item_id not in history: history[item_id] = []
-                
-                # Проверяем последнее изменение
-                last_entry = history[item_id][-1] if history[item_id] else None
-                
-                if not last_entry or last_entry['price'] != p_uah:
-                    change_text = ""
-                    if last_entry:
-                        diff = p_uah - last_entry['price']
-                        perc = (diff / last_entry['price']) * 100
+                last = history[item_id][-1] if history[item_id] else None
+                if not last or last['price'] != p_uah:
+                    if last:
+                        diff = p_uah - last['price']
+                        perc = (diff / last['price']) * 100
                         icon = "📈 Дороже" if diff > 0 else "📉 Дешевле"
-                        change_text = f"\n\n{icon} на <b>{abs(perc):.1f}%</b> ({diff:,} ₴)"
-                    
-                    # Пишем в лог
-                    history[item_id].append({'time': now_str, 'price': p_uah})
-                    
-                    # Шлем в ТГ только если это не первая запись в истории
-                    if last_entry:
-                        msg = f"🔔 <b>Изменение цены!</b>\n\n🔹 {model}\n🏪 Магазин: {shop}\n💰 Новая цена: <b>{p_uah:,} ₴</b>{change_text}"
+                        msg = f"🔔 <b>Изменение цены!</b>\n\n🔹 {model}\n🏪 {shop}\n💰 Новая: <b>{p_uah:,} ₴</b>\n\n{icon} на {abs(perc):.1f}%"
                         send_telegram(msg)
+                    history[item_id].append({'time': now_str, 'price': p_uah, 'cat': cat})
 
-            results.append({
-                'Модель': model, 
-                'Магазин': shop, 
-                'Цена_ГРН': p_uah,
-                'Категория': row.get('категория', 'Без категории') 
-            })
+            results.append({'Модель': model, 'Магазин': shop, 'Цена_ГРН': p_uah, 'Категория': cat})
             
         save_history(history)
         return pd.DataFrame(results)
-    except Exception as e:
-        st.error(f"Ошибка файла: {e}")
-        return pd.DataFrame()
+    except: return pd.DataFrame()
 
-# --- ВКЛАДКИ ---
-tab_used, tab_new = st.tabs(["Used (Б/У)", "New (Новые)"])
+# --- ВЫВОД ---
+tabs = st.tabs(["Used (Б/У)", "New (Новые)"])
+files = ['links.csv', 'links_new.csv']
 
-def render_content(file_name):
-    raw_data = fetch_and_track(file_name)
-    if not raw_data.empty:
-        # Быстрый пересчет валюты
-        def format_prices(val):
-            if pd.notnull(val):
-                p_usd = int(round(val / user_rate))
-                return f'<span class="uah">{int(val):,} ₴</span><br><span class="usd">{p_usd:,} $</span>'
-            return "—"
-        
-        display_df = raw_data.copy()
-        display_df['Цена'] = display_df['Цена_ГРН'].apply(format_prices)
-        
-        cats = display_df['Категория'].unique().tolist()
-        sel_cat = st.selectbox(f"Серия iPhone:", cats, key=f"sel_{file_name}")
-        
-        filtered = display_df[display_df['Категория'] == sel_cat]
-        order = filtered['Модель'].unique().tolist()
-        
-        pivot = filtered.drop_duplicates(subset=['Модель', 'Магазин']).pivot(
-            index='Модель', columns='Магазин', values='Цена'
-        ).fillna("—").reindex(order)
-        
-        st.write(pivot.to_html(escape=False), unsafe_allow_html=True)
-        
-        # --- СЕКЦИЯ ЛОГОВ ПО КЛИКУ ---
-        st.divider()
-        st.subheader("📊 История изменений (лог)")
-        hist = load_history()
-        
-        available_items = [k for k in hist.keys() if k.split(' | ')[0] in order]
-        if available_items:
-            target = st.selectbox("Выбери позицию для проверки истории:", sorted(available_items), key=f"log_{file_name}")
+for i, tab in enumerate(tabs):
+    with tab:
+        raw_data = fetch_and_track(files[i])
+        if not raw_data.empty:
+            # Формат ячейки
+            def fmt(v):
+                if pd.notnull(v):
+                    return f'<span class="uah">{int(v):,} ₴</span><br><span class="usd">{int(round(v/user_rate)):,} $</span>'
+                return "—"
             
-            log_list = hist[target]
-            for i in range(len(log_list)-1, -1, -1):
-                c = log_list[i]
-                p = log_list[i-1] if i > 0 else None
-                diff_label = ""
-                if p:
-                    d = c['price'] - p['price']
-                    pc = (d / p['price']) * 100
-                    if d > 0: diff_label = f'<span class="price-up"> ↑ {pc:.1f}% (+{d:,} ₴)</span>'
-                    elif d < 0: diff_label = f'<span class="price-down"> ↓ {abs(pc):.1f}% ({d:,} ₴)</span>'
-                
-                st.markdown(f"📅 **{c['time']}** — **{c['price']:,} ₴** {diff_label}", unsafe_allow_html=True)
-    else:
-        st.info(f"Файл {file_name} не загружен или пуст.")
-
-with tab_used: render_content('links.csv')
-with tab_new: render_content('links_new.csv')
+            df_disp = raw_data.copy()
+            df_disp['Цена'] = df_disp['Цена_ГРН'].apply(fmt)
+            
+            # Фильтр категории для таблицы
+            all_cats = raw_data['Категория'].unique().tolist()
+            sel_cat = st.selectbox("Выберите серию:", all_cats, key=f"cat_tab_{i}")
+            
+            filt = df_disp[df_disp['Категория'] == sel_cat]
+            order = filt['Модель'].unique().tolist()
+            
+            pivot = filt.drop_duplicates(subset=['Модель', 'Магазин']).pivot(
+                index='Модель', columns='Магазин', values='Цена'
+            ).fillna("—").reindex(order)
+            
+            st.write(pivot.to_html(escape=False), unsafe_allow_html=True)
+            
+            # --- НОВАЯ ИСТОРИЯ С ФИЛЬТРАМИ ---
+            st.divider()
+            st.subheader("📜 Поиск по истории")
+            hist_db = load_history()
+            
+            h_col1, h_col2, h_col3 = st.columns(3)
+            
+            # 1. Фильтр по категории (берем из истории)
+            available_cats = sorted(list(set(entry[0]['cat'] for entry in hist_db.values() if entry)))
+            with h_col1:
+                h_cat = st.selectbox("Категория лога:", available_cats, key=f"hcat_{i}")
+            
+            # 2. Фильтр по модели
+            models_in_cat = sorted(list(set(k.split(' | ')[0] for k, v in hist_db.items() if v and v[0]['cat'] == h_cat)))
+            with h_col2:
+                h_mod = st.selectbox("Модель:", models_in_cat, key=f"hmod_{i}")
+            
+            # 3. Фильтр по магазину
+            shops_for_mod = sorted([k.split(' | ')[1] for k in hist_db.keys() if k.startswith(f"{h_mod} |")])
+            with h_col3:
+                h_shop = st.selectbox("Магазин:", shops_for_mod, key=f"hshop_{i}")
+            
+            # Вывод лога
+            target_key = f"{h_mod} | {h_shop}"
+            if target_key in hist_db:
+                logs = hist_db[target_key]
+                for j in range(len(logs)-1, -1, -1):
+                    curr, prev = logs[j], (logs[j-1] if j > 0 else None)
+                    diff_txt = ""
+                    if prev:
+                        d = curr['price'] - prev['price']
+                        p_c = (d / prev['price']) * 100
+                        if d > 0: diff_txt = f'<span class="price-up"> ↑ {p_c:.1f}% (+{d:,} ₴)</span>'
+                        elif d < 0: diff_txt = f'<span class="price-down"> ↓ {abs(p_c):.1f}% ({d:,} ₴)</span>'
+                    st.markdown(f"📅 **{curr['time']}** — **{curr['price']:,} ₴** {diff_txt}", unsafe_allow_html=True)
+        else:
+            st.info("Файл не найден.")
