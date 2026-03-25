@@ -4,93 +4,87 @@ import requests
 from bs4 import BeautifulSoup
 import time
 import re
+from datetime import datetime
 
 st.set_page_config(page_title="Price Monitor PRO", layout="wide")
 
-# --- СТИЛИЗАЦИЯ ---
+# Стиль для компактности и цветов
 st.markdown("""
     <style>
-    .uah-price { color: black; font-weight: bold; }
-    .usd-price { color: #FF4B4B; font-weight: bold; }
+    .uah { color: black; font-weight: bold; }
+    .usd { color: #FF4B4B; font-weight: bold; }
+    .last-update { font-size: 14px; color: gray; }
+    div[data-testid="stColumn"] { display: flex; align-items: center; }
     </style>
     """, unsafe_allow_html=True)
 
-st.title("📱 Оптовый монитор цен")
+st.title("📱 Мониторинг цен")
 
-# --- БЛОК КУРСА ---
-user_rate = st.number_input("Установите ваш курс ($):", value=44.55, step=0.05)
+# --- ВЕРХНЯЯ ПАНЕЛЬ (Курс и Время) ---
+col1, col2 = st.columns([1, 2])
+with col1:
+    user_rate = st.number_input("Курс ($):", value=44.55, step=0.05)
+with col2:
+    # Показываем время прямо сейчас
+    now = datetime.now().strftime("%d.%m.%Y %H:%M:%S")
+    st.markdown(f"<p class='last-update'>Последняя проверка цен:<br><b>{now}</b> (обновление раз в сутки)</p>", unsafe_allow_html=True)
 
-# --- ФУНКЦИЯ ПАРСИНГА ---
-def get_price(url, selector):
-    if not url or pd.isna(url) or str(url).strip() == "" or str(url) == "ручной ввод":
-        return None
-    headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)'}
+# --- ФУНКЦИЯ ПАРСИНГА (с кэшем на 24 часа) ---
+@st.cache_data(ttl=86400) # 86400 секунд = 24 часа
+def fetch_all_prices(file_name, rate):
     try:
-        r = requests.get(url, headers=headers, timeout=10)
-        soup = BeautifulSoup(r.text, 'html.parser')
-        element = soup.select_one(selector)
-        if element:
-            clean_price = re.sub(r'\D', '', element.text.strip())
-            return int(clean_price)
-    except:
-        pass
-    return None
-
-# --- ГЛАВНАЯ ЛОГИКА ---
-tabs = st.tabs(["📦 ОПТ", "🛍️ РОЗНИЦА"])
-
-def run_monitor(file_name):
-    # Загружаем данные
-    try:
-        df = pd.read_csv(file_name, sep=None, engine='python')
-    except:
-        # Если файла нет, создаем пустой шаблон
-        df = pd.DataFrame(columns=['модель', 'магазин', 'ссылка', 'селектор', 'ручная_цена'])
-
-    st.subheader(f"Редактор данных ({file_name})")
-    st.write("💡 *Здесь можно менять ссылки или вводить цену вручную в колонку 'ручная_цена'*")
-    
-    # ИНТЕРФЕЙС РЕДАКТИРОВАНИЯ ТАБЛИЦЫ
-    edited_df = st.data_editor(df, num_rows="dynamic", key=file_name, use_container_width=True)
-    
-    # Кнопка сохранения правок (пока в рамках текущей сессии)
-    if st.button(f"💾 Сохранить изменения в {file_name}"):
-        edited_df.to_csv(file_name, index=False)
-        st.success("Файл обновлен!")
-
-    if st.button(f'🚀 ОБНОВИТЬ И ПЕРЕСЧИТАТЬ {file_name}'):
-        results = []
-        bar = st.progress(0)
+        df = pd.read_csv(file_name, sep=None, engine='python', encoding='utf-8-sig')
+        df.columns = [str(c).strip().lower() for c in df.columns]
         
-        for i, row in edited_df.iterrows():
-            # 1. Пробуем взять цену из парсера
-            price_uah = get_price(row.get('ссылка'), row.get('селектор'))
+        results = []
+        headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)'}
+        
+        for i, row in df.iterrows():
+            url = row.get('ссылка')
+            selector = row.get('селектор')
+            price_uah = None
             
-            # 2. Если парсер не нашел, берем из колонки ручного ввода
-            if not price_uah and 'ручная_цена' in edited_df.columns:
+            if url and not pd.isna(url):
                 try:
-                    price_uah = int(row['ручная_цена'])
+                    r = requests.get(url, headers=headers, timeout=10)
+                    soup = BeautifulSoup(r.text, 'html.parser')
+                    element = soup.select_one(selector)
+                    if element:
+                        clean_price = re.sub(r'\D', '', element.text.strip())
+                        price_uah = int(clean_price)
                 except:
-                    price_uah = None
+                    pass
 
             if price_uah:
-                price_usd = round(price_uah / user_rate, 1)
-                display_val = f'<span class="uah-price">{price_uah:,} ₴</span> / <span class="usd-price">{price_usd}$</span>'
+                price_usd = round(price_uah / rate, 1)
+                display_val = f'<span class="uah">{price_uah:,} ₴</span> / <span class="usd">{price_usd}$</span>'
             else:
                 display_val = "—"
 
             results.append({
-                'Модель': row.get('модель', 'Не указано'),
-                'Магазин': row.get('магазин', 'Не указано'),
+                'Модель': row.get('модель', '—'),
+                'Магазин': row.get('магазин', '—'),
                 'Цена': display_val
             })
-            bar.progress((i + 1) / len(edited_df))
-        
-        final_df = pd.DataFrame(results)
-        pivot = final_df.pivot_table(index='Модель', columns='Магазин', values='Цена', aggfunc='first')
-        st.write("### Результаты мониторинга")
-        st.write(pivot.to_html(escape=False), unsafe_allow_html=True)
+            time.sleep(0.2) # Небольшая пауза, чтобы не забанили
+            
+        res_df = pd.DataFrame(results)
+        return res_df.pivot_table(index='Модель', columns='Магазин', values='Цена', aggfunc='first')
+    except Exception as e:
+        return pd.DataFrame([{"Ошибка": str(e)}])
 
-# Запуск вкладок
-with tabs[0]: run_monitor('links.csv')
-with tabs[1]: run_monitor('links_r.csv')
+# --- ВКЛАДКИ ---
+tab1, tab2 = st.tabs(["📦 ОПТ", "🛍️ РОЗНИЦА"])
+
+with tab1:
+    data_opt = fetch_all_prices('links.csv', user_rate)
+    st.write(data_opt.to_html(escape=False), unsafe_allow_html=True)
+
+with tab2:
+    data_roz = fetch_all_prices('links_r.csv', user_rate)
+    st.write(data_roz.to_html(escape=False), unsafe_allow_html=True)
+
+# Кнопка для принудительного сброса кэша (если вдруг надо обновить прямо сейчас)
+if st.sidebar.button("♻️ Обновить принудительно"):
+    st.cache_data.clear()
+    st.rerun()
