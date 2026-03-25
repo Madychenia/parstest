@@ -726,5 +726,104 @@
       "type": "u",
       "order": 77
     }
+  ],
+  "iPh 13 128 | Jabko | u": [
+    {
+      "time": "25.03 18:18",
+      "price": 16354,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 0
+    }
+  ],
+  "iPh 13 256 | Jabko | u": [
+    {
+      "time": "25.03 18:18",
+      "price": 18122,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 1
+    }
+  ],
+  "iPh 13 512 | Jabko | u": [
+    {
+      "time": "25.03 18:18",
+      "price": 18564,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 2
+    }
+  ],
+  "iPh 13 Pro 128 | Jabko | u": [
+    {
+      "time": "25.03 18:18",
+      "price": 21216,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 6
+    }
+  ],
+  "iPh 13 Pro 256 | Jabko | u": [
+    {
+      "time": "25.03 18:18",
+      "price": 22984,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 7
+    }
+  ],
+  "iPh 13 Pro 512 | Jabko | u": [
+    {
+      "time": "25.03 18:18",
+      "price": 24310,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 8
+    }
+  ],
+  "iPh 13 Pro 1TB | Jabko | u": [
+    {
+      "time": "25.03 18:18",
+      "price": 25194,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 9
+    }
+  ],
+  "iPh 13 Pro Max 128 | Jabko | u": [
+    {
+      "time": "25.03 18:18",
+      "price": 22542,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 10
+    }
+  ],
+  "iPh 13 Pro Max 256 | Jabko | u": [
+    {
+      "time": "25.03 18:18",
+      "price": 25194,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 11
+    }
+  ],
+  "iPh 13 Pro Max 512 | Jabko | u": [
+    {
+      "time": "25.03 18:18",
+      "price": 26520,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 12
+    }
+  ],
+  "iPh 13 Pro Max 1TB | Jabko | u": [
+    {
+      "time": "25.03 18:18",
+      "price": 27404,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 13
+    }
   ]
 }
