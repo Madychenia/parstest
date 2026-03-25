@@ -8,6 +8,7 @@ import pytz
 import json
 import os
 import sys
+import time
 
 # --- КОНФИГ ---
 TELEGRAM_TOKEN = "8673005085:AAG-vDGUu4buhPHmMYoJt1a7UueVIywvAyQ"
@@ -34,17 +35,14 @@ st.markdown("""
     """, unsafe_allow_html=True)
 
 # --- ФУНКЦИИ ---
-@st.cache_data(ttl=3600) # Кэшируем курс на час, чтобы не долбить сайт Минфина при каждом клике
+@st.cache_data(ttl=3600)
 def get_minfin_sell_rate():
-    """Парсинг курса ПРОДАЖИ доллара с Минфина"""
     try:
         url = "https://minfin.com.ua/currency/"
         r = requests.get(url, headers={'User-Agent': 'Mozilla/5.0'}, timeout=10)
         soup = BeautifulSoup(r.text, 'html.parser')
-        # Ищем блок курсов. Нам нужно второе значение (продажа) в сетке курсов
         rates = soup.find_all('div', {'class': 'sc-1x32wa2-9'})
         if len(rates) >= 2:
-            # Обычно первый - покупка, второй - продажа
             rate_text = rates[1].text.replace(',', '.')
             val = float(re.findall(r"\d+\.\d+", rate_text)[0])
             return val
@@ -70,6 +68,63 @@ def clean_price(text):
         val = int(res)
         return val if val > 1000 else None
     except: return None
+
+# --- СКРИНШОТЕР ---
+def take_screenshot_and_send(cat_name, user_rate, minfin_rate):
+    from selenium import webdriver
+    from selenium.webdriver.chrome.options import Options
+    from selenium.webdriver.common.by import By
+    import requests
+
+    st.info("Формируем скриншот...")
+    
+    # Получаем URL текущего приложения
+    try:
+        # Streamlit cloud не всегда дает URL напрямую, пробуем получить его
+        report_url = st.get_option("server.baseUrlPath")
+        if not report_url:
+             report_url = "http://localhost:8501" # Запасной вариант для локального теста
+        else:
+             # На Streamlit Cloud URL выглядит сложнее, нужно формировать его
+             report_url = f"https://{st.get_option('server.address')}/{report_url}"
+    except:
+        report_url = "http://localhost:8501" 
+
+    chrome_options = Options()
+    chrome_options.add_argument("--headless") # Невидимый режим
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--window-size=1920,1080")
+
+    driver = webdriver.Chrome(options=chrome_options)
+    
+    try:
+        driver.get(report_url)
+        time.sleep(10) # Даем время на отрисовку всего интерфейса
+        
+        # Находим саму таблицу по классу
+        table_element = driver.find_element(By.CLASS_NAME, "table-container")
+        screenshot = table_element.screenshot_as_png
+        
+        # Формируем текст сообщения
+        now = datetime.now(KIEV_TZ).strftime('%d.%m %H:%M:%S')
+        caption = f"📊 Отчет по категории: {cat_name}\n" \
+                  f"📅 Дата: {now}\n" \
+                  f"👤 Ваш курс: {user_rate}\n" \
+                  f"🏦 Курс Минфина (продажа): {minfin_rate}"
+        
+        # Отправляем в Телеграм
+        url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendPhoto"
+        files = {'photo': ('screenshot.png', screenshot)}
+        data = {'chat_id': CHAT_ID, 'caption': caption}
+        requests.post(url, files=files, data=data)
+        
+        st.success("Скриншот отправлен в Telegram!")
+        
+    except Exception as e:
+        st.error(f"Ошибка при создании скриншота: {e}")
+    finally:
+        driver.quit()
 
 def run_parsing():
     history = load_data(HISTORY_FILE)
@@ -106,12 +161,10 @@ def run_parsing():
 # --- ИНТЕРФЕЙС ---
 st.title("📱 Мониторинг")
 
-# Курс Минфина (только для логов)
 minfin_rate = get_minfin_sell_rate()
 
 c1, c2, c3 = st.columns([1, 1, 1])
 with c1:
-    # Твой ручной курс (только для главной таблицы)
     user_rate = st.number_input("Ваш курс $:", value=44.55, step=0.01)
 with c2:
     st.write(f"Обновлено: **{load_data(LAST_RUN_FILE).get('time', '—')}**")
@@ -139,14 +192,24 @@ if db:
             df_tab = pd.DataFrame(rows)
             
             if not df_tab.empty:
-                # 1. ГЛАВНАЯ ТАБЛИЦА (использует USER_RATE)
-                sel_cat = st.selectbox("Категория:", sorted(df_tab['Кат'].unique()), key=f"main_cat_{t_tag}")
+                col_sel, col_btn = st.columns([3, 1])
+                with col_sel:
+                    sel_cat = st.selectbox("Категория:", sorted(df_tab['Кат'].unique()), key=f"main_cat_{t_tag}")
+                
                 f_df = df_tab[df_tab['Кат'] == sel_cat]
                 f_df['Цена'] = f_df['Цена_ГРН'].apply(lambda x: f'<span class="uah">{x:,} ₴</span><span class="usd">{int(x/user_rate):,} $</span>')
+                
                 pivot = f_df.pivot_table(index='Модель', columns='Магазин', values='Цена', aggfunc='first').fillna('—')
+                
+                # Кнопка скриншота
+                with col_btn:
+                    st.write("") # Отступ
+                    if st.button("📸 Скриншот в ТГ", key=f"scr_{t_tag}"):
+                        take_screenshot_and_send(sel_cat, user_rate, minfin_rate)
+
                 st.markdown(f'<div class="table-container">{pivot.to_html(escape=False)}</div>', unsafe_allow_html=True)
                 
-                # 2. ИСТОРИЯ (использует MINFIN_RATE)
+                # ИСТОРИЯ
                 st.markdown("<br>", unsafe_allow_html=True)
                 with st.expander(f"📜 История изменений ({tab_names[i]})", expanded=True):
                     f1, f2, f3 = st.columns(3)
@@ -164,7 +227,6 @@ if db:
                         st.divider()
                         for e in reversed(db[final_key]):
                             p_uah = e['price']
-                            # Здесь считаем только по Минфину
                             p_usd_minfin = int(p_uah / minfin_rate)
                             st.markdown(f"{e['time']} — **{p_uah:,} ₴** <span class='log-usd'>({p_usd_minfin:,} $)</span>", unsafe_allow_html=True)
             else:
