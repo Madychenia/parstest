@@ -67,7 +67,7 @@ def run_parsing(is_silent=False):
             m, s, u, sel, c = [str(row.get(k, '')).strip() for k in ['модель','магазин','ссылка','селектор','категория']]
             
             if not is_silent:
-                status_text.text(f"⏳ Проверяю: {m}")
+                status_text.text(f"⏳ Проверяю: {m} — {s}")
                 progress_bar.progress(current_step / total_steps)
 
             if u.startswith('http') and sel and sel != 'nan':
@@ -80,7 +80,7 @@ def run_parsing(is_silent=False):
                         if price_val:
                             key = f"{m} | {s} | {tag}"
                             
-                            # УМНАЯ ЗАПИСЬ: Сохраняем только если цена изменилась
+                            # УМНАЯ ЗАПИСЬ: Только при изменении
                             last_entry = history.get(key, [])[-1] if key in history and history[key] else None
                             
                             if not last_entry or last_entry['price'] != price_val:
@@ -90,7 +90,6 @@ def run_parsing(is_silent=False):
                                 
                                 if key not in history: history[key] = []
                                 history[key].append({'time': now, 'price': price_val, 'cat': c, 'type': tag, 'order': idx})
-                                # Лимит истории - 50 записей на модель
                                 if len(history[key]) > 50: history[key] = history[key][-50:]
                 except: pass
     
@@ -102,36 +101,53 @@ def run_parsing(is_silent=False):
         status_text.empty()
         progress_bar.empty()
 
-# --- ЛОГИКА ЗАПУСКА ИЗ GITHUB ---
+# --- ЛОГИКА АВТО-ЗАПУСКА ---
 if "--parse" in sys.argv:
     run_parsing(is_silent=True)
     sys.exit(0)
 
 # --- ИНТЕРФЕЙС STREAMLIT ---
 st.set_page_config(page_title="Мониторинг", layout="wide")
-st.markdown("""<style>
+
+# ВЕРНУЛ ВСЕ СТИЛИ (Красный $, закрепление, скрытие индекса)
+st.markdown("""
+    <style>
     .block-container { padding: 1rem !important; }
     .table-container { overflow-x: auto; width: 100%; border: 1px solid #eee; }
     th, td { padding: 8px !important; border: 1px solid #eee !important; font-size: 0.85em; text-align: center !important; }
     .blank, .index_name { display: none !important; }
-    td:first-child, th:first-child { position: sticky; left: 0; background-color: #f8f9fa !important; z-index: 3; font-weight: bold; border-right: 2px solid #ddd !important; }
+    
+    /* ЗАКРЕПЛЕНИЕ ПЕРВОГО СТОЛБЦА */
+    td:first-child, th:first-child { 
+        position: sticky; left: 0; background-color: #f8f9fa !important; z-index: 3; 
+        font-weight: bold; border-right: 2px solid #ddd !important; 
+    }
+    
     .uah { color: #1a1a1a; font-weight: 800; display: block; }
     .usd { color: #FF4B4B; font-weight: 700; font-size: 0.9em; }
-</style>""", unsafe_allow_html=True)
+    .log-usd { color: #FF4B4B; font-weight: bold; }
+    </style>
+    """, unsafe_allow_html=True)
 
 st.title("📱 Мониторинг")
 minfin_rate = 44.15 
 db = load_data(HISTORY_FILE)
 last_run = load_data(LAST_RUN_FILE)
 
-c1, c2, c3 = st.columns([1,1.5,1])
-with c1: user_rate = st.number_input("Курс $:", value=44.55) 
+# ВЕРНУЛ КНОПКИ И КУРС
+c1, c2, c3, c4 = st.columns([1,1.5,1,1])
+with c1: user_rate = st.number_input("Курс $:", value=44.55, label_visibility="visible") 
 with c2: 
     st.write(f"Обновлено: **{last_run.get('time', '—')}**")
     st.caption(f"Курс Минфина (продажа): **{minfin_rate}**") 
 with c3: 
     if st.button("♻️ ОБНОВИТЬ ВСЁ"): 
         run_parsing()
+        st.rerun()
+with c4:
+    if st.button("🗑 СБРОСИТЬ БАЗУ"):
+        if os.path.exists(HISTORY_FILE): os.remove(HISTORY_FILE)
+        st.cache_data.clear()
         st.rerun()
 
 tabs = st.tabs(["Used (Б/У)", "New (Новые)"])
@@ -152,4 +168,25 @@ for i, t_tag in enumerate(tags):
             if not f_df.empty:
                 f_df['Display'] = f_df['P'].apply(lambda x: f'<span class="uah">{x:,} ₴</span><span class="usd">{int(x/user_rate):,} $</span>')
                 pivot = f_df.pivot_table(index='M', columns='S', values='Display', aggfunc='first', sort=False).fillna('—')
+                pivot.index.name = None
+                pivot.columns.name = None
                 st.markdown(f'<div class="table-container">{pivot.to_html(escape=False)}</div>', unsafe_allow_html=True)
+
+# ВЕРНУЛ АНАЛИЗ И ИСТОРИЮ
+with st.expander("📜 История изменений (Used)"):
+    used_items = []
+    for k, logs in db.items():
+        if logs and logs[-1].get('type') == 'u':
+            p = k.split(" | ")
+            used_items.append({'M': p[0], 'S': p[1], 'C': logs[-1]['cat'], 'O': logs[-1].get('order', 999)})
+    
+    if used_items:
+        h_df = pd.DataFrame(used_items).sort_values('O')
+        f1, f2, f3 = st.columns(3)
+        with f1: h_cat = st.selectbox("1. Категория", h_df['C'].unique(), key="h_cat")
+        with f2: h_mod = st.selectbox("2. Модель", h_df[h_df['C'] == h_cat]['M'].unique(), key="h_mod")
+        with f3: h_shop = st.selectbox("3. Поставщик", h_df[(h_df['C'] == h_cat) & (h_df['M'] == h_mod)]['S'].unique(), key="h_shop")
+        h_key = f"{h_mod} | {h_shop} | u"
+        if h_key in db:
+            for e in reversed(db[h_key]):
+                st.markdown(f"{e['time']} — **{e['price']:,} ₴** <span class='log-usd'>({int(e['price']/minfin_rate)} $)</span>", unsafe_allow_html=True)
