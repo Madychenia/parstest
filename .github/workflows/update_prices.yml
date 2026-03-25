@@ -2,8 +2,8 @@ name: Update Prices & Take Screenshots
 
 on:
   schedule:
-    - cron: '0 */2 * * *' # Авто-запуск каждые 2 часа
-  workflow_dispatch:      # Кнопка для ручного запуска в GitHub Actions
+    - cron: '*/10 * * * *'  # Авто-запуск каждые 10 минут
+  workflow_dispatch:        # Кнопка для ручного запуска
 
 permissions:
   contents: write         # Разрешение роботу записывать изменения в файлы
