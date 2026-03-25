@@ -55,19 +55,17 @@ def run_parsing():
     
     for f_name, tag in mapping.items():
         if not os.path.exists(f_name): continue
+        # Читаем CSV с явным указанием разделителя
+        df = pd.read_csv(f_name, sep=';', engine='python', encoding='utf-8-sig')
+        df.columns = [c.strip().lower() for c in df.columns]
         
-        # ЧИТАЕМ СТРОГО: указываем названия колонок вручную, чтобы НЕ потерять первую строку
-        df = pd.read_csv(f_name, sep=';', engine='python', encoding='utf-8-sig', skiprows=1, 
-                         names=['модель', 'магазин', 'ссылка', 'селектор', 'категория'])
-        
-        for _, row in df.iterrows():
-            m = str(row['модель']).strip()
-            s = str(row['магазин']).strip()
-            u = str(row['ссылка']).strip()
-            sel = str(row['селектор']).strip()
-            c = str(row['категория']).strip()
+        for idx, row in df.iterrows():
+            m = str(row.get('модель','')).strip()
+            s = str(row.get('магазин','')).strip()
+            u = str(row.get('ссылка','')).strip()
+            sel = str(row.get('селектор','')).strip()
+            c = str(row.get('категория','')).strip()
             
-            # Проверяем наличие ссылки и селектора
             if u.startswith('http') and sel and sel != 'nan':
                 try:
                     r = requests.get(u, headers={'User-Agent': 'Mozilla/5.0'}, timeout=10)
@@ -76,9 +74,13 @@ def run_parsing():
                     if el:
                         price_val = clean_price(el.text)
                         if price_val:
-                            key = f"{m} | {s}"
-                            if key not in history: history[key] = []
-                            history[key].append({'time': now, 'price': price_val, 'cat': c, 'type': tag})
+                            # В ключе сохраняем и категорию, и тип, и порядок (idx)
+                            key = f"{m} | {s} | {tag}"
+                            history[key] = history.get(key, [])
+                            history[key].append({
+                                'time': now, 'price': price_val, 'cat': c, 
+                                'type': tag, 'order': idx
+                            })
                 except: pass
     save_data(HISTORY_FILE, history)
     save_data(LAST_RUN_FILE, {'time': now})
@@ -110,33 +112,44 @@ for i, t_tag in enumerate(tags):
         for k, logs in db.items():
             if logs and logs[-1].get('type') == t_tag:
                 p = k.split(" | ")
-                items.append({'M': p[0], 'S': p[1], 'P': logs[-1]['price'], 'C': logs[-1]['cat']})
+                items.append({
+                    'M': p[0], 'S': p[1], 'P': logs[-1]['price'], 
+                    'C': logs[-1]['cat'], 'O': logs[-1].get('order', 999)
+                })
         
         df_tab = pd.DataFrame(items)
         if not df_tab.empty:
-            cats = sorted(df_tab['C'].unique())
+            # Категории без алфавитной сортировки — как в файле
+            cats = df_tab['C'].unique() 
             sel_cat = st.selectbox("Категория:", cats, key=f"s_{t_tag}")
+            
             f_df = df_tab[df_tab['C'] == sel_cat].copy()
             if not f_df.empty:
+                # Сортируем по колонке 'O' (порядок в CSV)
+                f_df = f_df.sort_values('O')
                 f_df['Display'] = f_df['P'].apply(lambda x: f'<span class="uah">{x:,} ₴</span><span class="usd">{int(x/user_rate):,} $</span>')
-                pivot = f_df.pivot_table(index='M', columns='S', values='Display', aggfunc='first').fillna('—')
+                
+                pivot = f_df.pivot_table(index='M', columns='S', values='Display', aggfunc='first', sort=False).fillna('—')
                 pivot.index.name = None
                 pivot.columns.name = None
                 st.markdown(f'<div class="table-container">{pivot.to_html(escape=False)}</div>', unsafe_allow_html=True)
 
+# ИСТОРИЯ (ТОЛЬКО USED)
 with st.expander("📜 История изменений (Used)"):
     used_items = []
     for k, logs in db.items():
         if logs and logs[-1].get('type') == 'u':
             p = k.split(" | ")
-            used_items.append({'M': p[0], 'S': p[1], 'C': logs[-1]['cat']})
+            used_items.append({'M': p[0], 'S': p[1], 'C': logs[-1]['cat'], 'O': logs[-1].get('order', 999)})
+    
     if used_items:
-        h_df = pd.DataFrame(used_items)
+        h_df = pd.DataFrame(used_items).sort_values('O')
         f1, f2, f3 = st.columns(3)
-        with f1: h_cat = st.selectbox("1. Категория", sorted(h_df['C'].unique()), key="h_cat")
-        with f2: h_mod = st.selectbox("2. Модель", sorted(h_df[h_df['C'] == h_cat]['M'].unique()), key="h_mod")
-        with f3: h_shop = st.selectbox("3. Поставщик", sorted(h_df[(h_df['C'] == h_cat) & (h_df['M'] == h_mod)]['S'].unique()), key="h_shop")
-        h_key = f"{h_mod} | {h_shop}"
+        with f1: h_cat = st.selectbox("1. Категория", h_df['C'].unique(), key="h_cat")
+        with f2: h_mod = st.selectbox("2. Модель", h_df[h_df['C'] == h_cat]['M'].unique(), key="h_mod")
+        with f3: h_shop = st.selectbox("3. Поставщик", h_df[(h_df['C'] == h_cat) & (h_df['M'] == h_mod)]['S'].unique(), key="h_shop")
+        
+        h_key = f"{h_mod} | {h_shop} | u"
         if h_key in db:
             for e in reversed(db[h_key]):
                 st.markdown(f"{e['time']} — **{e['price']:,} ₴** <span class='log-usd'>({int(e['price']/minfin_rate)} $)</span>", unsafe_allow_html=True)
