@@ -7,6 +7,7 @@ from datetime import datetime
 import pytz
 import json
 import os
+import sys
 
 # --- КОНФИГ ---
 TELEGRAM_TOKEN = "8673005085:AAG-vDGUu4buhPHmMYoJt1a7UueVIywvAyQ"
@@ -17,7 +18,6 @@ KIEV_TZ = pytz.timezone('Europe/Kyiv')
 
 st.set_page_config(page_title="Мониторинг цен", layout="wide")
 
-# CSS для фиксации колонки и компактности
 st.markdown("""
     <style>
     .block-container { padding: 1rem !important; }
@@ -32,6 +32,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
+# --- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ---
 def load_data(file):
     if os.path.exists(file):
         try:
@@ -42,21 +43,16 @@ def load_data(file):
 def save_data(file, data):
     with open(file, 'w', encoding='utf-8') as f: json.dump(data, f, ensure_ascii=False, indent=2)
 
-def send_tg(msg):
-    try: requests.post(f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage", 
-                       data={"chat_id": CHAT_ID, "text": msg, "parse_mode": "HTML"}, timeout=5)
-    except: pass
-
 def clean_price(text):
     if not text: return None
-    # Очистка от мусора: оставляем только цифры до первой точки/запятой
     res = re.sub(r'[^\d.,]', '', text).replace(',', '.')
     if '.' in res: res = res.split('.')[0]
     try:
         val = int(res)
-        return val if val > 1000 else None # Игнорируем подозрительно низкие цены (ошибки парсинга)
+        return val if val > 1000 else None
     except: return None
 
+# --- ПАРСЕР (ДЛЯ РОБОТА И КНОПКИ) ---
 def run_parsing():
     history = load_data(HISTORY_FILE)
     is_first = len(history) == 0
@@ -69,9 +65,9 @@ def run_parsing():
         df.columns = [c.strip().lower() for c in df.columns]
         
         for _, row in df.iterrows():
-            m, s = str(row.get('модель', '—')), str(row.get('магазин', '—'))
-            u, sel = str(row.get('ссылка', '')), str(row.get('селектор', ''))
-            c = str(row.get('категория', '1'))
+            m, s = str(row.get('модель', '—')).strip(), str(row.get('магазин', '—')).strip()
+            u, sel = str(row.get('ссылка', '')).strip(), str(row.get('селектор', '')).strip()
+            c = str(row.get('категория', '1')).strip()
             key = f"{m} | {s}"
             
             if u.startswith('http'):
@@ -89,7 +85,8 @@ def run_parsing():
                             if last and not is_first:
                                 diff = price - last['price']
                                 sign = "📈" if diff > 0 else "📉"
-                                send_tg(f"{sign} <b>{m}</b>\n{s}: <b>{price:,} ₴</b> (было {last['price']:,})")
+                                requests.post(f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage", 
+                                              data={"chat_id": CHAT_ID, "text": f"{sign} <b>{m}</b>\n{s}: <b>{price:,} ₴</b>", "parse_mode": "HTML"})
                             history[key].append({'time': now, 'price': price, 'cat': c, 'type': tag})
                         else:
                             history[key][-1].update({'cat': c, 'type': tag})
@@ -114,35 +111,45 @@ with c3:
 db = load_data(HISTORY_FILE)
 if db:
     tabs = st.tabs(["Used (Б/У)", "New (Новые)"])
-    for i, t_tag in enumerate(['u', 'n']):
+    tags = ['u', 'n']
+    
+    for i, t_tag in enumerate(tags):
         with tabs[i]:
             rows = []
             for k, logs in db.items():
                 if logs and logs[-1].get('type') == t_tag:
                     m, s = k.split(" | ")
-                    rows.append({'Модель': m, 'Магазин': s, 'Цена_ГРН': logs[-1]['price'], 'Кат': logs[-1].get('cat', '1')})
+                    rows.append({
+                        'Модель': m, 
+                        'Магазин': s, 
+                        'Цена_ГРН': logs[-1]['price'], 
+                        'Кат': logs[-1].get('cat', 'Без категории')
+                    })
             
             df = pd.DataFrame(rows)
             if not df.empty:
-                cat = st.selectbox("Категория:", sorted(df['Кат'].unique()), key=f"tab_{i}")
-                f_df = df[df['Кат'] == cat]
+                # Сортируем категории как в файле
+                available_cats = sorted(df['Кат'].unique())
+                sel_cat = st.selectbox("Категория:", available_cats, key=f"filter_{t_tag}")
+                
+                f_df = df[df['Кат'] == sel_cat]
                 f_df['Цена'] = f_df['Цена_ГРН'].apply(lambda x: f'<span class="uah">{x:,} ₴</span><span class="usd">{int(x/rate):,} $</span>')
                 
-                # Создаем таблицу
-                res_table = f_df.pivot_table(index='Модель', columns='Магазин', values='Цена', aggfunc='first').fillna('—')
-                st.markdown(f'<div class="table-container">{res_table.to_html(escape=False)}</div>', unsafe_allow_html=True)
+                # Поворачиваем таблицу: Модели слева, Магазины сверху
+                try:
+                    res_table = f_df.pivot_table(index='Модель', columns='Магазин', values='Цена', aggfunc='first').fillna('—')
+                    st.markdown(f'<div class="table-container">{res_table.to_html(escape=False)}</div>', unsafe_allow_html=True)
+                except:
+                    st.error("Ошибка в структуре данных этой категории")
             else:
-                st.info("Нет данных")
-else:
-    st.warning("База пуста. Нажми 'ОБНОВИТЬ' или подожди робота.")
+                st.info("В этом разделе пока нет данных.")
 
 with st.expander("📜 Логи"):
     if db:
         target = st.selectbox("Девайс:", sorted(db.keys()))
         for e in reversed(db[target]): st.write(f"{e['time']} — **{e['price']:,} ₴**")
 
+# Точка входа для GitHub Actions
 if __name__ == "__main__":
-    # Это для запуска через GitHub Actions
-    import sys
     if len(sys.argv) > 1 and sys.argv[1] == '--parse':
         run_parsing()
