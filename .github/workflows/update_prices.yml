@@ -1,8 +1,8 @@
-name: Update Prices
+name: Update Prices & Take Screenshots
 
 on:
   schedule:
-    - cron: '0 */6 * * *' # Авто-запуск каждые 6 часов
+    - cron: '0 */2 * * *' # Авто-запуск каждые 2 часа
   workflow_dispatch:      # Кнопка для ручного запуска в GitHub Actions
 
 permissions:
@@ -20,9 +20,15 @@ jobs:
         with:
           python-version: '3.10'
 
+      # Установка Chrome и драйвера (для скриншотов)
+      - name: Install Chrome
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable
+
       - name: Install dependencies
         run: |
-          pip install pandas requests beautifulsoup4 pytz streamlit
+          pip install pandas requests beautifulsoup4 pytz streamlit selenium
 
       - name: Run parser
         run: |
