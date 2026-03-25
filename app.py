@@ -17,11 +17,12 @@ KIEV_TZ = pytz.timezone('Europe/Kyiv')
 
 st.set_page_config(page_title="Мониторинг", layout="wide")
 
+# СТИЛИ: Красный доллар и скрытые заголовки
 st.markdown("""
     <style>
     .block-container { padding: 1rem !important; }
     .table-container { overflow-x: auto; width: 100%; border: 1px solid #eee; }
-    th, td { padding: 8px !important; border: 1px solid #eee !important; font-size: 0.85 font-family: sans-serif; text-align: center !important; }
+    th, td { padding: 8px !important; border: 1px solid #eee !important; font-size: 0.85em; text-align: center !important; }
     .blank, .index_name { display: none !important; }
     td:first-child, th:first-child { 
         position: sticky; left: 0; background: #f8f9fa; z-index: 2; 
@@ -50,16 +51,17 @@ def clean_price(text):
 def run_parsing():
     history = load_data(HISTORY_FILE)
     now = datetime.now(KIEV_TZ).strftime('%d.%m %H:%M')
-    # Используем явный разделитель ';' для корректного чтения первой строки
     mapping = {'links.csv': 'u', 'links_new.csv': 'n'}
     
     for f_name, tag in mapping.items():
         if not os.path.exists(f_name): continue
+        # Читаем CSV с разделителем ';'
         df = pd.read_csv(f_name, sep=';', engine='python', encoding='utf-8-sig')
         df.columns = [c.strip().lower() for c in df.columns]
         for _, row in df.iterrows():
             m, s, u, sel, c = str(row.get('модель','')).strip(), str(row.get('магазин','')).strip(), str(row.get('ссылка','')).strip(), str(row.get('селектор','')).strip(), str(row.get('категория','')).strip()
-            if u.startswith('http'):
+            # Проверяем, что ссылка и селектор не пустые
+            if u.startswith('http') and sel:
                 try:
                     r = requests.get(u, headers={'User-Agent': 'Mozilla/5.0'}, timeout=10)
                     soup = BeautifulSoup(r.text, 'html.parser')
@@ -78,12 +80,16 @@ minfin_rate = 44.15
 db = load_data(HISTORY_FILE)
 last_run = load_data(LAST_RUN_FILE)
 
-c1, c2, c3 = st.columns(3)
+c1, c2, c3, c4 = st.columns([1,1,1,1])
 with c1: user_rate = st.number_input("Курс $:", value=44.55)
 with c2: st.write(f"Обновлено: **{last_run.get('time', '—')}**")
 with c3: 
-    if st.button("♻️ ОБНОВИТЬ ВСЁ"): 
+    if st.button("♻️ ОБНОВИТЬ"): 
         run_parsing()
+        st.rerun()
+with c4:
+    if st.button("🗑 СБРОСИТЬ БАЗУ"):
+        if os.path.exists(HISTORY_FILE): os.remove(HISTORY_FILE)
         st.rerun()
 
 tabs = st.tabs(["Used (Б/У)", "New (Новые)"])
@@ -91,13 +97,13 @@ tags = ['u', 'n']
 
 for i, t_tag in enumerate(tags):
     with tabs[i]:
-        rows = []
+        items = []
         for k, logs in db.items():
             if logs and logs[-1].get('type') == t_tag:
                 p = k.split(" | ")
-                rows.append({'M': p[0], 'S': p[1], 'P': logs[-1]['price'], 'C': logs[-1]['cat']})
+                items.append({'M': p[0], 'S': p[1], 'P': logs[-1]['price'], 'C': logs[-1]['cat']})
         
-        df_tab = pd.DataFrame(rows)
+        df_tab = pd.DataFrame(items)
         if not df_tab.empty:
             cats = sorted(df_tab['C'].unique())
             sel_cat = st.selectbox("Категория:", cats, key=f"s_{t_tag}")
@@ -109,21 +115,19 @@ for i, t_tag in enumerate(tags):
                 pivot.columns.name = None
                 st.markdown(f'<div class="table-container">{pivot.to_html(escape=False)}</div>', unsafe_allow_html=True)
 
-# ИСТОРИЯ ИЗМЕНЕНИЙ (В выпадающем списке и ТОЛЬКО для Used)
+# ИСТОРИЯ (ТОЛЬКО USED)
 with st.expander("📜 История изменений (Used)"):
     used_items = []
     for k, logs in db.items():
         if logs and logs[-1].get('type') == 'u':
             p = k.split(" | ")
             used_items.append({'M': p[0], 'S': p[1], 'C': logs[-1]['cat']})
-    
     if used_items:
         h_df = pd.DataFrame(used_items)
         f1, f2, f3 = st.columns(3)
         with f1: h_cat = st.selectbox("1. Категория", sorted(h_df['C'].unique()), key="h_cat")
         with f2: h_mod = st.selectbox("2. Модель", sorted(h_df[h_df['C'] == h_cat]['M'].unique()), key="h_mod")
         with f3: h_shop = st.selectbox("3. Поставщик", sorted(h_df[(h_df['C'] == h_cat) & (h_df['M'] == h_mod)]['S'].unique()), key="h_shop")
-        
         h_key = f"{h_mod} | {h_shop}"
         if h_key in db:
             for e in reversed(db[h_key]):
