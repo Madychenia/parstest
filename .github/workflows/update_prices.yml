@@ -2,10 +2,10 @@ name: Update Prices & Take Screenshots
 
 on:
   schedule:
-    - cron: '*/10 * * * *'  # Авто-запуск каждые 10 минут
-  push:                     # Запуск сразу после сохранения (удобно для тестов)
+    - cron: '*/10 * * * *'
+  push:
     branches: [ main ]
-  workflow_dispatch:        # Кнопка для ручного запуска
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -15,12 +15,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4  # Обновил до v4
         with:
-          fetch-depth: 0    # Важно для подгрузки истории изменений
+          fetch-depth: 0
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5  # Обновил до v5
         with:
           python-version: '3.10'
 
@@ -37,14 +37,12 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           
-          # Забираем изменения, чтобы не было конфликтов
-          git pull --rebase origin main
+          # Убираем ошибку 128: сначала забираем изменения из GitHub
+          git pull origin main --rebase
           
-          # Добавляем файлы цен
           git add price_history.json last_run.json
           
-          # Если изменений нет, просто выходим без ошибки
+          # Фиксируем изменения, если они есть
           git commit -m "Auto-update prices [skip ci]" || exit 0
           
-          # Отправляем в репозиторий
           git push origin main
