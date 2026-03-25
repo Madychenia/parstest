@@ -18,24 +18,17 @@ KIEV_TZ = pytz.timezone('Europe/Kyiv')
 
 st.set_page_config(page_title="Мониторинг цен", layout="wide")
 
-# ВОЗВРАЩАЕМ СТИЛИ: Красный доллар, скрытые заголовки и ЗАКРЕПЛЕННЫЙ СТОЛБЕЦ МОДЕЛЕЙ
+# СТИЛИ (Закрепленный столбец и оформление)
 st.markdown("""
     <style>
     .block-container { padding: 1rem !important; }
     .table-container { overflow-x: auto; width: 100%; border: 1px solid #eee; }
     th, td { padding: 8px !important; border: 1px solid #eee !important; font-size: 0.85em; text-align: center !important; }
     .blank, .index_name { display: none !important; }
-    
-    /* ЗАКРЕПЛЕНИЕ ПЕРВОГО СТОЛБЦА (Модели) */
     td:first-child, th:first-child { 
-        position: sticky; 
-        left: 0; 
-        background-color: #f8f9fa !important; /* Серый фон, чтобы не просвечивал */
-        z-index: 3; /* Поверх остальных ячеек */
-        font-weight: bold; 
-        border-right: 2px solid #ddd !important; /* Явная граница справа */
+        position: sticky; left: 0; background-color: #f8f9fa !important; z-index: 3; 
+        font-weight: bold; border-right: 2px solid #ddd !important; 
     }
-    
     .uah { color: #1a1a1a; font-weight: 800; display: block; }
     .usd { color: #FF4B4B; font-weight: 700; font-size: 0.9em; }
     .log-usd { color: #FF4B4B; font-weight: bold; }
@@ -52,6 +45,12 @@ def load_data(file):
 def save_data(file, data):
     with open(file, 'w', encoding='utf-8') as f: json.dump(data, f, ensure_ascii=False, indent=2)
 
+def send_telegram(text):
+    try:
+        url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
+        requests.post(url, json={"chat_id": CHAT_ID, "text": text, "parse_mode": "Markdown"})
+    except: pass
+
 def clean_price(text):
     res = re.sub(r'[^\d]', '', text)
     return int(res) if res else None
@@ -61,21 +60,17 @@ def run_parsing():
     now = datetime.now(KIEV_TZ).strftime('%d.%m %H:%M')
     mapping = {'links.csv': 'u', 'links_new.csv': 'n'}
     
-    # Считаем общее кол-во строк для прогресс-бара
     total_tasks = 0
     tasks = []
     for f_name, tag in mapping.items():
         if os.path.exists(f_name):
             try:
-                # Читаем CSV с явным указанием разделителя
                 tdf = pd.read_csv(f_name, sep=';', engine='python', encoding='utf-8-sig')
                 total_tasks += len(tdf)
                 tasks.append((f_name, tag, tdf))
             except: pass
 
-    if total_tasks == 0: 
-        st.error("Файлы ссылок пусты или не найдены.")
-        return
+    if total_tasks == 0: return
     
     progress_bar = st.progress(0)
     status_text = st.empty()
@@ -102,9 +97,18 @@ def run_parsing():
                     if el:
                         price_val = clean_price(el.text)
                         if price_val:
-                            # Уникальный ключ для базы (чтобы не было путаницы)
                             key = f"{m} | {s} | {tag}"
-                            history[key] = history.get(key, [])
+                            
+                            # ЛОГИКА УВЕДОМЛЕНИЙ
+                            if key in history and len(history[key]) > 0:
+                                last_price = history[key][-1]['price']
+                                if price_val != last_price:
+                                    diff = price_val - last_price
+                                    emoji = "📈" if diff > 0 else "📉"
+                                    msg = f"{emoji} *Изменение цены!*\n\n*{m}* ({s})\nБыло: {last_price:,} ₴\nСтало: {price_val:,} ₴\nРазница: {diff:+,} ₴"
+                                    send_telegram(msg)
+                            
+                            if key not in history: history[key] = []
                             history[key].append({
                                 'time': now, 'price': price_val, 'cat': c, 
                                 'type': tag, 'order': idx
@@ -113,37 +117,30 @@ def run_parsing():
     
     save_data(HISTORY_FILE, history)
     save_data(LAST_RUN_FILE, {'time': now})
-    status_text.success(f"✅ Обновление завершено в {now}")
+    status_text.success(f"✅ Готово! Данные обновлены в {now}")
     time.sleep(1)
     status_text.empty()
     progress_bar.empty()
 
 # --- ИНТЕРФЕЙС ---
 st.title("📱 Мониторинг")
-minfin_rate = 44.15 # Зафиксировали, как ты просил
+minfin_rate = 44.15 
 db = load_data(HISTORY_FILE)
 last_run = load_data(LAST_RUN_FILE)
 
 c1, c2, c3, c4 = st.columns([1,1.5,1,1])
-with c1: 
-    # УБРАЛИ СЛОВО КУРС, просто числовое поле
-    user_rate = st.number_input("Курс $:", value=44.55, label_visibility="visible") 
+with c1: user_rate = st.number_input("Курс $:", value=44.55, label_visibility="visible") 
 with c2: 
     st.write(f"Обновлено: **{last_run.get('time', '—')}**")
-    # ВЕРНУЛИ НАДПИСЬ КУРС МИНФИНА ПОД ДАТУ
     st.caption(f"Курс Минфина (продажа): **{minfin_rate}**") 
 with c3: 
     if st.button("♻️ ОБНОВИТЬ ВСЁ"): 
         run_parsing()
         st.rerun()
 with c4:
-    # Оставляем кнопку сброса на всякий случай
     if st.button("🗑 СБРОСИТЬ БАЗУ"):
-        if os.path.exists(HISTORY_FILE): 
-            os.remove(HISTORY_FILE)
-        # Очищаем также в памяти приложения
+        if os.path.exists(HISTORY_FILE): os.remove(HISTORY_FILE)
         st.cache_data.clear()
-        st.success("База на сервере очищена!")
         st.rerun()
 
 tabs = st.tabs(["Used (Б/У)", "New (Новые)"])
@@ -155,49 +152,34 @@ for i, t_tag in enumerate(tags):
         for k, logs in db.items():
             if logs and logs[-1].get('type') == t_tag:
                 p = k.split(" | ")
-                # p[0] - модель, p[1] - магазин
-                items.append({
-                    'M': p[0], 'S': p[1], 'P': logs[-1]['price'], 
-                    'C': logs[-1]['cat'], 'O': logs[-1].get('order', 999)
-                })
+                items.append({'M': p[0], 'S': p[1], 'P': logs[-1]['price'], 'C': logs[-1]['cat'], 'O': logs[-1].get('order', 999)})
         
         df_tab = pd.DataFrame(items)
         if not df_tab.empty:
-            # Сохраняем порядок категорий как в CSV
             cats = df_tab['C'].unique() 
             sel_cat = st.selectbox("Категория:", cats, key=f"s_{t_tag}")
-            
             f_df = df_tab[df_tab['C'] == sel_cat].copy()
             if not f_df.empty:
-                # Сортируем модели по порядку их записи в CSV
                 f_df = f_df.sort_values('O')
                 f_df['Display'] = f_df['P'].apply(lambda x: f'<span class="uah">{x:,} ₴</span><span class="usd">{int(x/user_rate):,} $</span>')
-                
-                # pivot_table с sort=False, чтобы сохранить наш порядок моделей
                 pivot = f_df.pivot_table(index='M', columns='S', values='Display', aggfunc='first', sort=False).fillna('—')
-                
-                # Окончательно убираем заголовки индексных осей для чистоты
                 pivot.index.name = None
                 pivot.columns.name = None
                 st.markdown(f'<div class="table-container">{pivot.to_html(escape=False)}</div>', unsafe_allow_html=True)
 
-# ИСТОРИЯ (ТОЛЬКО USED)
 with st.expander("📜 История изменений (Used)"):
     used_items = []
     for k, logs in db.items():
         if logs and logs[-1].get('type') == 'u':
             p = k.split(" | ")
-            # p[0] - модель, p[1] - магазин
             used_items.append({'M': p[0], 'S': p[1], 'C': logs[-1]['cat'], 'O': logs[-1].get('order', 999)})
     
     if used_items:
-        # Сортируем по порядку в CSV
         h_df = pd.DataFrame(used_items).sort_values('O')
         f1, f2, f3 = st.columns(3)
         with f1: h_cat = st.selectbox("1. Категория", h_df['C'].unique(), key="h_cat")
         with f2: h_mod = st.selectbox("2. Модель", h_df[h_df['C'] == h_cat]['M'].unique(), key="h_mod")
         with f3: h_shop = st.selectbox("3. Поставщик", h_df[(h_df['C'] == h_cat) & (h_df['M'] == h_mod)]['S'].unique(), key="h_shop")
-        
         h_key = f"{h_mod} | {h_shop} | u"
         if h_key in db:
             for e in reversed(db[h_key]):
