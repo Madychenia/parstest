@@ -32,13 +32,14 @@ def get_market_data():
         r = requests.get(url, headers=headers, timeout=15)
         soup = BeautifulSoup(r.text, 'html.parser')
         
-        # 1. Курс USD Киев (твой новый селектор внутри 1-го блока)
+        # 1. Киев USD (по твоему новому селектору)
         k_block = soup.select_one("#grid > div:nth-child(1)")
         if k_block:
+            # Селектор: div > div:nth-child(2) > div:nth-child(2)
             k_val = k_block.select_one("div > div:nth-child(2) > div:nth-child(2)")
             if k_val: res["kiev"] = k_val.text.strip()
 
-        # 2. Курс USD Черновцы (внутри 5-го блока)
+        # 2. Черновцы USD (аналогично в 5-м блоке)
         c_block = soup.select_one("#grid > div:nth-child(5)")
         if c_block:
             c_val = c_block.select_one("div > div:nth-child(2) > div:nth-child(2)")
@@ -47,7 +48,6 @@ def get_market_data():
         # 3. Средний USDT по 9 городам
         white_vals, blue_vals = [], []
         for i in range(1, 10):
-            # Селекторы для USDT (предпоследняя и последняя строки)
             w = soup.select_one(f"#grid > div:nth-child({i}) > div.usdt > div:nth-child(1) > div:nth-child(2) > span")
             b = soup.select_one(f"#grid > div:nth-child({i}) > div.usdt > div:nth-child(2) > div:nth-child(2) > span")
             
@@ -95,22 +95,35 @@ def fetch_prices(file_name, rate):
         results = []
         for _, row in df.iterrows():
             price_uah = None
-            url, selector = str(row['ссылка']).strip(), str(row['селектор']).strip()
+            url = str(row.get('ссылка', '')).strip()
+            selector = str(row.get('селектор', '')).strip()
             if url.startswith('http'):
                 try:
                     r = requests.get(url, headers={'User-Agent': 'Mozilla/5.0'}, timeout=10)
                     soup = BeautifulSoup(r.text, 'html.parser')
                     el = soup.select_one(selector)
-                    if el: price_uah = int(re.sub(r'\D', '', el.text.strip()))
+                    if el:
+                        price_uah = int(re.sub(r'\D', '', el.text.strip()))
                 except: pass
             
             p_usd = round(price_uah / rate, 1) if price_uah else 0
             val = f'<span class="uah">{price_uah:,} ₴</span><br><span class="usd">{p_usd}$</span>' if price_uah else "—"
-            results.append({'Модель': row['модель'], 'Магазин': row['магазин'], 'Цена': val})
+            results.append({'Модель': row.get('модель', '—'), 'Магазин': row.get('магазин', '—'), 'Цена': val})
         return pd.DataFrame(results).drop_duplicates(subset=['Модель', 'Магазин'])
     except: return pd.DataFrame()
 
 data = fetch_prices('links.csv', user_rate)
+
 if not data.empty:
+    # Исправленная логика фильтрации (без синтаксических ошибок)
     data['Серия'] = data['Модель'].apply(lambda x: re.search(r'\d+', str(x)).group() if re.search(r'\d+', str(x)) else "Прочее")
-    series = sorted(data['Серия'].unique(), key=lambda x:
+    series_list = sorted(data['Серия'].unique(), key=lambda x: int(x) if str(x).isdigit() else 999)
+    
+    sel = st.selectbox("Серия iPhone:", series_list, index=len(series_list)-1)
+    
+    filtered = data[data['Серия'] == sel]
+    # Создаем сводную таблицу
+    pivot = filtered.pivot(index='Модель', columns='Магазин', values='Price' if 'Price' in filtered.columns else 'Цена')
+    st.write(pivot.to_html(escape=False), unsafe_allow_html=True)
+else:
+    st.info("Загрузите файл links.csv для отображения цен на товары.")
