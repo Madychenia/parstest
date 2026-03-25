@@ -55,7 +55,7 @@ def run_parsing():
     
     for f_name, tag in mapping.items():
         if not os.path.exists(f_name): continue
-        # Читаем CSV с явным указанием разделителя
+        # Читаем CSV строго по порядку
         df = pd.read_csv(f_name, sep=';', engine='python', encoding='utf-8-sig')
         df.columns = [c.strip().lower() for c in df.columns]
         
@@ -74,7 +74,7 @@ def run_parsing():
                     if el:
                         price_val = clean_price(el.text)
                         if price_val:
-                            # В ключе сохраняем и категорию, и тип, и порядок (idx)
+                            # Ключ теперь уникален для типа, чтобы не было путаницы
                             key = f"{m} | {s} | {tag}"
                             history[key] = history.get(key, [])
                             history[key].append({
@@ -100,7 +100,9 @@ with c3:
         st.rerun()
 with c4:
     if st.button("🗑 СБРОСИТЬ БАЗУ"):
-        if os.path.exists(HISTORY_FILE): os.remove(HISTORY_FILE)
+        if os.path.exists(HISTORY_FILE): 
+            os.remove(HISTORY_FILE)
+            st.success("База очищена! Нажмите ОБНОВИТЬ")
         st.rerun()
 
 tabs = st.tabs(["Used (Б/У)", "New (Новые)"])
@@ -119,13 +121,13 @@ for i, t_tag in enumerate(tags):
         
         df_tab = pd.DataFrame(items)
         if not df_tab.empty:
-            # Категории без алфавитной сортировки — как в файле
+            # Сохраняем порядок категорий как в файле
             cats = df_tab['C'].unique() 
             sel_cat = st.selectbox("Категория:", cats, key=f"s_{t_tag}")
             
             f_df = df_tab[df_tab['C'] == sel_cat].copy()
             if not f_df.empty:
-                # Сортируем по колонке 'O' (порядок в CSV)
+                # Сортируем модели по их порядку в CSV
                 f_df = f_df.sort_values('O')
                 f_df['Display'] = f_df['P'].apply(lambda x: f'<span class="uah">{x:,} ₴</span><span class="usd">{int(x/user_rate):,} $</span>')
                 
@@ -134,7 +136,6 @@ for i, t_tag in enumerate(tags):
                 pivot.columns.name = None
                 st.markdown(f'<div class="table-container">{pivot.to_html(escape=False)}</div>', unsafe_allow_html=True)
 
-# ИСТОРИЯ (ТОЛЬКО USED)
 with st.expander("📜 История изменений (Used)"):
     used_items = []
     for k, logs in db.items():
