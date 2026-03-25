@@ -17,9 +17,8 @@ HISTORY_FILE = 'price_history.json'
 LAST_RUN_FILE = 'last_run.json'
 KIEV_TZ = pytz.timezone('Europe/Kyiv')
 
-st.set_page_config(page_title="Мониторинг цен", layout="wide")
+st.set_page_config(page_title="Мониторинг", layout="wide")
 
-# Стили
 st.markdown("""
     <style>
     .block-container { padding: 1rem !important; }
@@ -48,9 +47,9 @@ def get_minfin_sell_rate():
             rate_text = rates[1].text.replace(',', '.')
             val = float(re.findall(r"\d+\.\d+", rate_text)[0])
             return val
-        return 44.55
+        return 44.15  # Курс из твоего скриншота
     except:
-        return 44.55
+        return 44.15
 
 def load_data(file):
     if os.path.exists(file):
@@ -86,9 +85,9 @@ def send_excel_to_tg(df_pivot, cat_name, user_rate, minfin_rate):
         files = {'document': (f"prices_{cat_name}_{now}.xlsx", output)}
         data = {'chat_id': CHAT_ID, 'caption': caption}
         requests.post(url, files=files, data=data)
-        st.success("✅ Файл отправлен в Telegram!")
+        st.success("✅ Файл отправлен!")
     except Exception as e:
-        st.error(f"Ошибка отправки файла: {e}")
+        st.error(f"Ошибка: {e}")
 
 def run_parsing():
     history = load_data(HISTORY_FILE)
@@ -99,18 +98,20 @@ def run_parsing():
     
     for f_name, tag in mapping.items():
         if not os.path.exists(f_name): continue
-        df = pd.read_csv(f_name, sep=None, engine='python', encoding='utf-8-sig')
+        df = pd.read_csv(f_name, sep=';', engine='python', encoding='utf-8-sig') # Читаем строго по ';'
         df.columns = [c.strip().lower() for c in df.columns]
         
         for _, row in df.iterrows():
-            m, s = str(row.get('модель', '—')).strip(), str(row.get('магазин', '—')).strip()
-            u, sel = str(row.get('ссылка', '')).strip(), str(row.get('селектор', ''))
+            m = str(row.get('модель', '—')).strip()
+            s = str(row.get('магазин', '—')).strip()
+            u = str(row.get('ссылка', '')).strip()
+            sel = str(row.get('селектор', '')).strip()
             c = str(row.get('категория', '1')).strip()
             key = f"{m} | {s}"
             
             if u.startswith('http'):
                 try:
-                    r = requests.get(u, headers={'User-Agent': 'Mozilla/5.0'}, timeout=10)
+                    r = requests.get(u, headers={'User-Agent': 'Mozilla/5.0'}, timeout=15)
                     soup = BeautifulSoup(r.text, 'html.parser')
                     el = soup.select_one(sel)
                     price = clean_price(el.text.strip()) if el else None
@@ -125,15 +126,12 @@ def run_parsing():
                                               data={"chat_id": CHAT_ID, "text": msg, "parse_mode": "HTML"})
                             history[key].append({'time': now, 'price': price, 'cat': c, 'type': tag})
                     else:
-                        errors.append(f"❌ {key}: Цена не найдена")
+                        errors.append(f"❌ {key}: Не найден элемент по селектору")
                 except Exception as e:
-                    errors.append(f"❌ {key}: Ошибка запроса ({e})")
+                    errors.append(f"❌ {key}: {str(e)[:50]}")
                     
     save_data(HISTORY_FILE, history)
-    save_data(LAST_RUN_FILE, {
-        'time': datetime.now(KIEV_TZ).strftime('%d.%m %H:%M:%S'),
-        'errors': errors
-    })
+    save_data(LAST_RUN_FILE, {'time': datetime.now(KIEV_TZ).strftime('%d.%m %H:%M:%S'), 'errors': errors})
 
 # --- ИНТЕРФЕЙС ---
 st.title("📱 Мониторинг")
@@ -146,15 +144,15 @@ with c1:
     user_rate = st.number_input("Ваш курс $:", value=44.55, step=0.01)
 with c2:
     st.write(f"Обновлено: **{last_run.get('time', '—')}**")
-    st.caption(f"Курс Минфина (продажа): {minfin_rate}")
+    st.caption(f"Курс Минфина: {minfin_rate}")
 with c3:
     if st.button("♻️ ОБНОВИТЬ ВСЁ"):
-        with st.spinner("Парсинг..."):
+        with st.spinner("Работаю..."):
             run_parsing()
             st.rerun()
 
 if last_run.get('errors'):
-    with st.expander("⚠️ Статус парсинга (проблемы)"):
+    with st.expander("⚠️ Ошибки парсинга (проверь ссылки/селекторы)"):
         for err in last_run['errors']:
             st.markdown(f'<p class="status-error">{err}</p>', unsafe_allow_html=True)
 
@@ -168,63 +166,62 @@ if db:
     for i, t_tag in enumerate(tags):
         with tabs[i]:
             rows = []
+            # Собираем все ключи из истории, чтобы ничего не потерять
             for k, logs in db.items():
                 if logs:
                     last_entry = logs[-1]
                     if last_entry.get('type') == t_tag:
-                        m, s = k.split(" | ")
+                        parts = k.split(" | ")
                         rows.append({
-                            'Модель': m, 
-                            'Магазин': s, 
+                            'Модель': parts[0].strip(), 
+                            'Магазин': parts[1].strip(), 
                             'Цена_ГРН': last_entry['price'], 
-                            'Кат': last_entry.get('cat', '1')
+                            'Кат': str(last_entry.get('cat', '1')).strip()
                         })
             
             df_tab = pd.DataFrame(rows)
             
             if not df_tab.empty:
+                cat_list = sorted(df_tab['Кат'].unique())
                 col_sel, col_btn = st.columns([3, 1])
                 with col_sel:
-                    cat_list = sorted(df_tab['Кат'].unique())
-                    sel_cat = st.selectbox("Категория:", cat_list, key=f"main_cat_{t_tag}")
+                    sel_cat = st.selectbox("Выбери категорию:", cat_list, key=f"sel_{t_tag}")
                 
-                f_df = df_tab[df_tab['Кат'] == sel_cat]
-                # ТУТ ТВОЙ РУЧНОЙ КУРС
-                f_df['Цена'] = f_df['Цена_ГРН'].apply(lambda x: f'<span class="uah">{x:,} ₴</span><span class="usd">{int(x/user_rate):,} $</span>')
+                f_df = df_tab[df_tab['Кат'] == sel_cat].copy()
                 
-                pivot = f_df.pivot_table(index='Модель', columns='Магазин', values='Цена', aggfunc='first').fillna('—')
-                
-                with col_btn:
-                    st.write("") 
-                    if st.button("📊 Отправить таблицу в ТГ", key=f"file_{t_tag}"):
-                        send_excel_to_tg(pivot, sel_cat, user_rate, minfin_rate)
+                if not f_df.empty:
+                    f_df['Цена'] = f_df['Цена_ГРН'].apply(lambda x: f'<span class="uah">{x:,} ₴</span><span class="usd">{int(x/user_rate):,} $</span>')
+                    pivot = f_df.pivot_table(index='Модель', columns='Магазин', values='Цена', aggfunc='first').fillna('—')
+                    
+                    with col_btn:
+                        st.write("") 
+                        if st.button("📊 Excel в ТГ", key=f"btn_{t_tag}"):
+                            send_excel_to_tg(pivot, sel_cat, user_rate, minfin_rate)
 
-                st.markdown(f'<div class="table-container">{pivot.to_html(escape=False)}</div>', unsafe_allow_html=True)
+                    st.markdown(f'<div class="table-container">{pivot.to_html(escape=False)}</div>', unsafe_allow_html=True)
                 
                 st.markdown("<br>", unsafe_allow_html=True)
-                with st.expander(f"📜 История изменений ({tab_names[i]})", expanded=True):
+                with st.expander(f"📜 История изменений (по Минфину)", expanded=True):
                     f1, f2, f3 = st.columns(3)
                     with f1:
-                        l_cat = st.selectbox("1. Категория поиска", cat_list, key=f"log_cat_{t_tag}")
+                        l_cat = st.selectbox("Категория поиска", cat_list, key=f"lcat_{t_tag}")
                     with f2:
-                        models_in_cat = df_tab[df_tab['Кат'] == l_cat]['Модель'].unique()
-                        l_mod = st.selectbox("2. Модель", sorted(models_in_cat), key=f"log_mod_{t_tag}")
+                        l_mods = sorted(df_tab[df_tab['Кат'] == l_cat]['Модель'].unique())
+                        l_mod = st.selectbox("Модель", l_mods, key=f"lmod_{t_tag}")
                     with f3:
-                        shops_for_mod = df_tab[(df_tab['Кат'] == l_cat) & (df_tab['Модель'] == l_mod)]['Магазин'].unique()
-                        l_shop = st.selectbox("3. Поставщик", sorted(shops_for_mod), key=f"log_shop_{t_tag}")
+                        l_shps = sorted(df_tab[(df_tab['Кат'] == l_cat) & (df_tab['Модель'] == l_mod)]['Магазин'].unique())
+                        l_shop = st.selectbox("Поставщик", l_shps, key=f"lsh_{t_tag}")
                     
                     final_key = f"{l_mod} | {l_shop}"
                     if final_key in db:
-                        st.divider()
                         for e in reversed(db[final_key]):
                             p_uah = e['price']
-                            # ТУТ СТРОГО КУРС МИНФИНА
-                            p_usd_minfin = int(p_uah / minfin_rate)
-                            st.markdown(f"{e['time']} — **{p_uah:,} ₴** <span class='log-usd'>({p_usd_minfin:,} $)</span>", unsafe_allow_html=True)
+                            p_usd_mf = int(p_uah / minfin_rate)
+                            st.markdown(f"{e['time']} — **{p_uah:,} ₴** <span class='log-usd'>({p_usd_mf:,} $)</span>", unsafe_allow_html=True)
             else:
-                st.info("Нет данных")
+                st.info("В этой вкладке пока пусто")
 else:
-    st.warning("База пуста.")
+    st.warning("База данных не загружена.")
 
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == '--parse':
