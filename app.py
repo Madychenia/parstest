@@ -15,31 +15,61 @@ HISTORY_FILE = 'price_history.json'
 
 st.set_page_config(page_title="Мониторинг цен PRO", layout="wide", initial_sidebar_state="collapsed")
 
-# Компактный CSS с поддержкой прокрутки
+# CSS с фиксацией первой колонки (Sticky Column)
 st.markdown("""
     <style>
     [data-testid="stSidebar"] { display: none; }
-    .uah { color: #1a1a1a; font-weight: 800; font-size: 0.95em; display: block; }
-    .usd { color: #FF4B4B; font-weight: 700; font-size: 0.85em; }
+    .block-container { padding: 1rem !important; }
     
-    /* Контейнер для прокрутки на мобилках */
-    .table-container { overflow-x: auto; width: 100%; }
+    /* Контейнер для скролла */
+    .table-container { 
+        overflow-x: auto; 
+        width: 100%; 
+        border: 1px solid #eee;
+    }
     
-    table { width: auto !important; min-width: 400px; border-collapse: collapse; border: 1px solid #eee !important; margin-bottom: 20px; }
-    th { background-color: #f8f9fb !important; padding: 8px !important; border: 1px solid #eee !important; font-size: 0.85em; }
-    td { padding: 6px 10px !important; border: 1px solid #eee !important; height: auto !important; vertical-align: middle !important; text-align: center !important; }
+    table { 
+        border-collapse: separate; 
+        border-spacing: 0; 
+        width: auto !important; 
+    }
     
-    /* Первая колонка - Название модели */
-    td:first-child { text-align: left !important; font-weight: 700; background-color: #fafafa; min-width: 140px; white-space: nowrap; }
+    th, td { 
+        padding: 6px 8px !important; 
+        border: 1px solid #eee !important; 
+        white-space: nowrap; 
+        font-size: 0.82em;
+        text-align: center !important;
+    }
+
+    /* ФИКСАЦИЯ ПЕРВОЙ КОЛОНКИ */
+    td:first-child, th:first-child {
+        position: -webkit-sticky;
+        position: sticky;
+        left: 0;
+        z-index: 2;
+        background-color: #f8f9fa !important;
+        border-right: 2px solid #ddd !important;
+        text-align: left !important;
+        font-weight: 700;
+        min-width: 120px;
+    }
     
-    /* Убираем лишние отступы Streamlit */
-    .block-container { padding-top: 2rem !important; }
+    /* Чтобы шапка не перекрывала фиксированную колонку */
+    th:first-child { z-index: 3; }
+
+    .uah { color: #1a1a1a; font-weight: 800; display: block; line-height: 1.1; }
+    .usd { color: #FF4B4B; font-weight: 700; font-size: 0.9em; }
+    
+    /* Убираем лишние элементы Streamlit для компактности */
     div[data-testid="stNumberInput"] label { display: none; }
+    button { padding: 5px !important; height: 35px; }
     </style>
     """, unsafe_allow_html=True)
 
-st.title("📱 Мониторинг цен PRO")
+st.title("📱 Мониторинг цен")
 
+# --- ФУНКЦИИ БАЗЫ ---
 def load_history():
     if os.path.exists(HISTORY_FILE):
         try:
@@ -57,21 +87,19 @@ def send_telegram(message):
         requests.post(url, data={"chat_id": CHAT_ID, "text": message, "parse_mode": "HTML"}, timeout=5)
     except: pass
 
-# --- КОМПАКТНАЯ ПАНЕЛЬ ---
-col_rate, col_btn, col_test = st.columns([1, 1.5, 1.5])
+# --- ИНТЕРФЕЙС ---
+col_rate, col_btn, col_test = st.columns([0.8, 1, 1])
 with col_rate:
-    # Убрали надпись, оставили только ввод числа
-    user_rate = st.number_input("rate", value=44.55, step=0.01, label_visibility="collapsed")
+    user_rate = st.number_input("r", value=44.55, step=0.01, label_visibility="collapsed")
 with col_btn:
     if st.button("♻️ ОБНОВИТЬ", use_container_width=True):
         st.cache_data.clear()
         st.rerun()
 with col_test:
-    if st.button("🔔 ТЕСТ ТГ", use_container_width=True):
-        send_telegram("✅ Связь в норме!")
-        st.toast("Тест отправлен")
+    if st.button("🔔 ТЕСТ", use_container_width=True):
+        send_telegram("✅ Бот онлайн")
+        st.toast("Ок")
 
-# --- ЛОГИКА ---
 @st.cache_data(ttl=3600)
 def fetch_and_track(file_name):
     history = load_history()
@@ -84,17 +112,14 @@ def fetch_and_track(file_name):
         
         for _, row in df.iterrows():
             p_uah = None
-            model = str(row.get('модель', '—')).strip()
-            shop = str(row.get('магазин', '—')).strip()
+            model, shop = str(row.get('модель', '—')).strip(), str(row.get('магазин', '—')).strip()
             cat = str(row.get('категория', 'Без категории')).strip()
             item_id = f"{model} | {shop}"
-            
-            url = str(row.get('ссылка', '')).strip()
-            sel = str(row.get('селектор', '')).strip()
+            url, sel = str(row.get('ссылка', '')).strip(), str(row.get('селектор', '')).strip()
             
             if url.startswith('http'):
                 try:
-                    r = requests.get(url, headers={'User-Agent': 'Mozilla/5.0'}, timeout=10)
+                    r = requests.get(url, headers={'User-Agent': 'Mozilla/5.0'}, timeout=7)
                     soup = BeautifulSoup(r.text, 'html.parser')
                     el = soup.select_one(sel)
                     if el:
@@ -106,14 +131,9 @@ def fetch_and_track(file_name):
             if p_uah:
                 last = history[item_id][-1] if history[item_id] else None
                 if not last or last['price'] != p_uah:
-                    if last:
-                        diff = p_uah - last['price']
-                        msg = f"🔔 <b>{model}</b>\n🏪 {shop}\n💰 <b>{p_uah:,} ₴</b>"
-                        send_telegram(msg)
+                    if last: send_telegram(f"🔔 <b>{model}</b>\n🏪 {shop}: <b>{p_uah:,} ₴</b>")
                     history[item_id].append({'time': now_str, 'price': p_uah, 'cat': cat})
-                else:
-                    last['cat'] = cat
-            
+                else: last['cat'] = cat
             results.append({'Модель': model, 'Магазин': shop, 'Цена_ГРН': p_uah, 'Категория': cat})
             
         save_history(history)
@@ -128,11 +148,8 @@ for i, tab in enumerate(tabs):
     with tab:
         data = fetch_and_track(csv_files[i])
         if not data.empty:
-            all_cats = data['Категория'].unique().tolist()
-            sel_cat = st.selectbox("Категория:", all_cats, key=f"s_{i}", label_visibility="collapsed")
-            
+            sel_cat = st.selectbox("C", data['Категория'].unique(), key=f"c_{i}", label_visibility="collapsed")
             f_df = data[data['Категория'] == sel_cat]
-            mod_order = f_df['Модель'].unique().tolist()
             
             def cell_fmt(v):
                 if pd.notnull(v) and v > 0:
@@ -141,26 +158,11 @@ for i, tab in enumerate(tabs):
 
             disp = f_df.copy()
             disp['Цена'] = disp['Цена_ГРН'].apply(cell_fmt)
-            
             pivot = disp.drop_duplicates(subset=['Модель', 'Магазин']).pivot(
                 index='Модель', columns='Магазин', values='Цена'
-            ).fillna('<span style="color:#ccc">—</span>').reindex(mod_order)
+            ).fillna('<span style="color:#ccc">—</span>').reindex(f_df['Модель'].unique())
             
-            # Оборачиваем таблицу в div для прокрутки
+            # Оборачиваем в контейнер для скролла с фиксацией
             st.markdown(f'<div class="table-container">{pivot.to_html(escape=False)}</div>', unsafe_allow_html=True)
-            
-            # --- ИСТОРИЯ ---
-            with st.expander("📜 История (выбрать)"):
-                h_db = load_history()
-                h_c1, h_c2 = st.columns(2)
-                with h_c1:
-                    h_mod = st.selectbox("Модель:", sorted(f_df['Модель'].unique().tolist()), key=f"hm_{i}")
-                with h_c2:
-                    h_shop = st.selectbox("Магазин:", sorted(f_df[f_df['Модель'] == h_mod]['Магазин'].unique().tolist()), key=f"hs_{i}")
-                
-                target = f"{h_mod} | {h_shop}"
-                if target in h_db:
-                    for log in reversed(h_db[target]):
-                        st.write(f"📅 {log['time']} — **{log['price']:,} ₴**")
         else:
-            st.info("Нет данных")
+            st.info("Пусто")
