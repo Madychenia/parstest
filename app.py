@@ -47,10 +47,9 @@ def run_parsing():
                             if el:
                                 price_val = clean_price(el.text)
                                 if price_val:
-                                    key = f"{m} | {s} | {tag}"
+                                    key = f"{m} | {shop} | {tag}"
                                     if key not in history: history[key] = []
                                     history[key].append({'time': now, 'price': price_val, 'cat': c, 'type': tag, 'order': idx})
-                                    if len(history[key]) > 50: history[key] = history[key][-50:]
                         except: pass
             except: pass
     save_data(HISTORY_FILE, history)
@@ -62,22 +61,19 @@ if "--parse" in sys.argv:
 
 st.set_page_config(page_title="Мониторинг", layout="wide")
 
-# CSS для компактной таблицы БЕЗ лишних полос в углу
+# CSS: Таблица без мусора в углу + стили для логов
 st.markdown("""<style>
     .block-container { padding: 1rem !important; max-width: 1000px !important; margin: 0 auto !important; }
     .table-container { overflow-x: auto; width: 100%; text-align: center; margin-bottom: 20px; }
     table { margin: 0 auto; border-collapse: collapse; width: auto !important; }
     th, td { padding: 4px 10px !important; border: 1px solid #eee !important; font-size: 0.85em; text-align: center !important; }
-    
-    /* Оформление боковой колонки (Модели) */
     tbody tr th { background-color: #f8f9fa !important; font-weight: bold; text-align: left !important; border-right: 2px solid #ddd !important; }
-    
-    /* Убираем пустую строку и скрываем текст в угловой ячейке */
     thead tr:nth-child(2) { display: none; }
-    thead tr:first-child th:first-child { background-color: #f8f9fa !important; color: transparent !important; border: 1px solid #eee !important; }
-
+    thead tr:first-child th:first-child { background-color: #f8f9fa !important; color: transparent !important; }
     .uah { color: #1a1a1a; font-weight: 800; display: block; }
     .usd { color: #FF4B4B; font-weight: 700; font-size: 0.9em; }
+    .log-line { font-family: monospace; font-size: 0.95em; margin: 2px 0; }
+    .log-usd { color: #FF4B4B; font-weight: bold; }
 </style>""", unsafe_allow_html=True)
 
 st.title("📱 Мониторинг")
@@ -86,13 +82,12 @@ db = load_data(HISTORY_FILE)
 last_run = load_data(LAST_RUN_FILE)
 
 c1, c2, c3, c4 = st.columns([1,1.5,1,1])
-with c1: user_rate = st.number_input("", value=44.55, label_visibility="collapsed") 
+with c1: user_rate = st.number_input("Курс $:", value=44.55) 
 with c2: 
     st.write(f"Обновлено: **{last_run.get('time', '—')}**")
-    st.write(f"Курс Минфина: **{minfin_rate}**")
+    st.write(f"Курс Минфина (продажа): **{minfin_rate}**")
 with c3: 
-    if st.button("♻️ ОБНОВИТЬ"): 
-        run_parsing(); st.rerun()
+    if st.button("♻️ ОБНОВИТЬ"): run_parsing(); st.rerun()
 with c4:
     if st.button("🗑 СБРОСИТЬ"):
         if os.path.exists(HISTORY_FILE): os.remove(HISTORY_FILE)
@@ -112,23 +107,25 @@ for i, tab_ui in enumerate(tabs):
         
         if items:
             df_tab = pd.DataFrame(items)
-            sel_cat = st.selectbox("Категория:", sorted(df_tab['Категория'].unique()), key=f"s_{tag_key}")
+            sel_cat = st.selectbox("Выбор категории:", sorted(df_tab['Категория'].unique()), key=f"cat_{tag_key}")
             f_df = df_tab[df_tab['Категория'] == sel_cat].copy().sort_values('order')
             
             if not f_df.empty:
+                # Основная таблица
                 f_df['Display'] = f_df['Цена'].apply(lambda x: f'<span class="uah">{x:,} ₴</span><span class="usd">{int(x/user_rate):,} $</span>')
                 pivot = f_df.pivot_table(index='M', columns='S', values='Display', aggfunc='first', sort=False).fillna('—')
                 pivot.index.name = None; pivot.columns.name = None
                 st.markdown(f'<div class="table-container">{pivot.to_html(escape=False)}</div>', unsafe_allow_html=True)
 
-                # ИСТОРИЯ ЦЕН (Выпадающее меню и список)
+                # ИСТОРИЯ ЦЕН (ЛОГИ)
                 st.markdown("---")
-                sel_model = st.selectbox("История цены для модели:", sorted(f_df['M'].unique()), key=f"m_{tag_key}")
+                st.subheader("Отслеживание цены")
+                sel_model = st.selectbox("Выбор модели:", sorted(f_df['M'].unique()), key=f"mod_{tag_key}")
                 
-                for shop in f_df['S'].unique():
+                for shop in sorted(f_df[f_df['M'] == sel_model]['S'].unique()):
                     key = f"{sel_model} | {shop} | {tag_key}"
                     if key in db and db[key]:
-                        st.write(f"**{shop}**:")
-                        # Показываем последние 5 изменений цены текстом
-                        for entry in reversed(db[key][-5:]):
-                            st.write(f"└ {entry['time']}: {entry['price']:,} ₴")
+                        st.write(f"**{shop}:**")
+                        for entry in reversed(db[key]):
+                            usd_val = int(entry['price'] / user_rate)
+                            st.markdown(f'<div class="log-line">└ {entry["time"]}: {entry["price"]:,} ₴ (<span class="log-usd">{usd_val:,} $</span>)</div>', unsafe_allow_html=True)
