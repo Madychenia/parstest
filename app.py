@@ -8,13 +8,20 @@ import pytz
 import json
 import os
 import sys
+import time  # ДОБАВЛЕН ИМПОРТ ДЛЯ ПАУЗ
 
-# --- НАСТРОЙКИ (ТВОИ ДАННЫЕ) ---
+# --- НАСТРОЙКИ ---
 TELEGRAM_TOKEN = "7708518961:AAH8rY9Xq-Fv_m_iUjL-4u_GkC-JjI0eMFE"
 TELEGRAM_CHAT_ID = "1107530654"
 HISTORY_FILE = 'price_history.json'
 LAST_RUN_FILE = 'last_run.json'
 KIEV_TZ = pytz.timezone('Europe/Kyiv')
+
+# Реалистичный заголовок браузера
+HEADERS = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    'Accept-Language': 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7',
+}
 
 def send_telegram(message):
     try:
@@ -25,7 +32,7 @@ def send_telegram(message):
 def get_minfin_rate():
     try:
         url = "https://minfin.com.ua/currency/auction/usd/buy/kiev/"
-        r = requests.get(url, headers={'User-Agent': 'Mozilla/5.0'}, timeout=10)
+        r = requests.get(url, headers=HEADERS, timeout=10)
         soup = BeautifulSoup(r.text, 'html.parser')
         rate_el = soup.select_one('.sc-1x32wa2-9') 
         if rate_el:
@@ -50,7 +57,6 @@ def clean_price(text):
 
 def run_parsing():
     history = load_data(HISTORY_FILE)
-    # Формат времени: ровно час и минуты
     now = datetime.now(KIEV_TZ).strftime('%d.%m %H:%M')
     mapping = {'links.csv': 'u', 'links_new.csv': 'n'}
     current_keys = set()
@@ -76,12 +82,14 @@ def run_parsing():
     for i, (row, tag, idx) in enumerate(all_tasks):
         m, s, u, sel, c = [str(row.get(k, '')).strip() for k in ['модель','магазин','ссылка','селектор','категория']]
         if is_ui: st_text.text(f"Обновление: {m} ({s})")
+        
         if u.startswith('http') and sel and sel != 'nan':
             key = f"{m} | {s} | {tag}"
             try:
-                r = requests.get(u, headers={'User-Agent': 'Mozilla/5.0'}, timeout=15)
-                soup = BeautifulSoup(r.text, 'html.parser')
+                r = requests.get(u, headers=HEADERS, timeout=15)
+                soup = BeautifulSoup(r.text, 'lxml')
                 el = soup.select_one(sel)
+                
                 if el:
                     p_val = clean_price(el.text)
                     if p_val:
@@ -91,10 +99,20 @@ def run_parsing():
                             if last_p is not None:
                                 diff = ((p_val - last_p) / last_p) * 100
                                 trend = "📈" if p_val > last_p else "📉"
-                                send_telegram(f"{trend} <b>Цена изменилась!</b>\n\n📱 {m}\n🏪 {s}\n💰 {last_p:,} ₴ → <b>{p_val:,} ₴</b> ({diff:+.1f}%)")
+                                send_telegram(f"{trend} <b>Изменение цены!</b>\n\n📱 {m}\n🏪 {s}\n💰 {last_p:,} ₴ → <b>{p_val:,} ₴</b> ({diff:+.1f}%)")
                             history[key].append({'time': now, 'price': p_val, 'cat': c, 'type': tag, 'order': idx})
                             if len(history[key]) > 50: history[key] = history[key][-50:]
-            except: pass
+                else:
+                    # Если селектор не найден (например, сайт выдал капчу)
+                    print(f"⚠️ НЕ НАЙДЕН СЕЛЕКТОР: {s} - {m} ({u})")
+                    
+            except Exception as e:
+                # Если сайт не ответил (таймаут или сброс соединения)
+                print(f"❌ ОШИБКА ЗАПРОСА: {s} - {m} | Ошибка: {e}")
+            
+            # ПАУЗА 1.5 секунды, чтобы магазины не банили нас за спам
+            time.sleep(1.5)
+
         if is_ui: prog_bar.progress((i + 1) / len(all_tasks))
     
     history = {k: v for k, v in history.items() if k in current_keys}
@@ -150,13 +168,13 @@ for i, tab_ui in enumerate(tabs):
         
         if items:
             df_tab = pd.DataFrame(items)
-            # УБРАНА СОРТИРОВКА: Берем категории в порядке появления в файле
             cats = df_tab['Категория'].unique() 
             sel_cat = st.selectbox("Категория:", cats, key=f"cat_{tag_key}")
             f_df = df_tab[df_tab['Категория'] == sel_cat].copy().sort_values('order')
             
             if not f_df.empty:
                 f_df['Display'] = f_df['Цена'].apply(lambda x: f'<span class="uah">{x:,} ₴</span><span class="usd">{int(x/user_rate):,} $</span>')
+                f_df['M'] = pd.Categorical(f_df['M'], categories=f_df['M'].unique(), ordered=True)
                 pivot = f_df.pivot_table(index='M', columns='S', values='Display', aggfunc='first', sort=False).fillna('—')
                 pivot.index.name = pivot.columns.name = None
                 st.markdown(f'<div class="table-container">{pivot.to_html(escape=False)}</div>', unsafe_allow_html=True)
@@ -164,7 +182,6 @@ for i, tab_ui in enumerate(tabs):
                 st.markdown("---")
                 with st.expander("Отслеживание цены"):
                     hc1, hc2, hc3 = st.columns(3)
-                    # УБРАНА СОРТИРОВКА для выпадающих списков внизу
                     with hc1: h_cat = st.selectbox("Категория:", cats, key=f"hc_{tag_key}")
                     h_mod_df = df_tab[df_tab['Категория'] == h_cat].sort_values('order')
                     with hc2: h_mod = st.selectbox("Модель:", h_mod_df['M'].unique(), key=f"hm_{tag_key}")
