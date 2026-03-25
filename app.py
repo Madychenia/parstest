@@ -9,10 +9,18 @@ import json
 import os
 import sys
 
-# --- КОНФИГ ---
+# --- НАСТРОЙКИ (ТВОИ ДАННЫЕ) ---
+TELEGRAM_TOKEN = "7708518961:AAH8rY9Xq-Fv_m_iUjL-4u_GkC-JjI0eMFE"
+TELEGRAM_CHAT_ID = "1107530654"
 HISTORY_FILE = 'price_history.json'
 LAST_RUN_FILE = 'last_run.json'
 KIEV_TZ = pytz.timezone('Europe/Kyiv')
+
+def send_telegram(message):
+    try:
+        url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
+        requests.post(url, data={"chat_id": TELEGRAM_CHAT_ID, "text": message, "parse_mode": "HTML"}, timeout=10)
+    except: pass
 
 def get_minfin_rate():
     try:
@@ -42,31 +50,32 @@ def clean_price(text):
 
 def run_parsing():
     history = load_data(HISTORY_FILE)
+    # Формат времени: ровно час и минуты
     now = datetime.now(KIEV_TZ).strftime('%d.%m %H:%M')
     mapping = {'links.csv': 'u', 'links_new.csv': 'n'}
-    
-    # Сначала считаем общее кол-во задач для прогресс-бара
-    all_tasks = []
     current_keys = set()
+    all_tasks = []
+
     for f_name, tag in mapping.items():
         if os.path.exists(f_name):
-            df = pd.read_csv(f_name, sep=';', engine='python', encoding='utf-8-sig')
-            df.columns = [c.strip().lower() for c in df.columns]
-            for idx, row in df.iterrows():
-                all_tasks.append((row, tag, idx))
-                current_keys.add(f"{str(row.get('модель','')).strip()} | {str(row.get('магазин','')).strip()} | {tag}")
+            try:
+                df = pd.read_csv(f_name, sep=';', engine='python', encoding='utf-8-sig')
+                df.columns = [c.strip().lower() for c in df.columns]
+                for idx, row in df.iterrows():
+                    m_val, s_val = str(row.get('модель','')).strip(), str(row.get('магазин','')).strip()
+                    all_tasks.append((row, tag, idx))
+                    current_keys.add(f"{m_val} | {s_val} | {tag}")
+            except: pass
 
     if not all_tasks: return
-
-    # Создаем прогресс-бар в интерфейсе
-    progress_bar = st.progress(0)
-    status_text = st.empty()
-    total = len(all_tasks)
+    is_ui = not ("--parse" in sys.argv)
+    if is_ui:
+        prog_bar = st.progress(0)
+        st_text = st.empty()
 
     for i, (row, tag, idx) in enumerate(all_tasks):
         m, s, u, sel, c = [str(row.get(k, '')).strip() for k in ['модель','магазин','ссылка','селектор','категория']]
-        status_text.text(f"Обновление: {m} ({s})")
-        
+        if is_ui: st_text.text(f"Обновление: {m} ({s})")
         if u.startswith('http') and sel and sel != 'nan':
             key = f"{m} | {s} | {tag}"
             try:
@@ -74,31 +83,31 @@ def run_parsing():
                 soup = BeautifulSoup(r.text, 'html.parser')
                 el = soup.select_one(sel)
                 if el:
-                    price_val = clean_price(el.text)
-                    if price_val:
+                    p_val = clean_price(el.text)
+                    if p_val:
                         if key not in history: history[key] = []
-                        if not history[key] or history[key][-1]['price'] != price_val:
-                            history[key].append({'time': now, 'price': price_val, 'cat': c, 'type': tag, 'order': idx})
+                        last_p = history[key][-1]['price'] if history[key] else None
+                        if last_p != p_val:
+                            if last_p is not None:
+                                diff = ((p_val - last_p) / last_p) * 100
+                                trend = "📈" if p_val > last_p else "📉"
+                                send_telegram(f"{trend} <b>Цена изменилась!</b>\n\n📱 {m}\n🏪 {s}\n💰 {last_p:,} ₴ → <b>{p_val:,} ₴</b> ({diff:+.1f}%)")
+                            history[key].append({'time': now, 'price': p_val, 'cat': c, 'type': tag, 'order': idx})
                             if len(history[key]) > 50: history[key] = history[key][-50:]
             except: pass
-        
-        # Обновляем полоску
-        progress_bar.progress((i + 1) / total)
+        if is_ui: prog_bar.progress((i + 1) / len(all_tasks))
     
-    # Очистка мусора
     history = {k: v for k, v in history.items() if k in current_keys}
     save_data(HISTORY_FILE, history)
     save_data(LAST_RUN_FILE, {'time': now})
-    status_text.empty()
-    progress_bar.empty()
+    if is_ui: st_text.empty(); prog_bar.empty()
 
 if "--parse" in sys.argv:
-    # Для фонового запуска прогресс-бар не нужен
     run_parsing()
     sys.exit(0)
 
+# --- ИНТЕРФЕЙС ---
 st.set_page_config(page_title="Мониторинг", layout="wide")
-
 st.markdown("""<style>
     .block-container { padding: 1rem !important; max-width: 1000px !important; margin: 0 auto !important; }
     .table-container { overflow-x: auto; width: 100%; text-align: center; margin-bottom: 20px; }
@@ -115,18 +124,15 @@ st.markdown("""<style>
 
 st.title("📱 Мониторинг")
 minfin_rate = get_minfin_rate()
-db = load_data(HISTORY_FILE)
-last_run = load_data(LAST_RUN_FILE)
+db, last_run = load_data(HISTORY_FILE), load_data(LAST_RUN_FILE)
 
 c1, c2, c3, c4 = st.columns([1,1.5,1,1])
 with c1: user_rate = st.number_input("", value=44.55, label_visibility="collapsed") 
 with c2: 
     st.write(f"Обновлено: **{last_run.get('time', '—')}**")
-    st.write(f"Минфин: **{minfin_rate}**")
+    st.write(f"Минфин (продажа): **{minfin_rate}**")
 with c3: 
-    if st.button("♻️ ОБНОВИТЬ"): 
-        run_parsing()
-        st.rerun()
+    if st.button("♻️ ОБНОВИТЬ"): run_parsing(); st.rerun()
 with c4:
     if st.button("🗑 СБРОСИТЬ"):
         if os.path.exists(HISTORY_FILE): os.remove(HISTORY_FILE)
@@ -153,19 +159,18 @@ for i, tab_ui in enumerate(tabs):
             if not f_df.empty:
                 f_df['Display'] = f_df['Цена'].apply(lambda x: f'<span class="uah">{x:,} ₴</span><span class="usd">{int(x/user_rate):,} $</span>')
                 pivot = f_df.pivot_table(index='M', columns='S', values='Display', aggfunc='first', sort=False).fillna('—')
-                pivot.index.name = None; pivot.columns.name = None
+                pivot.index.name = pivot.columns.name = None
                 st.markdown(f'<div class="table-container">{pivot.to_html(escape=False)}</div>', unsafe_allow_html=True)
 
                 st.markdown("---")
                 with st.expander("Отслеживание цены"):
                     hc1, hc2, hc3 = st.columns(3)
-                    with hc1: h_cat = st.selectbox("Категория", cats, key=f"hc_{tag_key}")
+                    with hc1: h_cat = st.selectbox("Выбор категории:", cats, key=f"hc_{tag_key}")
                     h_mod_df = df_tab[df_tab['Категория'] == h_cat].sort_values('order')
-                    h_mod_list = h_mod_df['M'].unique()
-                    with hc2: h_mod = st.selectbox("Модель", h_mod_list, key=f"hm_{tag_key}")
+                    with hc2: h_mod = st.selectbox("Выбор модели:", h_mod_df['M'].unique(), key=f"hm_{tag_key}")
                     with hc3:
                         h_shop_list = sorted(df_tab[(df_tab['Категория'] == h_cat) & (df_tab['M'] == h_mod)]['S'].unique())
-                        h_shop = st.selectbox("Продавец", h_shop_list, key=f"hs_{tag_key}")
+                        h_shop = st.selectbox("Выбор продавца:", h_shop_list, key=f"hs_{tag_key}")
                     
                     hist_key = f"{h_mod} | {h_shop} | {tag_key}"
                     if hist_key in db:
