@@ -14,6 +14,20 @@ HISTORY_FILE = 'price_history.json'
 LAST_RUN_FILE = 'last_run.json'
 KIEV_TZ = pytz.timezone('Europe/Kyiv')
 
+def get_minfin_rate():
+    """Твой рабочий парсинг курса Минфина"""
+    try:
+        url = "https://minfin.com.ua/currency/auction/usd/buy/kiev/"
+        r = requests.get(url, headers={'User-Agent': 'Mozilla/5.0'}, timeout=10)
+        soup = BeautifulSoup(r.text, 'html.parser')
+        # Ищем актуальный курс продажи в Киеве
+        rate_el = soup.select_one('.sc-1x32wa2-9') 
+        if rate_el:
+            val = re.sub(r'[^\d.]', '', rate_el.text.replace(',', '.'))
+            return float(val)
+    except: pass
+    return 44.15 # Резерв, если сайт упадет
+
 def load_data(file):
     if os.path.exists(file):
         try:
@@ -32,6 +46,9 @@ def run_parsing():
     history = load_data(HISTORY_FILE)
     now = datetime.now(KIEV_TZ).strftime('%d.%m %H:%M')
     mapping = {'links.csv': 'u', 'links_new.csv': 'n'}
+    
+    current_keys = set() # Собираем только то, что есть в CSV сейчас
+
     for f_name, tag in mapping.items():
         if os.path.exists(f_name):
             try:
@@ -40,6 +57,8 @@ def run_parsing():
                 for idx, row in df.iterrows():
                     m, s, u, sel, c = [str(row.get(k, '')).strip() for k in ['модель','магазин','ссылка','селектор','категория']]
                     if u.startswith('http') and sel and sel != 'nan':
+                        key = f"{m} | {s} | {tag}"
+                        current_keys.add(key)
                         try:
                             r = requests.get(u, headers={'User-Agent': 'Mozilla/5.0'}, timeout=15)
                             soup = BeautifulSoup(r.text, 'html.parser')
@@ -47,14 +66,17 @@ def run_parsing():
                             if el:
                                 price_val = clean_price(el.text)
                                 if price_val:
-                                    key = f"{m} | {s} | {tag}"
                                     if key not in history: history[key] = []
-                                    # ПРОВЕРКА: Добавляем только если цена изменилась
+                                    # ЗАПИСЬ ТОЛЬКО ПРИ ИЗМЕНЕНИИ ЦЕНЫ
                                     if not history[key] or history[key][-1]['price'] != price_val:
                                         history[key].append({'time': now, 'price': price_val, 'cat': c, 'type': tag, 'order': idx})
                                         if len(history[key]) > 50: history[key] = history[key][-50:]
                         except: pass
             except: pass
+    
+    # АВТО-ОЧИСТКА: Удаляем мусор (старые названия моделей), которых нет в CSV
+    history = {k: v for k, v in history.items() if k in current_keys}
+    
     save_data(HISTORY_FILE, history)
     save_data(LAST_RUN_FILE, {'time': now})
 
@@ -64,6 +86,7 @@ if "--parse" in sys.argv:
 
 st.set_page_config(page_title="Мониторинг", layout="wide")
 
+# CSS: Таблица и логи
 st.markdown("""<style>
     .block-container { padding: 1rem !important; max-width: 1000px !important; margin: 0 auto !important; }
     .table-container { overflow-x: auto; width: 100%; text-align: center; margin-bottom: 20px; }
@@ -79,13 +102,12 @@ st.markdown("""<style>
 </style>""", unsafe_allow_html=True)
 
 st.title("📱 Мониторинг")
-minfin_rate = 44.15 # Здесь должна быть твоя функция парсинга курса Минфина
+minfin_rate = get_minfin_rate() # ПАРСИНГ ВКЛЮЧЕН
 db = load_data(HISTORY_FILE)
 last_run = load_data(LAST_RUN_FILE)
 
 c1, c2, c3, c4 = st.columns([1,1.5,1,1])
-with c1: 
-    user_rate = st.number_input("", value=44.55, label_visibility="collapsed") 
+with c1: user_rate = st.number_input("", value=44.55, label_visibility="collapsed") 
 with c2: 
     st.write(f"Обновлено: **{last_run.get('time', '—')}**")
     st.write(f"Курс Минфина: **{minfin_rate}**")
@@ -110,32 +132,48 @@ for i, tab_ui in enumerate(tabs):
         
         if items:
             df_tab = pd.DataFrame(items)
-            sel_cat = st.selectbox("Выбор категории:", sorted(df_tab['Категория'].unique()), key=f"cat_{tag_key}")
+            cats = sorted(df_tab['Категория'].unique())
+            sel_cat = st.selectbox("Категория:", cats, key=f"cat_{tag_key}")
+            
+            # СОРТИРОВКА ПО ПОРЯДКУ ИЗ CSV
             f_df = df_tab[df_tab['Категория'] == sel_cat].copy().sort_values('order')
             
             if not f_df.empty:
-                # Таблица сверху (считает по твоему вводу)
+                # Верхняя таблица (твой курс)
                 f_df['Display'] = f_df['Цена'].apply(lambda x: f'<span class="uah">{x:,} ₴</span><span class="usd">{int(x/user_rate):,} $</span>')
                 pivot = f_df.pivot_table(index='M', columns='S', values='Display', aggfunc='first', sort=False).fillna('—')
                 pivot.index.name = None; pivot.columns.name = None
                 st.markdown(f'<div class="table-container">{pivot.to_html(escape=False)}</div>', unsafe_allow_html=True)
 
-                # ОТСЛЕЖИВАНИЕ ЦЕНЫ (Логи снизу)
                 st.markdown("---")
                 with st.expander("Отслеживание цены"):
-                    # ГОРЗИНТАЛЬНОЕ МЕНЮ (3 колонки)
+                    # ГОРИЗОНТАЛЬНОЕ МЕНЮ
                     hc1, hc2, hc3 = st.columns(3)
-                    with hc1: h_cat = st.selectbox("Категория", sorted(df_tab['Категория'].unique()), key=f"hc_{tag_key}")
-                    with hc2: 
-                        h_mod_list = sorted(df_tab[df_tab['Категория'] == h_cat]['M'].unique())
-                        h_mod = st.selectbox("Модель", h_mod_list, key=f"hm_{tag_key}")
+                    with hc1: h_cat = st.selectbox("Категория", cats, key=f"hc_{tag_key}")
+                    
+                    h_mod_df = df_tab[df_tab['Категория'] == h_cat].sort_values('order')
+                    h_mod_list = h_mod_df['M'].unique()
+                    
+                    with hc2: h_mod = st.selectbox("Модель", h_mod_list, key=f"hm_{tag_key}")
                     with hc3:
                         h_shop_list = sorted(df_tab[(df_tab['Категория'] == h_cat) & (df_tab['M'] == h_mod)]['S'].unique())
                         h_shop = st.selectbox("Продавец", h_shop_list, key=f"hs_{tag_key}")
                     
                     hist_key = f"{h_mod} | {h_shop} | {tag_key}"
                     if hist_key in db:
-                        for entry in reversed(db[hist_key]):
-                            # Расчет логов СТРОГО ПО МИНФИНУ
+                        logs = db[hist_key]
+                        for j in range(len(logs)-1, -1, -1):
+                            entry = logs[j]
                             usd_minfin = int(entry['price'] / minfin_rate)
-                            st.markdown(f'<div class="log-line">└ {entry["time"]}: {entry["price"]:,} ₴ (<span class="log-usd">{usd_minfin:,} $</span>)</div>', unsafe_allow_html=True)
+                            
+                            diff_str = ""
+                            if j > 0:
+                                old_p = logs[j-1]['price']
+                                new_p = entry['price']
+                                diff = ((new_p - old_p) / old_p) * 100
+                                color = "red" if diff > 0 else "green"
+                                sign = "+" if diff > 0 else ""
+                                if diff != 0:
+                                    diff_str = f'<span style="color:{color}; font-size:0.85em;"> ({sign}{diff:.1f}%)</span>'
+                            
+                            st.markdown(f'<div class="log-line">└ {entry["time"]}: {entry["price"]:,} ₴ (<span class="log-usd">{usd_minfin:,} $</span>){diff_str}</div>', unsafe_allow_html=True)
