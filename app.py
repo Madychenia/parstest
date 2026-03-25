@@ -8,7 +8,6 @@ import pytz
 import json
 import os
 import sys
-import plotly.graph_objects as go
 
 # --- КОНФИГ ---
 HISTORY_FILE = 'price_history.json'
@@ -33,7 +32,6 @@ def run_parsing():
     history = load_data(HISTORY_FILE)
     now = datetime.now(KIEV_TZ).strftime('%d.%m %H:%M')
     mapping = {'links.csv': 'u', 'links_new.csv': 'n'}
-    
     for f_name, tag in mapping.items():
         if os.path.exists(f_name):
             try:
@@ -63,29 +61,23 @@ if "--parse" in sys.argv:
     sys.exit(0)
 
 st.set_page_config(page_title="Мониторинг", layout="wide")
+
+# CSS для компактной таблицы БЕЗ лишних полос в углу
 st.markdown("""<style>
-    .block-container { padding: 1rem !important; max-width: 1100px !important; margin: 0 auto !important; }
-    .table-container { overflow-x: auto; width: 100%; border: none; margin-bottom: 20px; text-align: center; }
-    
+    .block-container { padding: 1rem !important; max-width: 1000px !important; margin: 0 auto !important; }
+    .table-container { overflow-x: auto; width: 100%; text-align: center; margin-bottom: 20px; }
     table { margin: 0 auto; border-collapse: collapse; width: auto !important; }
     th, td { padding: 4px 10px !important; border: 1px solid #eee !important; font-size: 0.85em; text-align: center !important; }
     
-    tbody tr th { 
-        background-color: #f8f9fa !important; 
-        font-weight: bold; 
-        text-align: left !important;
-        border-right: 2px solid #ddd !important;
-    }
+    /* Оформление боковой колонки (Модели) */
+    tbody tr th { background-color: #f8f9fa !important; font-weight: bold; text-align: left !important; border-right: 2px solid #ddd !important; }
     
+    /* Убираем пустую строку и скрываем текст в угловой ячейке */
     thead tr:nth-child(2) { display: none; }
-    thead tr:first-child th:first-child { 
-        background-color: #f8f9fa !important;
-        color: transparent !important;
-    }
+    thead tr:first-child th:first-child { background-color: #f8f9fa !important; color: transparent !important; border: 1px solid #eee !important; }
 
     .uah { color: #1a1a1a; font-weight: 800; display: block; }
     .usd { color: #FF4B4B; font-weight: 700; font-size: 0.9em; }
-    .hist-box { padding: 10px; border: 1px solid #eee; border-radius: 5px; background: #fafafa; margin-top: 20px; }
 </style>""", unsafe_allow_html=True)
 
 st.title("📱 Мониторинг")
@@ -100,8 +92,7 @@ with c2:
     st.write(f"Курс Минфина: **{minfin_rate}**")
 with c3: 
     if st.button("♻️ ОБНОВИТЬ"): 
-        run_parsing()
-        st.rerun()
+        run_parsing(); st.rerun()
 with c4:
     if st.button("🗑 СБРОСИТЬ"):
         if os.path.exists(HISTORY_FILE): os.remove(HISTORY_FILE)
@@ -121,45 +112,23 @@ for i, tab_ui in enumerate(tabs):
         
         if items:
             df_tab = pd.DataFrame(items)
-            cats = sorted(df_tab['Категория'].unique())
-            sel_cat = st.selectbox("Выбор категории:", cats, key=f"s_{tag_key}")
-            
+            sel_cat = st.selectbox("Категория:", sorted(df_tab['Категория'].unique()), key=f"s_{tag_key}")
             f_df = df_tab[df_tab['Категория'] == sel_cat].copy().sort_values('order')
             
             if not f_df.empty:
                 f_df['Display'] = f_df['Цена'].apply(lambda x: f'<span class="uah">{x:,} ₴</span><span class="usd">{int(x/user_rate):,} $</span>')
                 pivot = f_df.pivot_table(index='M', columns='S', values='Display', aggfunc='first', sort=False).fillna('—')
-                pivot.index.name = None
-                pivot.columns.name = None
+                pivot.index.name = None; pivot.columns.name = None
                 st.markdown(f'<div class="table-container">{pivot.to_html(escape=False)}</div>', unsafe_allow_html=True)
 
-                # --- БЛОК ИСТОРИИ И ГРАФИКОВ ---
+                # ИСТОРИЯ ЦЕН (Выпадающее меню и список)
                 st.markdown("---")
-                models_in_cat = sorted(f_df['M'].unique())
-                sel_model = st.selectbox("История цены для модели:", models_in_cat, key=f"m_{tag_key}")
+                sel_model = st.selectbox("История цены для модели:", sorted(f_df['M'].unique()), key=f"m_{tag_key}")
                 
-                fig = go.Figure()
-                has_plot = False
-                
-                col_hist1, col_hist2 = st.columns([1, 2])
-                
-                with col_hist2:
-                    for shop in f_df['S'].unique():
-                        key = f"{sel_model} | {shop} | {tag_key}"
-                        if key in db:
-                            h_df = pd.DataFrame(db[key])
-                            if not h_df.empty:
-                                fig.add_trace(go.Scatter(x=h_df['time'], y=h_df['price'], name=shop, mode='lines+markers'))
-                                has_plot = True
-                    
-                    if has_plot:
-                        fig.update_layout(height=350, margin=dict(l=0,r=0,t=20,b=0), legend=dict(orientation="h", yanchor="bottom", y=1.02))
-                        st.plotly_chart(fig, use_container_width=True)
-
-                with col_hist1:
-                    st.write(f"**Последние изменения ({sel_model}):**")
-                    for shop in f_df['S'].unique():
-                        key = f"{sel_model} | {shop} | {tag_key}"
-                        if key in db and db[key]:
-                            last_p = db[key][-1]['price']
-                            st.write(f"{shop}: **{last_p:,} ₴** ({int(last_p/user_rate)} $)")
+                for shop in f_df['S'].unique():
+                    key = f"{sel_model} | {shop} | {tag_key}"
+                    if key in db and db[key]:
+                        st.write(f"**{shop}**:")
+                        # Показываем последние 5 изменений цены текстом
+                        for entry in reversed(db[key][-5:]):
+                            st.write(f"└ {entry['time']}: {entry['price']:,} ₴")
