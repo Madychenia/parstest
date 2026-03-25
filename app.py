@@ -42,7 +42,7 @@ except:
 
 st.write(f"Обновлено (Киев): **{time_str}**")
 
-# --- ШАГ 1: ПАРСИНГ ---
+# --- ШАГ 1: ПАРСИНГ (Чистые данные) ---
 @st.cache_data(ttl=3600)
 def get_raw_prices(file_name):
     try:
@@ -75,14 +75,14 @@ def get_raw_prices(file_name):
         return pd.DataFrame(results)
     except: return pd.DataFrame()
 
-# --- ШАГ 2: БЕЗОПАСНЫЙ ПЕРЕСЧЕТ ---
+# --- ШАГ 2: ПЕРЕСЧЕТ ---
 def format_data(df, rate):
     formatted = df.copy()
     def process_row(p_uah):
-        # Проверяем, что p_uah — это число и оно не пустое
         if pd.notnull(p_uah) and isinstance(p_uah, (int, float)) and rate > 0:
             try:
-                p_usd = int(round(p_uah / rate)) # Убираем .0 через int()
+                p_usd = int(round(p_uah / rate))
+                # Доллары теперь тоже с запятой-разделителем тысяч
                 return f'<span class="uah">{int(p_uah):,} ₴</span><br><span class="usd">{p_usd:,} $</span>'
             except:
                 return "—"
@@ -104,14 +104,13 @@ def show_tab_content(file_name):
         filtered = display_data[display_data['Категория'] == selected_cat].copy()
         original_order = filtered['Модель'].unique().tolist()
         
+        # Исправлено: используем 'Модель' вместо 'Model'
         pivot = filtered.drop_duplicates(subset=['Модель', 'Магазин']).pivot(
-            index='Model', # Используем внутреннее имя для индекса
+            index='Модель', 
             columns='Магазин', 
             values='Цена'
         ).fillna("—")
         
-        # Переименовываем индекс для красоты
-        pivot.index.name = 'Модель'
         pivot = pivot.reindex(original_order)
         st.write(pivot.to_html(escape=False), unsafe_allow_html=True)
     else:
