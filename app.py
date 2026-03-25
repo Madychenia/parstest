@@ -18,6 +18,7 @@ KIEV_TZ = pytz.timezone('Europe/Kyiv')
 
 st.set_page_config(page_title="Мониторинг цен", layout="wide")
 
+# Стили для таблиц
 st.markdown("""
     <style>
     .block-container { padding: 1rem !important; }
@@ -94,7 +95,7 @@ with c1:
 with c2:
     st.write(f"Обновлено: **{load_data(LAST_RUN_FILE).get('time', '—')}**")
 with c3:
-    if st.button("♻️ ОБНОВИТЬ"):
+    if st.button("♻️ ОБНОВИТЬ ВСЁ"):
         with st.spinner("..."):
             run_parsing()
             st.rerun()
@@ -102,49 +103,56 @@ with c3:
 db = load_data(HISTORY_FILE)
 
 if db:
-    tabs = st.tabs(["Used (Б/У)", "New (Новые)"])
+    tab_names = ["Used (Б/У)", "New (Новые)"]
+    tabs = st.tabs(tab_names)
     tags = ['u', 'n']
     
     for i, t_tag in enumerate(tags):
         with tabs[i]:
-            # 1. ГЛАВНАЯ ТАБЛИЦА СРАВНЕНИЯ
+            # Собираем данные текущей вкладки
             rows = []
             for k, logs in db.items():
                 if logs and logs[-1].get('type') == t_tag:
                     m, s = k.split(" | ")
-                    rows.append({'Модель': m, 'Магазин': s, 'Цена_ГРН': logs[-1]['price'], 'Кат': logs[-1].get('cat', '1'), 'Key': k})
+                    rows.append({
+                        'Модель': m, 
+                        'Магазин': s, 
+                        'Цена_ГРН': logs[-1]['price'], 
+                        'Кат': logs[-1].get('cat', '1'), 
+                        'Key': k
+                    })
             
             df_tab = pd.DataFrame(rows)
             
             if not df_tab.empty:
-                # Фильтр категории для таблицы
-                sel_cat = st.selectbox("Показать категорию:", sorted(df_tab['Кат'].unique()), key=f"main_cat_{t_tag}")
+                # 1. ГЛАВНАЯ ТАБЛИЦА
+                sel_cat = st.selectbox("Категория:", sorted(df_tab['Кат'].unique()), key=f"main_cat_{t_tag}")
                 f_df = df_tab[df_tab['Кат'] == sel_cat]
                 
                 f_df['Цена'] = f_df['Цена_ГРН'].apply(lambda x: f'<span class="uah">{x:,} ₴</span><span class="usd">{int(x/rate):,} $</span>')
                 pivot = f_df.pivot_table(index='Модель', columns='Магазин', values='Цена', aggfunc='first').fillna('—')
                 st.markdown(f'<div class="table-container">{pivot.to_html(escape=False)}</div>', unsafe_allow_html=True)
                 
-                # 2. ЛОГИ ВНУТРИ ВКЛАДКИ (ФИЛЬТР ТОЛЬКО ПО ТЕКУЩЕМУ ФАЙЛУ)
-                st.markdown("---")
-                with st.expander(f"📜 История цен ({tabs[i].label})"):
+                # 2. ИСТОРИЯ (ЛОГИ) - ТЕПЕРЬ ВСЕГДА ОТКРЫТА (expanded=True)
+                st.markdown("<br>", unsafe_allow_html=True)
+                with st.expander(f"📜 История изменений ({tab_names[i]})", expanded=True):
                     f1, f2, f3 = st.columns(3)
-                    # Фильтруем только то, что относится к текущему тегу (u или n)
                     with f1:
-                        l_cat = st.selectbox("1. Категория", sorted(df_tab['Кат'].unique()), key=f"log_cat_{t_tag}")
+                        l_cat = st.selectbox("1. Категория поиска", sorted(df_tab['Кат'].unique()), key=f"log_cat_{t_tag}")
                     with f2:
                         models_in_cat = df_tab[df_tab['Кат'] == l_cat]['Модель'].unique()
-                        l_mod = st.selectbox("2. Модель", sorted(models_in_cat), key=f"log_mod_{t_tag}")
+                        l_mod = st.selectbox("2. Выберите модель", sorted(models_in_cat), key=f"log_mod_{t_tag}")
                     with f3:
                         shops_for_mod = df_tab[(df_tab['Кат'] == l_cat) & (df_tab['Модель'] == l_mod)]['Магазин'].unique()
-                        l_shop = st.selectbox("3. Поставщик", sorted(shops_for_mod), key=f"log_shop_{t_tag}")
+                        l_shop = st.selectbox("3. Выберите поставщика", sorted(shops_for_mod), key=f"log_shop_{t_tag}")
                     
                     final_key = f"{l_mod} | {l_shop}"
                     if final_key in db:
+                        st.divider()
                         for e in reversed(db[final_key]):
                             st.write(f"📅 {e['time']} — **{e['price']:,} ₴**")
             else:
-                st.info("Нет данных")
+                st.info("В этой категории пока нет данных.")
 else:
     st.warning("База пуста.")
 
