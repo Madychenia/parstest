@@ -103,22 +103,30 @@ st.set_page_config(page_title="Мониторинг", layout="wide")
 st.markdown("""<style>
     .block-container { padding: 1rem !important; max-width: 1000px !important; margin: 0 auto !important; }
     .table-container { overflow-x: auto; width: 100%; border: 1px solid #eee; margin: 0 auto; text-align: center; }
-    table { margin: 0 auto; border-collapse: collapse; border: none !important; }
-    th, td { padding: 4px 6px !important; border: 1px solid #eee !important; font-size: 0.85em; text-align: center !important; }
-    tbody tr th { background-color: #f8f9fa !important; font-weight: bold; border-right: 2px solid #ddd !important; }
     
-    /* УДАЛЯЕМ ТЕХНИЧЕСКИЕ СТРОКИ И ТУ САМУЮ ПОЛОСКУ */
+    table { border-collapse: collapse; margin: 0 auto; width: auto; border: 1px solid #eee !important; }
+    th, td { padding: 8px 12px !important; border: 1px solid #eee !important; font-size: 0.85em; text-align: center !important; }
+    
+    /* Заголовок строк (названия моделей) */
+    tbody tr th { 
+        background-color: #f8f9fa !important; 
+        font-weight: bold; 
+        min-width: 250px !important; 
+        text-align: left !important;
+        border-right: 2px solid #ddd !important;
+    }
+    
+    /* Скрываем только лишнюю пустую строку под названиями магазинов */
     thead tr:nth-child(2) { display: none; }
-    thead tr th:first-child { 
-        border: none !important; 
-        background: none !important; 
-        width: 0px !important; 
-        padding: 0 !important;
+    
+    /* Оформление угловой ячейки: серый фон без текста */
+    thead tr:first-child th:first-child { 
+        background-color: #f8f9fa !important;
+        color: transparent !important;
     }
 
     .uah { color: #1a1a1a; font-weight: 800; display: block; }
     .usd { color: #FF4B4B; font-weight: 700; font-size: 0.9em; }
-    .log-usd { color: #FF4B4B; font-weight: bold; }
 </style>""", unsafe_allow_html=True)
 
 st.title("📱 Мониторинг")
@@ -164,22 +172,3 @@ for i, t_tag in enumerate(tabs):
                 pivot.index.name = None
                 pivot.columns.name = None
                 st.markdown(f'<div class="table-container">{pivot.to_html(escape=False)}</div>', unsafe_allow_html=True)
-        
-        with st.expander(f"📜 История изменений"):
-            h_list = []
-            for k, logs in db.items():
-                if logs and logs[-1].get('type') == tag_key:
-                    p = k.split(" | ")
-                    h_list.append({'Модель': p[0], 'Магазин': p[1], 'Категория': logs[-1]['cat']})
-            
-            if h_list:
-                h_df = pd.DataFrame(h_list)
-                f1, f2, f3 = st.columns(3)
-                with f1: hc = st.selectbox("Категория", h_df['Категория'].unique(), key=f"hc_{tag_key}")
-                with f2: hm = st.selectbox("Модель", h_df[h_df['Категория'] == hc]['Модель'].unique(), key=f"hm_{tag_key}")
-                with f3: hs = st.selectbox("Магазин", h_df[(h_df['Категория'] == hc) & (h_df['Модель'] == hm)]['Магазин'].unique(), key=f"hs_{tag_key}")
-                
-                h_key = f"{hm} | {hs} | {tag_key}"
-                if h_key in db:
-                    for e in reversed(db[h_key]):
-                        st.markdown(f"{e['time']} — **{e['price']:,} ₴** <span class='log-usd'>({int(e['price']/minfin_rate)} $)</span>", unsafe_allow_html=True)
