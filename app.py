@@ -101,57 +101,50 @@ with c3:
 
 db = load_data(HISTORY_FILE)
 
-# --- ГЛАВНЫЕ ТАБЛИЦЫ ---
 if db:
     tabs = st.tabs(["Used (Б/У)", "New (Новые)"])
     tags = ['u', 'n']
+    
     for i, t_tag in enumerate(tags):
         with tabs[i]:
+            # 1. ГЛАВНАЯ ТАБЛИЦА СРАВНЕНИЯ
             rows = []
             for k, logs in db.items():
                 if logs and logs[-1].get('type') == t_tag:
                     m, s = k.split(" | ")
-                    rows.append({'Модель': m, 'Магазин': s, 'Цена_ГРН': logs[-1]['price'], 'Кат': logs[-1].get('cat', '1')})
+                    rows.append({'Модель': m, 'Магазин': s, 'Цена_ГРН': logs[-1]['price'], 'Кат': logs[-1].get('cat', '1'), 'Key': k})
             
-            df_main = pd.DataFrame(rows)
-            if not df_main.empty:
-                sel_cat = st.selectbox("Показать категорию:", sorted(df_main['Кат'].unique()), key=f"main_cat_{t_tag}")
-                f_df = df_main[df_main['Кат'] == sel_cat]
-                f_df['Цена'] = f_df['Цена_ГРН'].apply(lambda x: f'<span class="uah">{x:,} ₴</span><span class="usd">{int(x/rate):,} $</span>')
+            df_tab = pd.DataFrame(rows)
+            
+            if not df_tab.empty:
+                # Фильтр категории для таблицы
+                sel_cat = st.selectbox("Показать категорию:", sorted(df_tab['Кат'].unique()), key=f"main_cat_{t_tag}")
+                f_df = df_tab[df_tab['Кат'] == sel_cat]
                 
+                f_df['Цена'] = f_df['Цена_ГРН'].apply(lambda x: f'<span class="uah">{x:,} ₴</span><span class="usd">{int(x/rate):,} $</span>')
                 pivot = f_df.pivot_table(index='Модель', columns='Магазин', values='Цена', aggfunc='first').fillna('—')
                 st.markdown(f'<div class="table-container">{pivot.to_html(escape=False)}</div>', unsafe_allow_html=True)
+                
+                # 2. ЛОГИ ВНУТРИ ВКЛАДКИ (ФИЛЬТР ТОЛЬКО ПО ТЕКУЩЕМУ ФАЙЛУ)
+                st.markdown("---")
+                with st.expander(f"📜 История цен ({tabs[i].label})"):
+                    f1, f2, f3 = st.columns(3)
+                    # Фильтруем только то, что относится к текущему тегу (u или n)
+                    with f1:
+                        l_cat = st.selectbox("1. Категория", sorted(df_tab['Кат'].unique()), key=f"log_cat_{t_tag}")
+                    with f2:
+                        models_in_cat = df_tab[df_tab['Кат'] == l_cat]['Модель'].unique()
+                        l_mod = st.selectbox("2. Модель", sorted(models_in_cat), key=f"log_mod_{t_tag}")
+                    with f3:
+                        shops_for_mod = df_tab[(df_tab['Кат'] == l_cat) & (df_tab['Модель'] == l_mod)]['Магазин'].unique()
+                        l_shop = st.selectbox("3. Поставщик", sorted(shops_for_mod), key=f"log_shop_{t_tag}")
+                    
+                    final_key = f"{l_mod} | {l_shop}"
+                    if final_key in db:
+                        for e in reversed(db[final_key]):
+                            st.write(f"📅 {e['time']} — **{e['price']:,} ₴**")
             else:
                 st.info("Нет данных")
-
-    # --- ЛОГИ С ФИЛЬТРОМ (ТО ЧТО ТЫ ПРОСИЛ) ---
-    st.markdown("---")
-    with st.expander("📜 ФИЛЬТР ЛОГОВ (История цен)"):
-        # Собираем общую базу для фильтров логов
-        log_items = []
-        for k, logs in db.items():
-            if logs:
-                m, s = k.split(" | ")
-                log_items.append({'Key': k, 'Model': m, 'Shop': s, 'Cat': logs[-1].get('cat', '1')})
-        
-        ldf = pd.DataFrame(log_items)
-        if not ldf.empty:
-            f1, f2, f3 = st.columns(3)
-            with f1:
-                l_cat = st.selectbox("1. Категория", sorted(ldf['Cat'].unique()))
-            with f2:
-                models_in_cat = ldf[ldf['Cat'] == l_cat]['Model'].unique()
-                l_mod = st.selectbox("2. Модель", sorted(models_in_cat))
-            with f3:
-                shops_for_mod = ldf[(ldf['Cat'] == l_cat) & (ldf['Model'] == l_mod)]['Shop'].unique()
-                l_shop = st.selectbox("3. Поставщик", sorted(shops_for_mod))
-            
-            # Вывод истории для выбранной комбинации
-            final_key = f"{l_mod} | {l_shop}"
-            if final_key in db:
-                st.write(f"История цен для **{l_mod}** у **{l_shop}**:")
-                for e in reversed(db[final_key]):
-                    st.write(f"📅 {e['time']} — **{e['price']:,} ₴**")
 else:
     st.warning("База пуста.")
 
