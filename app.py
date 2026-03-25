@@ -13,63 +13,32 @@ TELEGRAM_TOKEN = "8673005085:AAG-vDGUu4buhPHmMYoJt1a7UueVIywvAyQ"
 CHAT_ID = "258388401"
 HISTORY_FILE = 'price_history.json'
 
-st.set_page_config(page_title="Мониторинг цен PRO", layout="wide", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="Мониторинг цен", layout="wide", initial_sidebar_state="collapsed")
 
-# CSS с фиксацией первой колонки (Sticky Column)
+# CSS: Липкая колонка и компактность
 st.markdown("""
     <style>
     [data-testid="stSidebar"] { display: none; }
     .block-container { padding: 1rem !important; }
+    .table-container { overflow-x: auto; width: 100%; border: 1px solid #eee; margin-bottom: 10px; }
+    table { border-collapse: separate; border-spacing: 0; width: auto !important; }
+    th, td { padding: 6px 8px !important; border: 1px solid #eee !important; white-space: nowrap; font-size: 0.82em; text-align: center !important; }
     
-    /* Контейнер для скролла */
-    .table-container { 
-        overflow-x: auto; 
-        width: 100%; 
-        border: 1px solid #eee;
-    }
-    
-    table { 
-        border-collapse: separate; 
-        border-spacing: 0; 
-        width: auto !important; 
-    }
-    
-    th, td { 
-        padding: 6px 8px !important; 
-        border: 1px solid #eee !important; 
-        white-space: nowrap; 
-        font-size: 0.82em;
-        text-align: center !important;
-    }
-
-    /* ФИКСАЦИЯ ПЕРВОЙ КОЛОНКИ */
+    /* Фиксация модели */
     td:first-child, th:first-child {
-        position: -webkit-sticky;
-        position: sticky;
-        left: 0;
-        z-index: 2;
+        position: sticky; left: 0; z-index: 2;
         background-color: #f8f9fa !important;
         border-right: 2px solid #ddd !important;
-        text-align: left !important;
-        font-weight: 700;
-        min-width: 120px;
+        text-align: left !important; font-weight: 700; min-width: 120px;
     }
-    
-    /* Чтобы шапка не перекрывала фиксированную колонку */
     th:first-child { z-index: 3; }
-
     .uah { color: #1a1a1a; font-weight: 800; display: block; line-height: 1.1; }
     .usd { color: #FF4B4B; font-weight: 700; font-size: 0.9em; }
-    
-    /* Убираем лишние элементы Streamlit для компактности */
     div[data-testid="stNumberInput"] label { display: none; }
-    button { padding: 5px !important; height: 35px; }
     </style>
     """, unsafe_allow_html=True)
 
-st.title("📱 Мониторинг цен")
-
-# --- ФУНКЦИИ БАЗЫ ---
+# --- БАЗОВЫЕ ФУНКЦИИ ---
 def load_history():
     if os.path.exists(HISTORY_FILE):
         try:
@@ -87,7 +56,8 @@ def send_telegram(message):
         requests.post(url, data={"chat_id": CHAT_ID, "text": message, "parse_mode": "HTML"}, timeout=5)
     except: pass
 
-# --- ИНТЕРФЕЙС ---
+# --- ИНТЕРФЕЙС УПРАВЛЕНИЯ ---
+st.title("📱 Мониторинг цен")
 col_rate, col_btn, col_test = st.columns([0.8, 1, 1])
 with col_rate:
     user_rate = st.number_input("r", value=44.55, step=0.01, label_visibility="collapsed")
@@ -97,7 +67,7 @@ with col_btn:
         st.rerun()
 with col_test:
     if st.button("🔔 ТЕСТ", use_container_width=True):
-        send_telegram("✅ Бот онлайн")
+        send_telegram("✅ Связь в норме")
         st.toast("Ок")
 
 @st.cache_data(ttl=3600)
@@ -140,7 +110,7 @@ def fetch_and_track(file_name):
         return pd.DataFrame(results)
     except: return pd.DataFrame()
 
-# --- ВЫВОД ---
+# --- ВЫВОД ТАБЛИЦ И ЛОГОВ ---
 tabs = st.tabs(["Used", "New"])
 csv_files = ['links.csv', 'links_new.csv']
 
@@ -148,9 +118,10 @@ for i, tab in enumerate(tabs):
     with tab:
         data = fetch_and_track(csv_files[i])
         if not data.empty:
-            sel_cat = st.selectbox("C", data['Категория'].unique(), key=f"c_{i}", label_visibility="collapsed")
+            sel_cat = st.selectbox("C", data['Категория'].unique(), key=f"cat_{i}", label_visibility="collapsed")
             f_df = data[data['Категория'] == sel_cat]
             
+            # Форматирование ячейки
             def cell_fmt(v):
                 if pd.notnull(v) and v > 0:
                     return f'<span class="uah">{int(v):,} ₴</span><span class="usd">{int(round(v/user_rate)):,} $</span>'
@@ -162,7 +133,23 @@ for i, tab in enumerate(tabs):
                 index='Модель', columns='Магазин', values='Цена'
             ).fillna('<span style="color:#ccc">—</span>').reindex(f_df['Модель'].unique())
             
-            # Оборачиваем в контейнер для скролла с фиксацией
             st.markdown(f'<div class="table-container">{pivot.to_html(escape=False)}</div>', unsafe_allow_html=True)
+
+            # --- ВЕРНУЛИ ЛОГИ ИСТОРИИ ---
+            with st.expander("📜 История изменений цен"):
+                hist_db = load_history()
+                h_col1, h_col2 = st.columns(2)
+                with h_col1:
+                    h_mod = st.selectbox("Модель:", sorted(f_df['Модель'].unique()), key=f"hm_{i}")
+                with h_col2:
+                    shops_for_mod = sorted(f_df[f_df['Модель'] == h_mod]['Магазин'].unique())
+                    h_shop = st.selectbox("Магазин:", shops_for_mod, key=f"hs_{i}")
+                
+                target_key = f"{h_mod} | {h_shop}"
+                if target_key in hist_db and hist_db[target_key]:
+                    for entry in reversed(hist_db[target_key]):
+                        st.write(f"📅 {entry['time']} — **{entry['price']:,} ₴**")
+                else:
+                    st.write("История пуста")
         else:
-            st.info("Пусто")
+            st.info("Данных пока нет")
