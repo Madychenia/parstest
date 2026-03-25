@@ -8,6 +8,7 @@ import pytz
 import json
 import os
 import io
+import sys  # Добавлено для исправления ошибки NameError
 
 # --- КОНФИГ ---
 TELEGRAM_TOKEN = "8673005085:AAG-vDGUu4buhPHmMYoJt1a7UueVIywvAyQ"
@@ -170,7 +171,6 @@ if db:
             rows = []
             for k, logs in db.items():
                 if logs:
-                    # Берем самую свежую запись из истории
                     last_entry = logs[-1]
                     if last_entry.get('type') == t_tag:
                         m, s = k.split(" | ")
@@ -186,14 +186,12 @@ if db:
             if not df_tab.empty:
                 col_sel, col_btn = st.columns([3, 1])
                 with col_sel:
-                    # Сортируем категории для удобства
                     cat_list = sorted(df_tab['Кат'].unique())
                     sel_cat = st.selectbox("Категория:", cat_list, key=f"main_cat_{t_tag}")
                 
                 f_df = df_tab[df_tab['Кат'] == sel_cat]
                 f_df['Цена'] = f_df['Цена_ГРН'].apply(lambda x: f'<span class="uah">{x:,} ₴</span><span class="usd">{int(x/user_rate):,} $</span>')
                 
-                # Построение таблицы
                 pivot = f_df.pivot_table(index='Модель', columns='Магазин', values='Цена', aggfunc='first').fillna('—')
                 
                 with col_btn:
@@ -221,8 +219,9 @@ if db:
                         st.divider()
                         for e in reversed(db[final_key]):
                             p_uah = e['price']
-                            p_usd_minfin = int(p_uah / minfin_rate)
-                            st.markdown(f"{e['time']} — **{p_uah:,} ₴** <span class='log-usd'>({p_usd_minfin:,} $)</span>", unsafe_allow_html=True)
+                            # РАСЧЕТ В ДОЛЛАРАХ ПО КУРСУ ПОЛЬЗОВАТЕЛЯ
+                            p_usd = int(p_uah / user_rate)
+                            st.markdown(f"{e['time']} — **{p_uah:,} ₴** <span class='log-usd'>({p_usd:,} $)</span>", unsafe_allow_html=True)
             else:
                 st.info("Нет данных")
 else:
