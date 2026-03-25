@@ -2,9 +2,10 @@ name: Hourly Price Check
 
 on:
   schedule:
-    - cron: '0 * * * *'  # Запуск ровно в 00 минут каждого часа
-  workflow_dispatch:      # Кнопка для ручного запуска
-
+    # Запуск в 05:00 и 23:00 по Киеву (03:00 и 21:00 UTC)
+    - cron: '0 3,21 * * *'
+  workflow_dispatch:
+  
 jobs:
   build:
     runs-on: ubuntu-latest
