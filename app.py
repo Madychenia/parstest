@@ -18,7 +18,7 @@ KIEV_TZ = pytz.timezone('Europe/Kyiv')
 
 st.set_page_config(page_title="Мониторинг", layout="wide")
 
-# Убираем лишние заголовки
+# ВОЗВРАЩАЕМ СТИЛИ: Красный доллар и чистая таблица
 st.markdown("""
     <style>
     .block-container { padding: 1rem !important; }
@@ -37,7 +37,9 @@ st.markdown("""
 
 def load_data(file):
     if os.path.exists(file):
-        with open(file, 'r', encoding='utf-8') as f: return json.load(f)
+        try:
+            with open(file, 'r', encoding='utf-8') as f: return json.load(f)
+        except: return {}
     return {}
 
 def save_data(file, data):
@@ -57,7 +59,11 @@ def run_parsing():
         df = pd.read_csv(f_name, sep=';', engine='python', encoding='utf-8-sig')
         df.columns = [c.strip().lower() for c in df.columns]
         for _, row in df.iterrows():
-            m, s, u, sel, c = str(row.get('модель','')).strip(), str(row.get('магазин','')).strip(), str(row.get('ссылка','')).strip(), str(row.get('селектор','')).strip(), str(row.get('категория','')).strip()
+            m = str(row.get('модель','')).strip()
+            s = str(row.get('магазин','')).strip()
+            u = str(row.get('ссылка','')).strip()
+            sel = str(row.get('селектор','')).strip()
+            c = str(row.get('категория','')).strip()
             if u.startswith('http'):
                 try:
                     r = requests.get(u, headers={'User-Agent': 'Mozilla/5.0'}, timeout=10)
@@ -72,15 +78,17 @@ def run_parsing():
     save_data(LAST_RUN_FILE, {'time': now})
 
 # --- ИНТЕРФЕЙС ---
-minfin_rate = 44.15 #
+st.title("📱 Мониторинг") # ВЕРНУЛ ЗАГОЛОВОК
+
+minfin_rate = 44.15 
 db = load_data(HISTORY_FILE)
 last_run = load_data(LAST_RUN_FILE)
 
 c1, c2, c3 = st.columns(3)
 with c1: user_rate = st.number_input("Курс $:", value=44.55)
-with c2: st.write(f"Обновлено: {last_run.get('time', '—')}")
+with c2: st.write(f"Обновлено: **{last_run.get('time', '—')}**")
 with c3: 
-    if st.button("♻️ ОБНОВИТЬ"): 
+    if st.button("♻️ ОБНОВИТЬ ВСЁ"): 
         run_parsing()
         st.rerun()
 
@@ -89,33 +97,42 @@ tags = ['u', 'n']
 
 for i, t_tag in enumerate(tags):
     with tabs[i]:
-        rows = []
+        items = []
         for k, logs in db.items():
             if logs and logs[-1].get('type') == t_tag:
                 p = k.split(" | ")
-                rows.append({'Модель': p[0], 'Магазин': p[1], 'Цена': logs[-1]['price'], 'Кат': logs[-1]['cat']})
+                items.append({'M': p[0], 'S': p[1], 'P': logs[-1]['price'], 'C': logs[-1]['cat']})
         
-        df = pd.DataFrame(rows)
+        df = pd.DataFrame(items)
         if not df.empty:
-            cats = sorted(df['Кат'].unique())
+            cats = sorted(df['C'].unique())
             sel_cat = st.selectbox("Категория:", cats, key=f"s_{t_tag}")
             
-            f_df = df[df['Кат'] == sel_cat].copy()
+            f_df = df[df['C'] == sel_cat].copy()
             if not f_df.empty:
-                f_df['Display'] = f_df['Цена'].apply(lambda x: f'<span class="uah">{x:,} ₴</span><span class="usd">{int(x/user_rate):,} $</span>')
-                pivot = f_df.pivot_table(index='Модель', columns='Магазин', values='Display', aggfunc='first').fillna('—')
+                f_df['Display'] = f_df['P'].apply(lambda x: f'<span class="uah">{x:,} ₴</span><span class="usd">{int(x/user_rate):,} $</span>')
+                pivot = f_df.pivot_table(index='M', columns='S', values='Display', aggfunc='first').fillna('—')
                 pivot.index.name = None
                 pivot.columns.name = None
-                st.markdown(pivot.to_html(escape=False), unsafe_allow_html=True)
-                
-                # ИСТОРИЯ ИЗМЕНЕНИЙ ВНИЗУ
-                st.markdown("---")
-                st.subheader("📜 История цен")
-                f1, f2 = st.columns(2)
-                with f1: h_mod = st.selectbox("Модель", sorted(f_df['Модель'].unique()), key=f"m_{t_tag}")
-                with f2: h_shop = st.selectbox("Магазин", sorted(f_df[f_df['Модель'] == h_mod]['Магазин'].unique()), key=f"sh_{t_tag}")
-                
-                h_key = f"{h_mod} | {h_shop}"
-                if h_key in db:
-                    for e in reversed(db[h_key]):
-                        st.write(f"{e['time']} — **{e['price']:,} ₴** ({int(e['price']/minfin_rate)} $)")
+                st.markdown(f'<div class="table-container">{pivot.to_html(escape=False)}</div>', unsafe_allow_html=True)
+
+# ИСТОРИЯ ИЗМЕНЕНИЙ (ВЕРНУЛ ТРОЙНОЙ ФИЛЬТР)
+st.markdown("---")
+st.subheader("📜 История изменений")
+if db:
+    all_rows = []
+    for k, logs in db.items():
+        if logs:
+            p = k.split(" | ")
+            all_rows.append({'M': p[0], 'S': p[1], 'C': logs[-1]['cat']})
+    
+    h_df = pd.DataFrame(all_rows)
+    f1, f2, f3 = st.columns(3)
+    with f1: h_cat = st.selectbox("1. Категория", sorted(h_df['C'].unique()), key="h_cat")
+    with f2: h_mod = st.selectbox("2. Модель", sorted(h_df[h_df['C'] == h_cat]['M'].unique()), key="h_mod")
+    with f3: h_shop = st.selectbox("3. Поставщик", sorted(h_df[(h_df['C'] == h_cat) & (h_df['M'] == h_mod)]['S'].unique()), key="h_shop")
+    
+    h_key = f"{h_mod} | {h_shop}"
+    if h_key in db:
+        for e in reversed(db[h_key]):
+            st.markdown(f"{e['time']} — **{e['price']:,} ₴** <span class='log-usd'>({int(e['price']/minfin_rate)} $)</span>", unsafe_allow_html=True)
