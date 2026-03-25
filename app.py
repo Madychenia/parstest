@@ -6,20 +6,20 @@ import time
 import re
 from datetime import datetime
 
-# Настройка страницы (убираем меню и отступы)
+# Настройки страницы
 st.set_page_config(page_title="Price Monitor PRO", layout="wide", initial_sidebar_state="collapsed")
 
-# Продвинутый CSS: скрываем боковое меню, красим цены, ровняем кнопки
+# CSS для красоты и цветов
 st.markdown("""
     <style>
     [data-testid="stSidebar"] { display: none; }
     .uah { color: black; font-weight: bold; }
     .usd { color: #FF4B4B; font-weight: bold; }
-    .update-text { font-size: 14px; color: gray; line-height: 1.2; }
-    /* Центрируем таблицу и кнопки */
-    .stButton button { width: 100%; margin-top: 25px; }
-    table { width: 100% !important; border-radius: 10px; overflow: hidden; }
-    th { background-color: #f0f2f6 !important; }
+    .update-text { font-size: 14px; color: gray; }
+    .stSelectbox label { font-weight: bold; font-size: 18px; }
+    table { width: 100% !important; border-radius: 10px; overflow: hidden; border: 1px solid #f0f2f6; }
+    th { background-color: #f8f9fb !important; text-align: center !important; }
+    td { text-align: center !important; padding: 10px !important; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -32,17 +32,15 @@ with col_rate:
     user_rate = st.number_input("Курс ($):", value=44.55, step=0.01)
 
 with col_time:
-    # Показываем время последнего захода/обновления
     now = datetime.now().strftime("%H:%M:%S")
-    today = datetime.now().strftime("%d.%m.%Y")
-    st.markdown(f"<p class='update-text'>Дата: <b>{today}</b><br>Проверка в: <b>{now}</b></p>", unsafe_allow_html=True)
+    st.markdown(f"<p class='update-text'>Обновлено в: <b>{now}</b><br>Курс вводится вручную</p>", unsafe_allow_html=True)
 
 with col_btn:
-    if st.button("♻️ ОБНОВИТЬ СЕЙЧАС"):
+    if st.button("♻️ ОБНОВИТЬ ЦЕНЫ"):
         st.cache_data.clear()
         st.rerun()
 
-# --- ФУНКЦИЯ ПАРСИНГА (кэш на 24 часа) ---
+# --- ФУНКЦИЯ ПАРСИНГА ---
 @st.cache_data(ttl=86400)
 def fetch_prices(file_name, rate):
     try:
@@ -68,7 +66,7 @@ def fetch_prices(file_name, rate):
 
             if price_uah:
                 price_usd = round(price_uah / rate, 1)
-                val = f'<span class="uah">{price_uah:,} ₴</span> / <span class="usd">{price_usd}$</span>'
+                val = f'<span class="uah">{price_uah:,} ₴</span><br><span class="usd">{price_usd}$</span>'
             else:
                 val = "—"
 
@@ -77,20 +75,37 @@ def fetch_prices(file_name, rate):
                 'Магазин': row.get('магазин', '—'),
                 'Цена': val
             })
-            time.sleep(0.1)
+            time.sleep(0.05)
             
-        res_df = pd.DataFrame(results)
-        return res_df.pivot_table(index='Модель', columns='Магазин', values='Цена', aggfunc='first')
-    except Exception as e:
-        return pd.DataFrame([{"Ошибка": "Проверьте файлы CSV"}])
+        return pd.DataFrame(results)
+    except:
+        return pd.DataFrame()
 
-# --- ТАБЛИЦЫ ---
+# --- ЛОГИКА ОТОБРАЖЕНИЯ ---
 tab_opt, tab_roz = st.tabs(["📦 ОПТ", "🛍️ РОЗНИЦА"])
 
+def show_filtered_table(file_name):
+    all_data = fetch_prices(file_name, user_rate)
+    
+    if not all_data.empty:
+        # Извлекаем серии (ищем цифры 13, 14, 15 в названии модели)
+        all_data['Серия'] = all_data['Модель'].apply(lambda x: re.search(r'\d+', str(x)).group() if re.search(r'\d+', str(x)) else "Прочее")
+        
+        series_list = sorted(all_data['Серия'].unique(), key=lambda x: int(x) if x.isdigit() else 999)
+        
+        # Кнопки выбора серии
+        selected_series = st.selectbox(f"Выберите модель для {file_name}:", series_list, index=len(series_list)-1)
+        
+        # Фильтруем данные
+        filtered_df = all_data[all_data['Серия'] == selected_series]
+        pivot = filtered_df.pivot_table(index='Модель', columns='Магазин', values='Цена', aggfunc='first')
+        
+        st.write(pivot.to_html(escape=False), unsafe_allow_html=True)
+    else:
+        st.warning(f"Файл {file_name} пуст или не найден.")
+
 with tab_opt:
-    with st.spinner('Парсинг ОПТ...'):
-        st.write(fetch_prices('links.csv', user_rate).to_html(escape=False), unsafe_allow_html=True)
+    show_filtered_table('links.csv')
 
 with tab_roz:
-    with st.spinner('Парсинг РОЗНИЦА...'):
-        st.write(fetch_prices('links_r.csv', user_rate).to_html(escape=False), unsafe_allow_html=True)
+    show_filtered_table('links_r.csv')
