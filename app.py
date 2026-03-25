@@ -8,7 +8,7 @@ from datetime import datetime
 # Настройки страницы
 st.set_page_config(page_title="Мониторинг цен", layout="wide", initial_sidebar_state="collapsed")
 
-# Стили для таблицы и компактного списка
+# Стили для выравнивания и размеров
 st.markdown("""
     <style>
     [data-testid="stSidebar"] { display: none; }
@@ -16,12 +16,17 @@ st.markdown("""
     .usd { color: #FF4B4B; font-weight: bold; }
     td { text-align: center !important; padding: 10px !important; }
     th { background-color: #f0f2f6 !important; text-align: center !important; }
-    /* Сужаем выпадающий список */
-    [data-testid="stSelectbox"] { max-width: 300px; }
+    
+    /* Одинаковая ширина для полей и выравнивание кнопки */
+    [data-testid="stNumberInput"], [data-testid="stSelectbox"] {
+        max-width: 250px;
+    }
+    div.stButton {
+        margin-top: 28px; /* Опускаем кнопку ровно в ряд с полями */
+    }
     </style>
     """, unsafe_allow_html=True)
 
-# Убран заголовок : iPhone
 st.title("📱 Мониторинг цен")
 
 # --- ФУНКЦИЯ ПАРСИНГА ---
@@ -34,7 +39,8 @@ def fetch_prices(file_name, rate):
         headers = {'User-Agent': 'Mozilla/5.0'}
         for _, row in df.iterrows():
             p_uah = None
-            url, sel = str(row.get('ссылка', '')).strip(), str(row.get('селектор', '')).strip()
+            url = str(row.get('ссылка', '')).strip()
+            sel = str(row.get('селектор', '')).strip()
             if url.startswith('http'):
                 try:
                     r = requests.get(url, headers=headers, timeout=10)
@@ -47,35 +53,46 @@ def fetch_prices(file_name, rate):
             
             p_usd = round(p_uah / rate, 1) if p_uah else 0
             val = f'<span class="uah">{p_uah:,} ₴</span><br><span class="usd">{p_usd}$</span>' if p_uah else "—"
-            results.append({'Модель': row.get('модель', '—'), 'Магазин': row.get('магазин', '—'), 'Цена': val})
+            results.append({
+                'Модель': row.get('модель', '—'), 
+                'Магазин': row.get('магазин', '—'), 
+                'Цена': val
+            })
         return pd.DataFrame(results)
     except: return pd.DataFrame()
 
-# --- ВЕРХНЯЯ ПАНЕЛЬ УПРАВЛЕНИЯ (Курс + Кнопка) ---
-col_rate, col_btn = st.columns([4, 1])
-with col_rate:
+# --- ВЕРХНЯЯ ПАНЕЛЬ (Курс + Обновить) ---
+col1, col2, col3 = st.columns([2, 2, 6])
+with col1:
     user_rate = st.number_input("Курс для расчета ($):", value=44.55, step=0.01)
-with col_btn:
-    st.write(" ") # Выравнивание
+with col2:
     if st.button("♻️ ОБНОВИТЬ"):
         st.cache_data.clear()
         st.rerun()
 
 st.write(f"Обновлено: **{datetime.now().strftime('%H:%M:%S')}**")
 
-# --- ВЫВОД ТАБЛИЦЫ ---
-data = fetch_prices('links.csv', user_rate)
+# --- ВКЛАДКИ ---
+tab_used, tab_new = st.tabs(["Used (Б/У)", "New (Новые)"])
 
-if not data.empty:
-    data['Серия'] = data['Модель'].apply(lambda x: re.search(r'\d+', str(x)).group() if re.search(r'\d+', str(x)) else "Прочее")
-    series_list = sorted(data['Серия'].unique(), key=lambda x: int(x) if str(x).isdigit() else 999)
-    
-    # Компактный выбор серии
-    selected_series = st.selectbox("Серия:", series_list, index=len(series_list)-1)
-    
-    filtered = data[data['Серия'] == selected_series]
-    pivot = filtered.drop_duplicates(subset=['Модель', 'Магазин']).pivot(index='Модель', columns='Магазин', values='Цена').fillna("—")
-    
-    st.write(pivot.to_html(escape=False), unsafe_allow_html=True)
-else:
-    st.warning("Загрузите корректный links.csv")
+def show_table(file_name):
+    data = fetch_prices(file_name, user_rate)
+    if not data.empty:
+        # Серия для фильтра
+        data['Серия'] = data['Модель'].apply(lambda x: re.search(r'\d+', str(x)).group() if re.search(r'\d+', str(x)) else "Прочее")
+        series_list = sorted(data['Серия'].unique(), key=lambda x: int(x) if str(x).isdigit() else 999)
+        
+        # Выбор серии (теперь такого же размера как курс)
+        selected_series = st.selectbox(f"Серия ({file_name}):", series_list, index=len(series_list)-1, key=file_name)
+        
+        filtered = data[data['Серия'] == selected_series]
+        pivot = filtered.drop_duplicates(subset=['Модель', 'Магазин']).pivot(index='Модель', columns='Магазин', values='Цена').fillna("—")
+        st.write(pivot.to_html(escape=False), unsafe_allow_html=True)
+    else:
+        st.warning(f"Файл {file_name} не найден или пуст")
+
+with tab_used:
+    show_table('links.csv')
+
+with tab_new:
+    show_table('links_new.csv')
