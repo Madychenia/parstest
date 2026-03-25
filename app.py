@@ -18,17 +18,20 @@ KIEV_TZ = pytz.timezone('Europe/Kyiv')
 
 st.set_page_config(page_title="Мониторинг цен", layout="wide")
 
-# СТИЛИ (Закрепленный столбец и оформление)
+# СТИЛИ: Закрепленный столбец моделей и оформление таблицы
 st.markdown("""
     <style>
     .block-container { padding: 1rem !important; }
     .table-container { overflow-x: auto; width: 100%; border: 1px solid #eee; }
     th, td { padding: 8px !important; border: 1px solid #eee !important; font-size: 0.85em; text-align: center !important; }
     .blank, .index_name { display: none !important; }
+    
+    /* Закрепление первого столбца */
     td:first-child, th:first-child { 
         position: sticky; left: 0; background-color: #f8f9fa !important; z-index: 3; 
         font-weight: bold; border-right: 2px solid #ddd !important; 
     }
+    
     .uah { color: #1a1a1a; font-weight: 800; display: block; }
     .usd { color: #FF4B4B; font-weight: 700; font-size: 0.9em; }
     .log-usd { color: #FF4B4B; font-weight: bold; }
@@ -99,7 +102,7 @@ def run_parsing():
                         if price_val:
                             key = f"{m} | {s} | {tag}"
                             
-                            # ЛОГИКА УВЕДОМЛЕНИЙ
+                            # ПРОВЕРКА ИЗМЕНЕНИЯ ЦЕНЫ ДЛЯ ТЕЛЕГРАМА
                             if key in history and len(history[key]) > 0:
                                 last_price = history[key][-1]['price']
                                 if price_val != last_price:
@@ -132,7 +135,7 @@ c1, c2, c3, c4 = st.columns([1,1.5,1,1])
 with c1: user_rate = st.number_input("Курс $:", value=44.55, label_visibility="visible") 
 with c2: 
     st.write(f"Обновлено: **{last_run.get('time', '—')}**")
-    st.caption(f"Курс Минфина (продажа): **{minfin_rate}**") 
+    st.caption(f"Курс Минфина (продажа): **{minfin_rate}**") #
 with c3: 
     if st.button("♻️ ОБНОВИТЬ ВСЁ"): 
         run_parsing()
@@ -160,7 +163,7 @@ for i, t_tag in enumerate(tags):
             sel_cat = st.selectbox("Категория:", cats, key=f"s_{t_tag}")
             f_df = df_tab[df_tab['C'] == sel_cat].copy()
             if not f_df.empty:
-                f_df = f_df.sort_values('O')
+                f_df = f_df.sort_values('O') #
                 f_df['Display'] = f_df['P'].apply(lambda x: f'<span class="uah">{x:,} ₴</span><span class="usd">{int(x/user_rate):,} $</span>')
                 pivot = f_df.pivot_table(index='M', columns='S', values='Display', aggfunc='first', sort=False).fillna('—')
                 pivot.index.name = None
@@ -182,5 +185,5 @@ with st.expander("📜 История изменений (Used)"):
         with f3: h_shop = st.selectbox("3. Поставщик", h_df[(h_df['C'] == h_cat) & (h_df['M'] == h_mod)]['S'].unique(), key="h_shop")
         h_key = f"{h_mod} | {h_shop} | u"
         if h_key in db:
-            for e in reversed(db[h_key]):
+            for e in reversed(db[h_key]): #
                 st.markdown(f"{e['time']} — **{e['price']:,} ₴** <span class='log-usd'>({int(e['price']/minfin_rate)} $)</span>", unsafe_allow_html=True)
