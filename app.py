@@ -146,3 +146,6 @@ with st.expander("📜 История изменений (Логи)"):
         sk = st.selectbox("Выберите модель для логов:", sorted(hist_db.keys()))
         for e in reversed(hist_db[sk]):
             st.write(f"{e['time']} — **{e['price']:,} ₴**")
+
+if __name__ == "__main__":
+    run_parsing()
