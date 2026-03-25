@@ -1,6 +1,6 @@
 ﻿Модель;Магазин;Ссылка;Селектор;Категория
 iPh 13 128;Anika;https://anikaphone.com.ua/product/%d0%b1-%d1%83-iphone-13-128gb-green-mngd3/;#mainPrice > div > p > ins > span > bdi;iPh 13
-iPh 13 266;Anika;https://anikaphone.com.ua/product/%d0%b1-%d1%83-iphone-13-256gb-green-mnge3/;#mainPrice > div > p > ins > span > bdi;iPh 13
+iPh 13 222;Anika;https://anikaphone.com.ua/product/%d0%b1-%d1%83-iphone-13-256gb-green-mnge3/;#mainPrice > div > p > ins > span > bdi;iPh 13
 iPh 13 512;Anika;;;iPh 13
 iPh 13 Mini 128;Anika;;;iPh 13
 iPh 13 Mini 256;Anika;;;iPh 13
