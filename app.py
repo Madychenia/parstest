@@ -55,21 +55,30 @@ def run_parsing():
     
     for f_name, tag in mapping.items():
         if not os.path.exists(f_name): continue
-        # Читаем CSV с разделителем ';'
-        df = pd.read_csv(f_name, sep=';', engine='python', encoding='utf-8-sig')
-        df.columns = [c.strip().lower() for c in df.columns]
+        
+        # ЧИТАЕМ СТРОГО: указываем названия колонок вручную, чтобы НЕ потерять первую строку
+        df = pd.read_csv(f_name, sep=';', engine='python', encoding='utf-8-sig', skiprows=1, 
+                         names=['модель', 'магазин', 'ссылка', 'селектор', 'категория'])
+        
         for _, row in df.iterrows():
-            m, s, u, sel, c = str(row.get('модель','')).strip(), str(row.get('магазин','')).strip(), str(row.get('ссылка','')).strip(), str(row.get('селектор','')).strip(), str(row.get('категория','')).strip()
-            # Проверяем, что ссылка и селектор не пустые
-            if u.startswith('http') and sel:
+            m = str(row['модель']).strip()
+            s = str(row['магазин']).strip()
+            u = str(row['ссылка']).strip()
+            sel = str(row['селектор']).strip()
+            c = str(row['категория']).strip()
+            
+            # Проверяем наличие ссылки и селектора
+            if u.startswith('http') and sel and sel != 'nan':
                 try:
                     r = requests.get(u, headers={'User-Agent': 'Mozilla/5.0'}, timeout=10)
                     soup = BeautifulSoup(r.text, 'html.parser')
-                    price_val = clean_price(soup.select_one(sel).text)
-                    if price_val:
-                        key = f"{m} | {s}"
-                        if key not in history: history[key] = []
-                        history[key].append({'time': now, 'price': price_val, 'cat': c, 'type': tag})
+                    el = soup.select_one(sel)
+                    if el:
+                        price_val = clean_price(el.text)
+                        if price_val:
+                            key = f"{m} | {s}"
+                            if key not in history: history[key] = []
+                            history[key].append({'time': now, 'price': price_val, 'cat': c, 'type': tag})
                 except: pass
     save_data(HISTORY_FILE, history)
     save_data(LAST_RUN_FILE, {'time': now})
@@ -115,7 +124,6 @@ for i, t_tag in enumerate(tags):
                 pivot.columns.name = None
                 st.markdown(f'<div class="table-container">{pivot.to_html(escape=False)}</div>', unsafe_allow_html=True)
 
-# ИСТОРИЯ (ТОЛЬКО USED)
 with st.expander("📜 История изменений (Used)"):
     used_items = []
     for k, logs in db.items():
