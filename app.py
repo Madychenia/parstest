@@ -4,11 +4,12 @@ import requests
 from bs4 import BeautifulSoup
 import re
 from datetime import datetime
+import pytz
 
 # Настройки страницы
 st.set_page_config(page_title="Мониторинг цен", layout="wide", initial_sidebar_state="collapsed")
 
-# Стили
+# Стили оформления
 st.markdown("""
     <style>
     [data-testid="stSidebar"] { display: none; }
@@ -16,13 +17,39 @@ st.markdown("""
     .usd { color: #FF4B4B; font-weight: bold; }
     td { text-align: center !important; padding: 10px !important; }
     th { background-color: #f0f2f6 !important; text-align: center !important; }
-    [data-testid="stNumberInput"], [data-testid="stSelectbox"] { max-width: 250px; }
-    div.stButton { margin-top: 28px; }
+    
+    /* Компактные поля и выравнивание кнопки */
+    [data-testid="stNumberInput"], [data-testid="stSelectbox"] {
+        max-width: 250px;
+    }
+    div.stButton {
+        margin-top: 28px;
+    }
     </style>
     """, unsafe_allow_html=True)
 
 st.title("📱 Мониторинг цен")
 
+# --- ПАНЕЛЬ УПРАВЛЕНИЯ ---
+col1, col2, col3 = st.columns([2, 2, 6])
+with col1:
+    user_rate = st.number_input("Курс для расчета ($):", value=44.55, step=0.01)
+with col2:
+    if st.button("♻️ ОБНОВИТЬ"):
+        st.cache_data.clear()
+        st.rerun()
+
+# Настройка правильного времени (Киев)
+try:
+    kiev_tz = pytz.timezone('Europe/Kyiv')
+    now_kiev = datetime.now(kiev_tz)
+    time_str = now_kiev.strftime('%H:%M:%S')
+except:
+    time_str = datetime.now().strftime('%H:%M:%S')
+
+st.write(f"Обновлено (Киев): **{time_str}**")
+
+# --- ФУНКЦИЯ ПАРСИНГА ---
 @st.cache_data(ttl=3600)
 def fetch_prices(file_name, rate):
     try:
@@ -53,34 +80,26 @@ def fetch_prices(file_name, rate):
                 'Модель': row.get('модель', '—'), 
                 'Магазин': row.get('магазин', '—'), 
                 'Цена': val,
-                'Категория': row.get('категория', 'Без категории') # Берем твое название из файла
+                'Категория': row.get('категория', 'Без категории') 
             })
         return pd.DataFrame(results)
     except: return pd.DataFrame()
 
-# Панель управления
-col1, col2, col3 = st.columns([2, 2, 6])
-with col1:
-    user_rate = st.number_input("Курс для расчета ($):", value=44.55, step=0.01)
-with col2:
-    if st.button("♻️ ОБНОВИТЬ"):
-        st.cache_data.clear()
-        st.rerun()
-
-st.write(f"Обновлено: **{datetime.now().strftime('%H:%M:%S')}**")
-
+# --- ВКЛАДКИ ---
 tab_used, tab_new = st.tabs(["Used (Б/У)", "New (Новые)"])
 
-def show_table(file_name):
+def show_category_table(file_name):
     data = fetch_prices(file_name, user_rate)
     if not data.empty:
-        # Список уникальных категорий прямо из твоего CSV
+        # Берем уникальные категории из твоего CSV
         cat_list = sorted(data['Категория'].unique())
         
+        # Выпадающий список (теперь компактный)
         selected_cat = st.selectbox(f"Выберите категорию ({file_name}):", cat_list, key=file_name)
         
         filtered = data[data['Категория'] == selected_cat]
-        # Строим таблицу, Модель — это строки, Магазин — колонки
+        
+        # Строим сводную таблицу
         pivot = filtered.drop_duplicates(subset=['Модель', 'Магазин']).pivot(
             index='Модель', 
             columns='Магазин', 
@@ -89,10 +108,10 @@ def show_table(file_name):
         
         st.write(pivot.to_html(escape=False), unsafe_allow_html=True)
     else:
-        st.warning(f"Файл {file_name} не найден или пуст")
+        st.info(f"Файл {file_name} пуст или не найден. Добавьте его в репозиторий.")
 
 with tab_used:
-    show_table('links.csv')
+    show_category_table('links.csv')
 
 with tab_new:
-    show_table('links_new.csv')
+    show_category_table('links_new.csv')
