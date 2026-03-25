@@ -18,21 +18,21 @@ KIEV_TZ = pytz.timezone('Europe/Kyiv')
 
 st.set_page_config(page_title="Мониторинг цен", layout="wide")
 
+# Компактный стиль для мобильного
 st.markdown("""
     <style>
-    .block-container { padding: 1rem !important; }
-    .table-container { overflow-x: auto; width: 100%; border: 1px solid #eee; }
-    th, td { padding: 8px !important; border: 1px solid #eee !important; font-size: 0.85em; text-align: center !important; }
-    td:first-child, th:first-child { 
-        position: sticky; left: 0; background: #f8f9fa; z-index: 2; 
-        font-weight: bold; border-right: 2px solid #ddd !important; 
+    .block-container { padding: 0.5rem 1rem !important; }
+    .price-row { 
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 10px; border-bottom: 1px solid #eee; background: white;
     }
-    .uah { color: #1a1a1a; font-weight: 800; display: block; }
-    .usd { color: #FF4B4B; font-weight: 700; font-size: 0.9em; }
+    .model-name { font-weight: 600; font-size: 0.95em; color: #333; }
+    .price-block { text-align: right; }
+    .uah { font-weight: 800; color: #1a1a1a; display: block; font-size: 1.1em; }
+    .usd { color: #FF4B4B; font-weight: 700; font-size: 0.85em; }
     </style>
     """, unsafe_allow_html=True)
 
-# --- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ---
 def load_data(file):
     if os.path.exists(file):
         try:
@@ -52,41 +52,33 @@ def clean_price(text):
         return val if val > 1000 else None
     except: return None
 
-# --- ПАРСЕР (ДЛЯ РОБОТА И КНОПКИ) ---
 def run_parsing():
     history = load_data(HISTORY_FILE)
     is_first = len(history) == 0
     now = datetime.now(KIEV_TZ).strftime('%d.%m %H:%M')
-    
     mapping = {'links.csv': 'u', 'links_new.csv': 'n'}
     for f_name, tag in mapping.items():
         if not os.path.exists(f_name): continue
         df = pd.read_csv(f_name, sep=None, engine='python', encoding='utf-8-sig')
         df.columns = [c.strip().lower() for c in df.columns]
-        
         for _, row in df.iterrows():
             m, s = str(row.get('модель', '—')).strip(), str(row.get('магазин', '—')).strip()
             u, sel = str(row.get('ссылка', '')).strip(), str(row.get('селектор', '')).strip()
             c = str(row.get('категория', '1')).strip()
             key = f"{m} | {s}"
-            
             if u.startswith('http'):
                 try:
                     r = requests.get(u, headers={'User-Agent': 'Mozilla/5.0'}, timeout=10)
                     soup = BeautifulSoup(r.text, 'html.parser')
                     el = soup.select_one(sel)
                     price = clean_price(el.text.strip()) if el else None
-                    
                     if price:
                         if key not in history: history[key] = []
                         last = history[key][-1] if history[key] else None
-                        
                         if not last or last['price'] != price:
                             if last and not is_first:
-                                diff = price - last['price']
-                                sign = "📈" if diff > 0 else "📉"
                                 requests.post(f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage", 
-                                              data={"chat_id": CHAT_ID, "text": f"{sign} <b>{m}</b>\n{s}: <b>{price:,} ₴</b>", "parse_mode": "HTML"})
+                                              data={"chat_id": CHAT_ID, "text": f"🔔 <b>{m}</b>\n{s}: <b>{price:,} ₴</b>", "parse_mode": "HTML"})
                             history[key].append({'time': now, 'price': price, 'cat': c, 'type': tag})
                         else:
                             history[key][-1].update({'cat': c, 'type': tag})
@@ -95,22 +87,20 @@ def run_parsing():
     save_data(LAST_RUN_FILE, {'time': datetime.now(KIEV_TZ).strftime('%d.%m %H:%M:%S')})
 
 # --- ИНТЕРФЕЙС ---
-st.title("📱 Мониторинг")
-
 c1, c2, c3 = st.columns([1, 1, 1])
 with c1:
     rate = st.number_input("$:", value=44.55, step=0.01, label_visibility="collapsed")
 with c2:
-    st.write(f"Обновлено: **{load_data(LAST_RUN_FILE).get('time', '—')}**")
+    st.caption(f"Обновлено: {load_data(LAST_RUN_FILE).get('time', '—')}")
 with c3:
-    if st.button("♻️ ОБНОВИТЬ"):
-        with st.spinner("Парсим..."):
+    if st.button("♻️"):
+        with st.spinner("..."):
             run_parsing()
             st.rerun()
 
 db = load_data(HISTORY_FILE)
 if db:
-    tabs = st.tabs(["Used (Б/У)", "New (Новые)"])
+    tabs = st.tabs(["Used", "New"])
     tags = ['u', 'n']
     
     for i, t_tag in enumerate(tags):
@@ -119,37 +109,42 @@ if db:
             for k, logs in db.items():
                 if logs and logs[-1].get('type') == t_tag:
                     m, s = k.split(" | ")
-                    rows.append({
-                        'Модель': m, 
-                        'Магазин': s, 
-                        'Цена_ГРН': logs[-1]['price'], 
-                        'Кат': logs[-1].get('cat', 'Без категории')
-                    })
+                    rows.append({'Модель': m, 'Поставщик': s, 'Цена_ГРН': logs[-1]['price'], 'Кат': logs[-1].get('cat', '1')})
             
             df = pd.DataFrame(rows)
             if not df.empty:
-                # Сортируем категории как в файле
-                available_cats = sorted(df['Кат'].unique())
-                sel_cat = st.selectbox("Категория:", available_cats, key=f"filter_{t_tag}")
+                col_a, col_b = st.columns(2)
+                with col_a:
+                    sel_cat = st.selectbox("Категория", sorted(df['Кат'].unique()), key=f"cat_{t_tag}")
                 
-                f_df = df[df['Кат'] == sel_cat]
-                f_df['Цена'] = f_df['Цена_ГРН'].apply(lambda x: f'<span class="uah">{x:,} ₴</span><span class="usd">{int(x/rate):,} $</span>')
+                # Фильтруем поставщиков на основе выбранной категории
+                df_cat = df[df['Кат'] == sel_cat]
+                with col_b:
+                    sel_prov = st.selectbox("Поставщик", sorted(df_cat['Поставщик'].unique()), key=f"prov_{t_tag}")
                 
-                # Поворачиваем таблицу: Модели слева, Магазины сверху
-                try:
-                    res_table = f_df.pivot_table(index='Модель', columns='Магазин', values='Цена', aggfunc='first').fillna('—')
-                    st.markdown(f'<div class="table-container">{res_table.to_html(escape=False)}</div>', unsafe_allow_html=True)
-                except:
-                    st.error("Ошибка в структуре данных этой категории")
+                # Финальный список моделей
+                f_df = df_cat[df_cat['Поставщик'] == sel_prov].sort_values('Модель')
+                
+                for _, row in f_df.iterrows():
+                    p_uah = row['Цена_ГРН']
+                    p_usd = int(p_uah / rate)
+                    st.markdown(f"""
+                        <div class="price-row">
+                            <div class="model-name">{row['Модель']}</div>
+                            <div class="price-block">
+                                <span class="uah">{p_uah:,} ₴</span>
+                                <span class="usd">{p_usd:,} $</span>
+                            </div>
+                        </div>
+                    """, unsafe_allow_html=True)
             else:
-                st.info("В этом разделе пока нет данных.")
+                st.info("Нет данных")
 
 with st.expander("📜 Логи"):
     if db:
         target = st.selectbox("Девайс:", sorted(db.keys()))
         for e in reversed(db[target]): st.write(f"{e['time']} — **{e['price']:,} ₴**")
 
-# Точка входа для GitHub Actions
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == '--parse':
         run_parsing()
