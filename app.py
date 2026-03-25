@@ -17,7 +17,7 @@ KIEV_TZ = pytz.timezone('Europe/Kyiv')
 
 st.set_page_config(page_title="Мониторинг цен", layout="wide")
 
-# Чистый интерфейс
+# Чистый интерфейс без лишних надписей
 st.markdown("""
     <style>
     .block-container { padding: 1rem !important; }
@@ -44,17 +44,25 @@ def send_tg(msg):
 
 def run_parsing():
     history = load_data(HISTORY_FILE)
+    is_first_start = len(history) == 0 # Проверяем, пустая ли база
     now = datetime.now(KIEV_TZ).strftime('%d.%m %H:%M')
     files = {'links.csv': 'u', 'links_new.csv': 'n'}
     
     for f_name, tag in files.items():
         if not os.path.exists(f_name): continue
-        df = pd.read_csv(f_name, sep=None, engine='python')
-        df.columns = [c.strip().lower() for c in df.columns]
+        try:
+            df = pd.read_csv(f_name, sep=None, engine='python')
+            df.columns = [c.strip().lower() for c in df.columns]
+        except: continue
         
         for _, row in df.iterrows():
-            model, shop, url, sel = str(row.get('модель', '')), str(row.get('магазин', '')), str(row.get('ссылка', '')), str(row.get('селектор', ''))
-            cat = str(row.get('категория', '1'))
+            # Берем данные, учитывая твои колонки
+            model = str(row.get('модель', row.get('model', 'Unknown')))
+            shop = str(row.get('магазин', row.get('shop', 'Shop')))
+            url = str(row.get('ссылка', row.get('url', '')))
+            sel = str(row.get('селектор', row.get('selector', '')))
+            cat = str(row.get('категория', row.get('category', '1')))
+            
             key = f"{model} | {shop}"
             
             if url.startswith('http'):
@@ -64,30 +72,38 @@ def run_parsing():
                     el = soup.select_one(sel)
                     if el:
                         price = int(re.sub(r'\D', '', el.text.strip()))
-                        if key not in history: history[key] = []
-                        last = history[key][-1] if history[key] else None
                         
-                        if not last or last['price'] != price:
-                            if last: send_tg(f"🔔 <b>{model}</b>\n{shop}: <b>{price:,} ₴</b>")
+                        if key not in history:
+                            history[key] = []
+                            # Если это не самый первый запуск программы, маякуем о новой позиции
+                            if not is_first_start:
+                                send_tg(f"🆕 <b>{model}</b>\nДобавлена цена в {shop}: <b>{price:,} ₴</b>")
+                        
+                        last_entry = history[key][-1] if history[key] else None
+                        
+                        if not last_entry or last_entry['price'] != price:
+                            if last_entry and not is_first_start:
+                                diff = price - last_entry['price']
+                                symbol = "📈" if diff > 0 else "📉"
+                                send_tg(f"{symbol} <b>{model}</b> ({shop})\nСтало: <b>{price:,} ₴</b>\nБыло: {last_entry['price']:,} ₴")
+                            
                             history[key].append({'time': now, 'price': price, 'cat': cat, 'type': tag})
-                        else:
-                            history[key][-1].update({'cat': cat, 'type': tag})
                 except: continue
     
     save_data(HISTORY_FILE, history)
     save_data(LAST_RUN_FILE, {'time': datetime.now(KIEV_TZ).strftime('%d.%m %H:%M:%S')})
 
-# --- UI ---
+# --- ОСНОВНОЙ UI ---
 st.title("📱 Мониторинг")
 
 c1, c2, c3 = st.columns([1, 2, 1])
 with c1:
-    rate = st.number_input("$:", value=44.55, label_visibility="collapsed")
+    rate = st.number_input("Курс $:", value=44.55, label_visibility="collapsed")
 with c2:
     last_t = load_data(LAST_RUN_FILE).get('time', 'Никогда')
     st.write(f"Обновлено: **{last_t}**")
 with c3:
-    if st.button("🔔 ТЕСТ"): send_tg("✅ Тест связи")
+    if st.button("🔔 ТЕСТ ТГ"): send_tg("✅ Бот на связи!")
 
 hist_db = load_data(HISTORY_FILE)
 
@@ -104,19 +120,29 @@ if hist_db:
             if items:
                 df = pd.DataFrame(items)
                 cat_list = sorted(df['Кат'].unique())
-                sel_cat = st.selectbox("Категория:", cat_list, key=f"s_{tag}")
+                sel_cat = st.selectbox("Категория:", cat_list, key=f"sel_{tag}")
                 
                 f_df = df[df['Кат'] == sel_cat]
+                # Формируем красивый вывод
                 f_df['Цена'] = f_df['Цена_ГРН'].apply(lambda x: f'<span class="uah">{x:,} ₴</span><span class="usd">{int(x/rate):,} $</span>')
                 
-                pivot = f_df.pivot_table(index='Модель', columns='Магазин', values='Цена', aggfunc='first').fillna('—')
-                st.markdown(f'<div class="table-container">{pivot.to_html(escape=False)}</div>', unsafe_allow_html=True)
+                try:
+                    pivot = f_df.pivot_table(index='Модель', columns='Магазин', values='Цена', aggfunc='first').fillna('—')
+                    st.markdown(f'<div class="table-container">{pivot.to_html(escape=False)}</div>', unsafe_allow_html=True)
+                except Exception as e:
+                    st.error(f"Ошибка таблицы: {e}")
+            else:
+                st.info("В этой категории пока нет данных.")
 else:
-    if st.button("🚀 ЗАПУСТИТЬ ПЕРВЫЙ ПАРСИНГ"):
+    st.warning("База пуста. Нажмите 'ОБНОВИТЬ ВСЁ', чтобы собрать данные.")
+
+if st.button("♻️ ОБНОВИТЬ ВСЁ"):
+    with st.spinner("Парсим..."):
         run_parsing()
         st.rerun()
 
-with st.expander("📜 Логи"):
+with st.expander("📜 История изменений (Логи)"):
     if hist_db:
-        sk = st.selectbox("Девайс:", sorted(hist_db.keys()))
-        for e in reversed(hist_db[sk]): st.write(f"{e['time']} — {e['price']:,} ₴")
+        sk = st.selectbox("Выберите модель для логов:", sorted(hist_db.keys()))
+        for e in reversed(hist_db[sk]):
+            st.write(f"{e['time']} — **{e['price']:,} ₴**")
