@@ -1,11 +1,15 @@
 name: Update Prices
+
 on:
   schedule:
-    - cron: '0 */6 * * *' # Запуск каждые 6 часов
-  workflow_dispatch: # Позволяет запустить вручную кнопкой
+    - cron: '0 */6 * * *' # Авто-запуск каждые 6 часов
+  workflow_dispatch:      # Кнопка для ручного запуска в GitHub Actions
+
+permissions:
+  contents: write         # Разрешение роботу записывать изменения в файлы
 
 jobs:
-  build:
+  update:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -18,16 +22,16 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install pandas requests beautifulsoup4 pytz
+          pip install pandas requests beautifulsoup4 pytz streamlit
 
       - name: Run parser
         run: |
-          python -c "from app import run_parsing; run_parsing()"
+          python app.py --parse
 
       - name: Commit and push changes
         run: |
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'
           git add price_history.json last_run.json
-          git commit -m "Auto-update prices" || exit 0
+          git commit -m "Auto-update prices [skip ci]" || exit 0
           git push
