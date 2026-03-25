@@ -103,13 +103,18 @@ st.set_page_config(page_title="Мониторинг", layout="wide")
 st.markdown("""<style>
     .block-container { padding: 1rem !important; max-width: 1000px !important; margin: 0 auto !important; }
     .table-container { overflow-x: auto; width: 100%; border: 1px solid #eee; margin: 0 auto; text-align: center; }
-    table { margin: 0 auto; border-collapse: collapse; }
+    table { margin: 0 auto; border-collapse: collapse; border: none !important; }
     th, td { padding: 4px 6px !important; border: 1px solid #eee !important; font-size: 0.85em; text-align: center !important; }
     tbody tr th { background-color: #f8f9fa !important; font-weight: bold; border-right: 2px solid #ddd !important; }
     
-    /* СКРЫВАЕМ ТОЛЬКО ПУСТЫЕ ТЕХНИЧЕСКИЕ ЯЧЕЙКИ В ШАПКЕ */
+    /* УДАЛЯЕМ ТЕХНИЧЕСКИЕ СТРОКИ И ТУ САМУЮ ПОЛОСКУ */
     thead tr:nth-child(2) { display: none; }
-    thead tr th:first-child { color: transparent; border: none !important; background: transparent !important; }
+    thead tr th:first-child { 
+        border: none !important; 
+        background: none !important; 
+        width: 0px !important; 
+        padding: 0 !important;
+    }
 
     .uah { color: #1a1a1a; font-weight: 800; display: block; }
     .usd { color: #FF4B4B; font-weight: 700; font-size: 0.9em; }
@@ -123,7 +128,6 @@ last_run = load_data(LAST_RUN_FILE)
 
 c1, c2, c3, c4 = st.columns([1,1.5,1,1])
 with c1: 
-    # Убираем подпись "Курс $:"
     user_rate = st.number_input("", value=44.55, label_visibility="collapsed") 
 with c2: 
     st.write(f"Обновлено: **{last_run.get('time', '—')}**")
@@ -147,7 +151,6 @@ for i, t_tag in enumerate(tabs):
         for k, logs in db.items():
             if logs and logs[-1].get('type') == tag_key:
                 p = k.split(" | ")
-                # Убираем слова Магазин/Модель из данных
                 items.append({'M': p[0], 'S': p[1], 'Цена': logs[-1]['price'], 'Категория': logs[-1]['cat'], 'order': logs[-1].get('order', 999)})
         
         if items:
@@ -158,7 +161,6 @@ for i, t_tag in enumerate(tabs):
             if not f_df.empty:
                 f_df['Display'] = f_df['Цена'].apply(lambda x: f'<span class="uah">{x:,} ₴</span><span class="usd">{int(x/user_rate):,} $</span>')
                 pivot = f_df.pivot_table(index='M', columns='S', values='Display', aggfunc='first', sort=False).fillna('—')
-                # Удаляем подписи осей для чистоты
                 pivot.index.name = None
                 pivot.columns.name = None
                 st.markdown(f'<div class="table-container">{pivot.to_html(escape=False)}</div>', unsafe_allow_html=True)
