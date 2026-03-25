@@ -15,18 +15,16 @@ LAST_RUN_FILE = 'last_run.json'
 KIEV_TZ = pytz.timezone('Europe/Kyiv')
 
 def get_minfin_rate():
-    """Твой рабочий парсинг курса Минфина"""
     try:
         url = "https://minfin.com.ua/currency/auction/usd/buy/kiev/"
         r = requests.get(url, headers={'User-Agent': 'Mozilla/5.0'}, timeout=10)
         soup = BeautifulSoup(r.text, 'html.parser')
-        # Ищем актуальный курс продажи в Киеве
         rate_el = soup.select_one('.sc-1x32wa2-9') 
         if rate_el:
             val = re.sub(r'[^\d.]', '', rate_el.text.replace(',', '.'))
             return float(val)
     except: pass
-    return 44.15 # Резерв, если сайт упадет
+    return 44.15
 
 def load_data(file):
     if os.path.exists(file):
@@ -47,46 +45,60 @@ def run_parsing():
     now = datetime.now(KIEV_TZ).strftime('%d.%m %H:%M')
     mapping = {'links.csv': 'u', 'links_new.csv': 'n'}
     
-    current_keys = set() # Собираем только то, что есть в CSV сейчас
-
+    # Сначала считаем общее кол-во задач для прогресс-бара
+    all_tasks = []
+    current_keys = set()
     for f_name, tag in mapping.items():
         if os.path.exists(f_name):
+            df = pd.read_csv(f_name, sep=';', engine='python', encoding='utf-8-sig')
+            df.columns = [c.strip().lower() for c in df.columns]
+            for idx, row in df.iterrows():
+                all_tasks.append((row, tag, idx))
+                current_keys.add(f"{str(row.get('модель','')).strip()} | {str(row.get('магазин','')).strip()} | {tag}")
+
+    if not all_tasks: return
+
+    # Создаем прогресс-бар в интерфейсе
+    progress_bar = st.progress(0)
+    status_text = st.empty()
+    total = len(all_tasks)
+
+    for i, (row, tag, idx) in enumerate(all_tasks):
+        m, s, u, sel, c = [str(row.get(k, '')).strip() for k in ['модель','магазин','ссылка','селектор','категория']]
+        status_text.text(f"Обновление: {m} ({s})")
+        
+        if u.startswith('http') and sel and sel != 'nan':
+            key = f"{m} | {s} | {tag}"
             try:
-                df = pd.read_csv(f_name, sep=';', engine='python', encoding='utf-8-sig')
-                df.columns = [c.strip().lower() for c in df.columns]
-                for idx, row in df.iterrows():
-                    m, s, u, sel, c = [str(row.get(k, '')).strip() for k in ['модель','магазин','ссылка','селектор','категория']]
-                    if u.startswith('http') and sel and sel != 'nan':
-                        key = f"{m} | {s} | {tag}"
-                        current_keys.add(key)
-                        try:
-                            r = requests.get(u, headers={'User-Agent': 'Mozilla/5.0'}, timeout=15)
-                            soup = BeautifulSoup(r.text, 'html.parser')
-                            el = soup.select_one(sel)
-                            if el:
-                                price_val = clean_price(el.text)
-                                if price_val:
-                                    if key not in history: history[key] = []
-                                    # ЗАПИСЬ ТОЛЬКО ПРИ ИЗМЕНЕНИИ ЦЕНЫ
-                                    if not history[key] or history[key][-1]['price'] != price_val:
-                                        history[key].append({'time': now, 'price': price_val, 'cat': c, 'type': tag, 'order': idx})
-                                        if len(history[key]) > 50: history[key] = history[key][-50:]
-                        except: pass
+                r = requests.get(u, headers={'User-Agent': 'Mozilla/5.0'}, timeout=15)
+                soup = BeautifulSoup(r.text, 'html.parser')
+                el = soup.select_one(sel)
+                if el:
+                    price_val = clean_price(el.text)
+                    if price_val:
+                        if key not in history: history[key] = []
+                        if not history[key] or history[key][-1]['price'] != price_val:
+                            history[key].append({'time': now, 'price': price_val, 'cat': c, 'type': tag, 'order': idx})
+                            if len(history[key]) > 50: history[key] = history[key][-50:]
             except: pass
+        
+        # Обновляем полоску
+        progress_bar.progress((i + 1) / total)
     
-    # АВТО-ОЧИСТКА: Удаляем мусор (старые названия моделей), которых нет в CSV
+    # Очистка мусора
     history = {k: v for k, v in history.items() if k in current_keys}
-    
     save_data(HISTORY_FILE, history)
     save_data(LAST_RUN_FILE, {'time': now})
+    status_text.empty()
+    progress_bar.empty()
 
 if "--parse" in sys.argv:
+    # Для фонового запуска прогресс-бар не нужен
     run_parsing()
     sys.exit(0)
 
 st.set_page_config(page_title="Мониторинг", layout="wide")
 
-# CSS: Таблица и логи
 st.markdown("""<style>
     .block-container { padding: 1rem !important; max-width: 1000px !important; margin: 0 auto !important; }
     .table-container { overflow-x: auto; width: 100%; text-align: center; margin-bottom: 20px; }
@@ -102,7 +114,7 @@ st.markdown("""<style>
 </style>""", unsafe_allow_html=True)
 
 st.title("📱 Мониторинг")
-minfin_rate = get_minfin_rate() # ПАРСИНГ ВКЛЮЧЕН
+minfin_rate = get_minfin_rate()
 db = load_data(HISTORY_FILE)
 last_run = load_data(LAST_RUN_FILE)
 
@@ -110,9 +122,11 @@ c1, c2, c3, c4 = st.columns([1,1.5,1,1])
 with c1: user_rate = st.number_input("", value=44.55, label_visibility="collapsed") 
 with c2: 
     st.write(f"Обновлено: **{last_run.get('time', '—')}**")
-    st.write(f"Курс Минфина: **{minfin_rate}**")
+    st.write(f"Минфин: **{minfin_rate}**")
 with c3: 
-    if st.button("♻️ ОБНОВИТЬ"): run_parsing(); st.rerun()
+    if st.button("♻️ ОБНОВИТЬ"): 
+        run_parsing()
+        st.rerun()
 with c4:
     if st.button("🗑 СБРОСИТЬ"):
         if os.path.exists(HISTORY_FILE): os.remove(HISTORY_FILE)
@@ -134,12 +148,9 @@ for i, tab_ui in enumerate(tabs):
             df_tab = pd.DataFrame(items)
             cats = sorted(df_tab['Категория'].unique())
             sel_cat = st.selectbox("Категория:", cats, key=f"cat_{tag_key}")
-            
-            # СОРТИРОВКА ПО ПОРЯДКУ ИЗ CSV
             f_df = df_tab[df_tab['Категория'] == sel_cat].copy().sort_values('order')
             
             if not f_df.empty:
-                # Верхняя таблица (твой курс)
                 f_df['Display'] = f_df['Цена'].apply(lambda x: f'<span class="uah">{x:,} ₴</span><span class="usd">{int(x/user_rate):,} $</span>')
                 pivot = f_df.pivot_table(index='M', columns='S', values='Display', aggfunc='first', sort=False).fillna('—')
                 pivot.index.name = None; pivot.columns.name = None
@@ -147,13 +158,10 @@ for i, tab_ui in enumerate(tabs):
 
                 st.markdown("---")
                 with st.expander("Отслеживание цены"):
-                    # ГОРИЗОНТАЛЬНОЕ МЕНЮ
                     hc1, hc2, hc3 = st.columns(3)
                     with hc1: h_cat = st.selectbox("Категория", cats, key=f"hc_{tag_key}")
-                    
                     h_mod_df = df_tab[df_tab['Категория'] == h_cat].sort_values('order')
                     h_mod_list = h_mod_df['M'].unique()
-                    
                     with hc2: h_mod = st.selectbox("Модель", h_mod_list, key=f"hm_{tag_key}")
                     with hc3:
                         h_shop_list = sorted(df_tab[(df_tab['Категория'] == h_cat) & (df_tab['M'] == h_mod)]['S'].unique())
@@ -164,16 +172,12 @@ for i, tab_ui in enumerate(tabs):
                         logs = db[hist_key]
                         for j in range(len(logs)-1, -1, -1):
                             entry = logs[j]
-                            usd_minfin = int(entry['price'] / minfin_rate)
-                            
+                            usd_min = int(entry['price'] / minfin_rate)
                             diff_str = ""
                             if j > 0:
-                                old_p = logs[j-1]['price']
-                                new_p = entry['price']
+                                old_p, new_p = logs[j-1]['price'], entry['price']
                                 diff = ((new_p - old_p) / old_p) * 100
-                                color = "red" if diff > 0 else "green"
-                                sign = "+" if diff > 0 else ""
                                 if diff != 0:
-                                    diff_str = f'<span style="color:{color}; font-size:0.85em;"> ({sign}{diff:.1f}%)</span>'
-                            
-                            st.markdown(f'<div class="log-line">└ {entry["time"]}: {entry["price"]:,} ₴ (<span class="log-usd">{usd_minfin:,} $</span>){diff_str}</div>', unsafe_allow_html=True)
+                                    color = "red" if diff > 0 else "green"
+                                    diff_str = f' <span style="color:{color}; font-size:0.85em;">({"+" if diff>0 else ""}{diff:.1f}%)</span>'
+                            st.markdown(f'<div class="log-line">└ {entry["time"]}: {entry["price"]:,} ₴ (<span class="log-usd">{usd_min:,} $</span>){diff_str}</div>', unsafe_allow_html=True)
