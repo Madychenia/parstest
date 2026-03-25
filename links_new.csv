@@ -1,0 +1,5 @@
+﻿Модель;Магазин;Ссылка;Селектор;Категория
+iPh 13 128;Anika;https://anikaphone.com.ua/product/%d0%b1-%d1%83-iphone-13-128gb-blue-mlpk3/;#mainPrice > div > p > ins > span > bdi;1
+iPh 13 2561;iStories;https://anikaphone.com.ua/product/%d0%b1-%d1%83-iphone-13-128gb-blue-mlpk3/;#mainPrice > div > p > ins > span > bdi;2
+iPh 13 512;Anika;https://anikaphone.com.ua/product/%d0%b1-%d1%83-iphone-13-128gb-blue-mlpk3/;#mainPrice > div > p > ins > span > bdi;3
+iPh 13 2563;iStories;https://anikaphone.com.ua/product/%d0%b1-%d1%83-iphone-13-128gb-blue-mlpk3/;#mainPrice > div > p > ins > span > bdi;4
