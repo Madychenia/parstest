@@ -51,22 +51,11 @@ def run_parsing(is_silent=False):
             except: pass
 
     if not tasks: return
-    if not is_silent:
-        progress_bar = st.progress(0)
-        status_text = st.empty()
     
-    total_steps = sum(len(t[2]) for t in tasks)
-    current_step = 0
-
     for f_name, tag, df in tasks:
         df.columns = [c.strip().lower() for c in df.columns]
         for idx, row in df.iterrows():
-            current_step += 1
             m, s, u, sel, c = [str(row.get(k, '')).strip() for k in ['модель','магазин','ссылка','селектор','категория']]
-            if not is_silent:
-                status_text.text(f"⏳ Проверяю: {m}")
-                progress_bar.progress(current_step / total_steps)
-
             if u.startswith('http') and sel and sel != 'nan':
                 try:
                     r = requests.get(u, headers={'User-Agent': 'Mozilla/5.0'}, timeout=15)
@@ -89,11 +78,6 @@ def run_parsing(is_silent=False):
     
     save_data(HISTORY_FILE, history)
     save_data(LAST_RUN_FILE, {'time': now})
-    if not is_silent:
-        status_text.success(f"✅ Готово")
-        time.sleep(1)
-        status_text.empty()
-        progress_bar.empty()
 
 if "--parse" in sys.argv:
     run_parsing(is_silent=True)
@@ -102,29 +86,29 @@ if "--parse" in sys.argv:
 st.set_page_config(page_title="Мониторинг", layout="wide")
 st.markdown("""<style>
     .block-container { padding: 1rem !important; max-width: 1000px !important; margin: 0 auto !important; }
-    .table-container { overflow-x: auto; width: 100%; border: 1px solid #eee; margin: 0 auto; text-align: center; }
+    .table-container { overflow-x: auto; width: 100%; border: none; margin: 0 auto; text-align: center; }
     
-    table { border-collapse: collapse; margin: 0 auto; width: auto; border: 1px solid #eee !important; }
-    th, td { padding: 8px 12px !important; border: 1px solid #eee !important; font-size: 0.85em; text-align: center !important; }
+    /* ВОЗВРАЩАЕМ РОДНУЮ КОМПАКТНУЮ ВЕРСТКУ */
+    table { margin: 0 auto; border-collapse: collapse; }
+    th, td { padding: 4px 6px !important; border: 1px solid #eee !important; font-size: 0.85em; text-align: center !important; }
     
-    /* Заголовок строк (названия моделей) */
+    /* Заголовок строк (модели) */
     tbody tr th { 
         background-color: #f8f9fa !important; 
         font-weight: bold; 
-        min-width: 250px !important; 
         text-align: left !important;
         border-right: 2px solid #ddd !important;
+        /* УБРАЛИ min-width, ЧТОБЫ КОЛОНКА НЕ БЫЛА ДЛИННОЙ */
     }
     
-    /* Скрываем только лишнюю пустую строку под названиями магазинов */
+    /* Аккуратно скрываем пустоту в углу, не ломая верстку */
     thead tr:nth-child(2) { display: none; }
-    
-    /* Оформление угловой ячейки: серый фон без текста */
-    thead tr:first-child th:first-child { 
-        background-color: #f8f9fa !important;
+    thead tr th:first-child { 
+        background-color: transparent !important;
         color: transparent !important;
+        border: none !important;
     }
-
+    
     .uah { color: #1a1a1a; font-weight: 800; display: block; }
     .usd { color: #FF4B4B; font-weight: 700; font-size: 0.9em; }
 </style>""", unsafe_allow_html=True)
@@ -136,6 +120,7 @@ last_run = load_data(LAST_RUN_FILE)
 
 c1, c2, c3, c4 = st.columns([1,1.5,1,1])
 with c1: 
+    # УБРАЛИ "Курс $:" и ":"
     user_rate = st.number_input("", value=44.55, label_visibility="collapsed") 
 with c2: 
     st.write(f"Обновлено: **{last_run.get('time', '—')}**")
@@ -152,13 +137,14 @@ with c4:
 tabs = st.tabs(["Used (Б/У)", "New (Новые)"])
 tags = ['u', 'n']
 
-for i, t_tag in enumerate(tabs):
+for i, t_tab in enumerate(tabs):
     tag_key = tags[i]
     with t_tag:
         items = []
         for k, logs in db.items():
             if logs and logs[-1].get('type') == tag_key:
                 p = k.split(" | ")
+                # Убираем слова Модель/Магазин из данных
                 items.append({'M': p[0], 'S': p[1], 'Цена': logs[-1]['price'], 'Категория': logs[-1]['cat'], 'order': logs[-1].get('order', 999)})
         
         if items:
@@ -169,6 +155,26 @@ for i, t_tag in enumerate(tabs):
             if not f_df.empty:
                 f_df['Display'] = f_df['Цена'].apply(lambda x: f'<span class="uah">{x:,} ₴</span><span class="usd">{int(x/user_rate):,} $</span>')
                 pivot = f_df.pivot_table(index='M', columns='S', values='Display', aggfunc='first', sort=False).fillna('—')
+                # Удаляем подписи осей для компактности
                 pivot.index.name = None
                 pivot.columns.name = None
                 st.markdown(f'<div class="table-container">{pivot.to_html(escape=False)}</div>', unsafe_allow_html=True)
+        
+        with st.expander(f"📜 История изменений"):
+            h_list = []
+            for k, logs in db.items():
+                if logs and logs[-1].get('type') == tag_key:
+                    p = k.split(" | ")
+                    h_list.append({'Модель': p[0], 'Магазин': p[1], 'Категория': logs[-1]['cat']})
+            
+            if h_list:
+                h_df = pd.DataFrame(h_list)
+                f1, f2, f3 = st.columns(3)
+                with f1: hc = st.selectbox("Категория", h_df['Категория'].unique(), key=f"hc_{tag_key}")
+                with f2: hm = st.selectbox("Модель", h_df[h_df['Категория'] == hc]['Модель'].unique(), key=f"hm_{tag_key}")
+                with f3: hs = st.selectbox("Магазин", h_df[(h_df['Категория'] == hc) & (h_df['Модель'] == hm)]['Магазин'].unique(), key=f"hs_{tag_key}")
+                
+                h_key = f"{hm} | {hs} | {tag_key}"
+                if h_key in db:
+                    for e in reversed(db[h_key]):
+                        st.markdown(f"{e['time']} — **{e['price']:,} ₴** <span class='log-usd'>({int(e['price']/minfin_rate)} $)</span>", unsafe_allow_html=True)
