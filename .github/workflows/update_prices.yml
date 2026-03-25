@@ -17,7 +17,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0    # Нужно для корректного слияния веток
+          fetch-depth: 0    # Важно для подгрузки истории изменений
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -26,7 +26,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install pandas requests beautifulsoup4 pytz streamlit selenium
+          pip install pandas requests beautifulsoup4 pytz streamlit
 
       - name: Run parser
         run: |
@@ -37,14 +37,14 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           
-          # Сначала забираем изменения из GitHub, чтобы не было конфликтов
+          # Забираем изменения, чтобы не было конфликтов
           git pull --rebase origin main
           
-          # Добавляем обновленные файлы цен
+          # Добавляем файлы цен
           git add price_history.json last_run.json
           
-          # Фиксируем изменения, если они есть
+          # Если изменений нет, просто выходим без ошибки
           git commit -m "Auto-update prices [skip ci]" || exit 0
           
-          # Отправляем обратно в репозиторий
-          git push
+          # Отправляем в репозиторий
+          git push origin main
