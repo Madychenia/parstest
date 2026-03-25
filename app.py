@@ -101,14 +101,11 @@ if "--parse" in sys.argv:
 
 st.set_page_config(page_title="Мониторинг", layout="wide")
 st.markdown("""<style>
-    /* ВОЗВРАЩАЕМ КОМПАКТНОСТЬ */
     .block-container { padding: 1rem !important; max-width: 1000px !important; margin: 0 auto !important; }
     .table-container { overflow-x: auto; width: 100%; border: 1px solid #eee; margin: 0 auto; text-align: center; }
     table { margin: 0 auto; border-collapse: collapse; }
     th, td { padding: 4px 6px !important; border: 1px solid #eee !important; font-size: 0.85em; text-align: center !important; }
     tbody tr th { background-color: #f8f9fa !important; font-weight: bold; border-right: 2px solid #ddd !important; }
-    /* ВОЗВРАЩАЕМ ЗАГОЛОВКИ */
-    thead tr th:first-child { display: table-cell; }
     .uah { color: #1a1a1a; font-weight: 800; display: block; }
     .usd { color: #FF4B4B; font-weight: 700; font-size: 0.9em; }
     .log-usd { color: #FF4B4B; font-weight: bold; }
@@ -119,9 +116,10 @@ minfin_rate = 44.15
 db = load_data(HISTORY_FILE)
 last_run = load_data(LAST_RUN_FILE)
 
-# ВОЗВРАЩАЕМ «Курс $:» и все кнопки
 c1, c2, c3, c4 = st.columns([1,1.5,1,1])
-with c1: user_rate = st.number_input("Курс $:", value=44.55) 
+with c1: 
+    # УБРАЛИ СЛОВО "КУРС"
+    user_rate = st.number_input("", value=44.55, label_visibility="collapsed") 
 with c2: 
     st.write(f"Обновлено: **{last_run.get('time', '—')}**")
     st.write(f"Курс Минфина (продажа): **{minfin_rate}**")
@@ -144,8 +142,7 @@ for i, t_tag in enumerate(tabs):
         for k, logs in db.items():
             if logs and logs[-1].get('type') == tag_key:
                 p = k.split(" | ")
-                # ВОЗВРАЩАЕМ «Модель» и «Магазин»
-                items.append({'Модель': p[0], 'Магазин': p[1], 'Цена': logs[-1]['price'], 'Категория': logs[-1]['cat'], 'order': logs[-1].get('order', 999)})
+                items.append({'M': p[0], 'S': p[1], 'Цена': logs[-1]['price'], 'Категория': logs[-1]['cat'], 'order': logs[-1].get('order', 999)})
         
         if items:
             df_tab = pd.DataFrame(items)
@@ -154,13 +151,12 @@ for i, t_tag in enumerate(tabs):
             
             if not f_df.empty:
                 f_df['Display'] = f_df['Цена'].apply(lambda x: f'<span class="uah">{x:,} ₴</span><span class="usd">{int(x/user_rate):,} $</span>')
-                # ВОЗВРАЩАЕМ ЗАГОЛОВКИ ЯЧЕЕК И РОДНУЮ СОРТИРОВКУ
-                pivot = f_df.pivot_table(index='Модель', columns='Магазин', values='Display', aggfunc='first', sort=False).fillna('—')
-                pivot.index.name = "Модель"
-                pivot.columns.name = "Магазин"
+                # ПУСТЫЕ ЗАГОЛОВКИ В ТАБЛИЦЕ
+                pivot = f_df.pivot_table(index='M', columns='S', values='Display', aggfunc='first', sort=False).fillna('—')
+                pivot.index.name = ""
+                pivot.columns.name = ""
                 st.markdown(f'<div class="table-container">{pivot.to_html(escape=False)}</div>', unsafe_allow_html=True)
         
-        # ВОЗВРАЩАЕМ ФИЛЬТРЫ ИСТОРИИ ВНИЗУ
         with st.expander(f"📜 История изменений"):
             h_list = []
             for k, logs in db.items():
