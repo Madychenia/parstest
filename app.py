@@ -6,41 +6,40 @@ import time
 import re
 from datetime import datetime
 
-# Настройки страницы
-st.set_page_config(page_title="Price Monitor PRO", layout="wide", initial_sidebar_state="collapsed")
+# Настройки страницы: убираем боковое меню и расширяем контент
+st.set_page_config(page_title="Price Monitor", layout="wide", initial_sidebar_state="collapsed")
 
-# CSS для красоты и цветов
+# CSS: черная гривна, красный доллар, аккуратная таблица
 st.markdown("""
     <style>
     [data-testid="stSidebar"] { display: none; }
     .uah { color: black; font-weight: bold; }
     .usd { color: #FF4B4B; font-weight: bold; }
     .update-text { font-size: 14px; color: gray; }
-    .stSelectbox label { font-weight: bold; font-size: 18px; }
     table { width: 100% !important; border-radius: 10px; overflow: hidden; border: 1px solid #f0f2f6; }
     th { background-color: #f8f9fb !important; text-align: center !important; }
-    td { text-align: center !important; padding: 10px !important; }
+    td { text-align: center !important; padding: 12px !important; font-size: 16px !important; }
     </style>
     """, unsafe_allow_html=True)
 
-st.title("📱 Мониторинг цен")
+st.title("📱 Мониторинг цен: РОЗНИЦА")
 
 # --- ВЕРХНЯЯ ПАНЕЛЬ ---
 col_rate, col_time, col_btn = st.columns([1.5, 2.5, 1.5])
 
 with col_rate:
-    user_rate = st.number_input("Курс ($):", value=44.55, step=0.01)
+    user_rate = st.number_input("Курс доллара ($):", value=44.55, step=0.01)
 
 with col_time:
     now = datetime.now().strftime("%H:%M:%S")
-    st.markdown(f"<p class='update-text'>Обновлено в: <b>{now}</b><br>Курс вводится вручную</p>", unsafe_allow_html=True)
+    st.markdown(f"<p class='update-text'>Обновлено в: <b>{now}</b><br>Данные из файла: links.csv</p>", unsafe_allow_html=True)
 
 with col_btn:
     if st.button("♻️ ОБНОВИТЬ ЦЕНЫ"):
         st.cache_data.clear()
         st.rerun()
 
-# --- ФУНКЦИЯ ПАРСИНГА ---
+# --- ФУНКЦИЯ ПАРСИНГА (Кэш 24 часа) ---
 @st.cache_data(ttl=86400)
 def fetch_prices(file_name, rate):
     try:
@@ -61,7 +60,9 @@ def fetch_prices(file_name, rate):
                     soup = BeautifulSoup(r.text, 'html.parser')
                     element = soup.select_one(selector)
                     if element:
-                        price_uah = int(re.sub(r'\D', '', element.text.strip()))
+                        # Оставляем только цифры
+                        clean_price = re.sub(r'\D', '', element.text.strip())
+                        price_uah = int(clean_price)
                 except: pass
 
             if price_uah:
@@ -81,31 +82,24 @@ def fetch_prices(file_name, rate):
     except:
         return pd.DataFrame()
 
-# --- ЛОГИКА ОТОБРАЖЕНИЯ ---
-tab_opt, tab_roz = st.tabs(["📦 ОПТ", "🛍️ РОЗНИЦА"])
+# --- ВЫВОД ТАБЛИЦЫ С ФИЛЬТРОМ ---
+all_data = fetch_prices('links.csv', user_rate)
 
-def show_filtered_table(file_name):
-    all_data = fetch_prices(file_name, user_rate)
+if not all_data.empty:
+    # Авто-группировка по цифрам в названии (13, 14, 15...)
+    all_data['Серия'] = all_data['Модель'].apply(
+        lambda x: re.search(r'\d+', str(x)).group() if re.search(r'\d+', str(x)) else "Прочее"
+    )
     
-    if not all_data.empty:
-        # Извлекаем серии (ищем цифры 13, 14, 15 в названии модели)
-        all_data['Серия'] = all_data['Модель'].apply(lambda x: re.search(r'\d+', str(x)).group() if re.search(r'\d+', str(x)) else "Прочее")
-        
-        series_list = sorted(all_data['Серия'].unique(), key=lambda x: int(x) if x.isdigit() else 999)
-        
-        # Кнопки выбора серии
-        selected_series = st.selectbox(f"Выберите модель для {file_name}:", series_list, index=len(series_list)-1)
-        
-        # Фильтруем данные
-        filtered_df = all_data[all_data['Серия'] == selected_series]
-        pivot = filtered_df.pivot_table(index='Модель', columns='Магазин', values='Цена', aggfunc='first')
-        
-        st.write(pivot.to_html(escape=False), unsafe_allow_html=True)
-    else:
-        st.warning(f"Файл {file_name} пуст или не найден.")
-
-with tab_opt:
-    show_filtered_table('links.csv')
-
-with tab_roz:
-    show_filtered_table('links_r.csv')
+    series_list = sorted(all_data['Серия'].unique(), key=lambda x: int(x) if x.isdigit() else 999)
+    
+    # Выбор серии (кнопки-фильтры)
+    selected_series = st.selectbox("Выберите модель iPhone:", series_list, index=len(series_list)-1)
+    
+    # Фильтруем и показываем
+    filtered_df = all_data[all_data['Серия'] == selected_series]
+    pivot = filtered_df.pivot_table(index='Модель', columns='Магазин', values='Цена', aggfunc='first')
+    
+    st.write(pivot.to_html(escape=False), unsafe_allow_html=True)
+else:
+    st.error("Файл links.csv не найден или пуст. Загрузите его на GitHub.")
