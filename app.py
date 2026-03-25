@@ -15,22 +15,21 @@ HISTORY_FILE = 'price_history.json'
 
 st.set_page_config(page_title="Мониторинг цен PRO", layout="wide", initial_sidebar_state="collapsed")
 
-# Улучшенный CSS для ровности и красоты
+# Улучшенный CSS: фиксируем ширину колонок для идеальной ровности
 st.markdown("""
     <style>
     [data-testid="stSidebar"] { display: none; }
-    .uah { color: black; font-weight: bold; font-size: 1.05em; line-height: 1.2; }
-    .usd { color: #FF4B4B; font-weight: bold; font-size: 0.95em; }
+    .uah { color: black; font-weight: bold; font-size: 1.05em; line-height: 1.1; }
+    .usd { color: #FF4B4B; font-weight: bold; font-size: 0.9em; }
     .price-up { color: #d32f2f; font-weight: bold; }
     .price-down { color: #388e3c; font-weight: bold; }
     
-    /* Делаем таблицу ровной */
-    table { width: 100% !important; border-collapse: collapse; }
-    td { text-align: center !important; padding: 12px 8px !important; border: 1px solid #f0f2f6 !important; min-width: 100px; }
-    th { background-color: #f8f9fb !important; text-align: center !important; padding: 10px !important; }
+    table { width: 100% !important; border-collapse: collapse; table-layout: fixed; }
+    th { background-color: #f8f9fb !important; text-align: center !important; padding: 12px !important; border: 1px solid #dee2e6 !important; }
+    td { text-align: center !important; padding: 15px 5px !important; border: 1px solid #dee2e6 !important; height: 60px; vertical-align: middle !important; }
     
-    /* Компактные селекторы */
-    .stSelectbox, .stNumberInput { max-width: 300px; }
+    /* Фиксируем первую колонку с названием модели */
+    td:first-child { text-align: left !important; padding-left: 15px !important; font-weight: 600; background-color: #fcfcfc; width: 250px; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -125,18 +124,16 @@ for i, tab in enumerate(tabs):
     with tab:
         raw_data = fetch_and_track(files[i])
         if not raw_data.empty:
-            # Формат ячейки
             def fmt(v):
-                if pd.notnull(v):
+                if pd.notnull(v) and v > 0:
                     return f'<span class="uah">{int(v):,} ₴</span><br><span class="usd">{int(round(v/user_rate)):,} $</span>'
                 return "—"
             
             df_disp = raw_data.copy()
             df_disp['Цена'] = df_disp['Цена_ГРН'].apply(fmt)
             
-            # Фильтр категории для таблицы
             all_cats = raw_data['Категория'].unique().tolist()
-            sel_cat = st.selectbox("Выберите серию:", all_cats, key=f"cat_tab_{i}")
+            sel_cat = st.selectbox("Серия iPhone:", all_cats, key=f"cat_tab_{i}")
             
             filt = df_disp[df_disp['Категория'] == sel_cat]
             order = filt['Модель'].unique().tolist()
@@ -147,40 +144,42 @@ for i, tab in enumerate(tabs):
             
             st.write(pivot.to_html(escape=False), unsafe_allow_html=True)
             
-            # --- НОВАЯ ИСТОРИЯ С ФИЛЬТРАМИ ---
+            # --- ИСТОРИЯ С ЗАЩИТОЙ ОТ KEYERROR ---
             st.divider()
             st.subheader("📜 Поиск по истории")
             hist_db = load_history()
             
-            h_col1, h_col2, h_col3 = st.columns(3)
-            
-            # 1. Фильтр по категории (берем из истории)
-            available_cats = sorted(list(set(entry[0]['cat'] for entry in hist_db.values() if entry)))
-            with h_col1:
-                h_cat = st.selectbox("Категория лога:", available_cats, key=f"hcat_{i}")
-            
-            # 2. Фильтр по модели
-            models_in_cat = sorted(list(set(k.split(' | ')[0] for k, v in hist_db.items() if v and v[0]['cat'] == h_cat)))
-            with h_col2:
-                h_mod = st.selectbox("Модель:", models_in_cat, key=f"hmod_{i}")
-            
-            # 3. Фильтр по магазину
-            shops_for_mod = sorted([k.split(' | ')[1] for k in hist_db.keys() if k.startswith(f"{h_mod} |")])
-            with h_col3:
-                h_shop = st.selectbox("Магазин:", shops_for_mod, key=f"hshop_{i}")
-            
-            # Вывод лога
-            target_key = f"{h_mod} | {h_shop}"
-            if target_key in hist_db:
-                logs = hist_db[target_key]
-                for j in range(len(logs)-1, -1, -1):
-                    curr, prev = logs[j], (logs[j-1] if j > 0 else None)
-                    diff_txt = ""
-                    if prev:
-                        d = curr['price'] - prev['price']
-                        p_c = (d / prev['price']) * 100
-                        if d > 0: diff_txt = f'<span class="price-up"> ↑ {p_c:.1f}% (+{d:,} ₴)</span>'
-                        elif d < 0: diff_txt = f'<span class="price-down"> ↓ {abs(p_c):.1f}% ({d:,} ₴)</span>'
-                    st.markdown(f"📅 **{curr['time']}** — **{curr['price']:,} ₴** {diff_txt}", unsafe_allow_html=True)
+            if hist_db:
+                h_col1, h_col2, h_col3 = st.columns(3)
+                
+                # Безопасное получение категорий из истории
+                available_cats = sorted(list(set(v[0].get('cat', 'Без категории') for v in hist_db.values() if v)))
+                with h_col1:
+                    h_cat = st.selectbox("Категория лога:", available_cats, key=f"hcat_{i}")
+                
+                # Фильтр моделей внутри категории
+                models_in_cat = sorted(list(set(k.split(' | ')[0] for k, v in hist_db.items() if v and v[0].get('cat', 'Без категории') == h_cat)))
+                with h_col2:
+                    h_mod = st.selectbox("Модель:", models_in_cat, key=f"hmod_{i}")
+                
+                # Фильтр магазинов для выбранной модели
+                shops_for_mod = sorted([k.split(' | ')[1] for k in hist_db.keys() if k.startswith(f"{h_mod} |")])
+                with h_col3:
+                    h_shop = st.selectbox("Магазин:", shops_for_mod, key=f"hshop_{i}")
+                
+                target_key = f"{h_mod} | {h_shop}"
+                if target_key in hist_db:
+                    logs = hist_db[target_key]
+                    for j in range(len(logs)-1, -1, -1):
+                        curr, prev = logs[j], (logs[j-1] if j > 0 else None)
+                        diff_txt = ""
+                        if prev:
+                            d = curr['price'] - prev['price']
+                            p_c = (d / prev['price']) * 100
+                            if d > 0: diff_txt = f'<span class="price-up"> ↑ {p_c:.1f}% (+{d:,} ₴)</span>'
+                            elif d < 0: diff_txt = f'<span class="price-down"> ↓ {abs(p_c):.1f}% ({d:,} ₴)</span>'
+                        st.markdown(f"📅 **{curr['time']}** — **{curr['price']:,} ₴** {diff_txt}", unsafe_allow_html=True)
+            else:
+                st.info("История пока пуста. Нажми 'Обновить всё'.")
         else:
             st.info("Файл не найден.")
