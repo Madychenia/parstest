@@ -8,7 +8,7 @@ import pytz
 import json
 import os
 import io
-import sys  # Добавлено для исправления ошибки NameError
+import sys
 
 # --- КОНФИГ ---
 TELEGRAM_TOKEN = "8673005085:AAG-vDGUu4buhPHmMYoJt1a7UueVIywvAyQ"
@@ -19,7 +19,7 @@ KIEV_TZ = pytz.timezone('Europe/Kyiv')
 
 st.set_page_config(page_title="Мониторинг цен", layout="wide")
 
-# Стили для таблицы и интерфейса
+# Стили
 st.markdown("""
     <style>
     .block-container { padding: 1rem !important; }
@@ -136,7 +136,7 @@ def run_parsing():
     })
 
 # --- ИНТЕРФЕЙС ---
-st.title("📱 Мониторинг цен")
+st.title("📱 Мониторинг")
 
 minfin_rate = get_minfin_sell_rate()
 last_run = load_data(LAST_RUN_FILE)
@@ -153,7 +153,6 @@ with c3:
             run_parsing()
             st.rerun()
 
-# Вывод ошибок парсинга (если есть)
 if last_run.get('errors'):
     with st.expander("⚠️ Статус парсинга (проблемы)"):
         for err in last_run['errors']:
@@ -190,6 +189,7 @@ if db:
                     sel_cat = st.selectbox("Категория:", cat_list, key=f"main_cat_{t_tag}")
                 
                 f_df = df_tab[df_tab['Кат'] == sel_cat]
+                # ТУТ ТВОЙ РУЧНОЙ КУРС
                 f_df['Цена'] = f_df['Цена_ГРН'].apply(lambda x: f'<span class="uah">{x:,} ₴</span><span class="usd">{int(x/user_rate):,} $</span>')
                 
                 pivot = f_df.pivot_table(index='Модель', columns='Магазин', values='Цена', aggfunc='first').fillna('—')
@@ -201,7 +201,6 @@ if db:
 
                 st.markdown(f'<div class="table-container">{pivot.to_html(escape=False)}</div>', unsafe_allow_html=True)
                 
-                # ИСТОРИЯ ЛОГОВ
                 st.markdown("<br>", unsafe_allow_html=True)
                 with st.expander(f"📜 История изменений ({tab_names[i]})", expanded=True):
                     f1, f2, f3 = st.columns(3)
@@ -219,13 +218,13 @@ if db:
                         st.divider()
                         for e in reversed(db[final_key]):
                             p_uah = e['price']
-                            # РАСЧЕТ В ДОЛЛАРАХ ПО КУРСУ ПОЛЬЗОВАТЕЛЯ
-                            p_usd = int(p_uah / user_rate)
-                            st.markdown(f"{e['time']} — **{p_uah:,} ₴** <span class='log-usd'>({p_usd:,} $)</span>", unsafe_allow_html=True)
+                            # ТУТ СТРОГО КУРС МИНФИНА
+                            p_usd_minfin = int(p_uah / minfin_rate)
+                            st.markdown(f"{e['time']} — **{p_uah:,} ₴** <span class='log-usd'>({p_usd_minfin:,} $)</span>", unsafe_allow_html=True)
             else:
                 st.info("Нет данных")
 else:
-    st.warning("База пуста. Нажмите 'ОБНОВИТЬ ВСЁ'.")
+    st.warning("База пуста.")
 
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == '--parse':
