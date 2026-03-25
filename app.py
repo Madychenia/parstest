@@ -18,18 +18,17 @@ KIEV_TZ = pytz.timezone('Europe/Kyiv')
 
 st.set_page_config(page_title="Мониторинг цен", layout="wide")
 
-# Компактный стиль для мобильного
 st.markdown("""
     <style>
-    .block-container { padding: 0.5rem 1rem !important; }
-    .price-row { 
-        display: flex; justify-content: space-between; align-items: center;
-        padding: 10px; border-bottom: 1px solid #eee; background: white;
+    .block-container { padding: 1rem !important; }
+    .table-container { overflow-x: auto; width: 100%; border: 1px solid #eee; }
+    th, td { padding: 8px !important; border: 1px solid #eee !important; font-size: 0.85em; text-align: center !important; }
+    td:first-child, th:first-child { 
+        position: sticky; left: 0; background: #f8f9fa; z-index: 2; 
+        font-weight: bold; border-right: 2px solid #ddd !important; 
     }
-    .model-name { font-weight: 600; font-size: 0.95em; color: #333; }
-    .price-block { text-align: right; }
-    .uah { font-weight: 800; color: #1a1a1a; display: block; font-size: 1.1em; }
-    .usd { color: #FF4B4B; font-weight: 700; font-size: 0.85em; }
+    .uah { color: #1a1a1a; font-weight: 800; display: block; }
+    .usd { color: #FF4B4B; font-weight: 700; font-size: 0.9em; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -63,7 +62,7 @@ def run_parsing():
         df.columns = [c.strip().lower() for c in df.columns]
         for _, row in df.iterrows():
             m, s = str(row.get('модель', '—')).strip(), str(row.get('магазин', '—')).strip()
-            u, sel = str(row.get('ссылка', '')).strip(), str(row.get('селектор', '')).strip()
+            u, sel = str(row.get('ссылка', '')).strip(), str(row.get('селектор', ''))
             c = str(row.get('категория', '1')).strip()
             key = f"{m} | {s}"
             if u.startswith('http'):
@@ -87,63 +86,74 @@ def run_parsing():
     save_data(LAST_RUN_FILE, {'time': datetime.now(KIEV_TZ).strftime('%d.%m %H:%M:%S')})
 
 # --- ИНТЕРФЕЙС ---
+st.title("📱 Мониторинг")
+
 c1, c2, c3 = st.columns([1, 1, 1])
 with c1:
     rate = st.number_input("$:", value=44.55, step=0.01, label_visibility="collapsed")
 with c2:
-    st.caption(f"Обновлено: {load_data(LAST_RUN_FILE).get('time', '—')}")
+    st.write(f"Обновлено: **{load_data(LAST_RUN_FILE).get('time', '—')}**")
 with c3:
-    if st.button("♻️"):
+    if st.button("♻️ ОБНОВИТЬ"):
         with st.spinner("..."):
             run_parsing()
             st.rerun()
 
 db = load_data(HISTORY_FILE)
+
+# --- ГЛАВНЫЕ ТАБЛИЦЫ ---
 if db:
-    tabs = st.tabs(["Used", "New"])
+    tabs = st.tabs(["Used (Б/У)", "New (Новые)"])
     tags = ['u', 'n']
-    
     for i, t_tag in enumerate(tags):
         with tabs[i]:
             rows = []
             for k, logs in db.items():
                 if logs and logs[-1].get('type') == t_tag:
                     m, s = k.split(" | ")
-                    rows.append({'Модель': m, 'Поставщик': s, 'Цена_ГРН': logs[-1]['price'], 'Кат': logs[-1].get('cat', '1')})
+                    rows.append({'Модель': m, 'Магазин': s, 'Цена_ГРН': logs[-1]['price'], 'Кат': logs[-1].get('cat', '1')})
             
-            df = pd.DataFrame(rows)
-            if not df.empty:
-                col_a, col_b = st.columns(2)
-                with col_a:
-                    sel_cat = st.selectbox("Категория", sorted(df['Кат'].unique()), key=f"cat_{t_tag}")
+            df_main = pd.DataFrame(rows)
+            if not df_main.empty:
+                sel_cat = st.selectbox("Показать категорию:", sorted(df_main['Кат'].unique()), key=f"main_cat_{t_tag}")
+                f_df = df_main[df_main['Кат'] == sel_cat]
+                f_df['Цена'] = f_df['Цена_ГРН'].apply(lambda x: f'<span class="uah">{x:,} ₴</span><span class="usd">{int(x/rate):,} $</span>')
                 
-                # Фильтруем поставщиков на основе выбранной категории
-                df_cat = df[df['Кат'] == sel_cat]
-                with col_b:
-                    sel_prov = st.selectbox("Поставщик", sorted(df_cat['Поставщик'].unique()), key=f"prov_{t_tag}")
-                
-                # Финальный список моделей
-                f_df = df_cat[df_cat['Поставщик'] == sel_prov].sort_values('Модель')
-                
-                for _, row in f_df.iterrows():
-                    p_uah = row['Цена_ГРН']
-                    p_usd = int(p_uah / rate)
-                    st.markdown(f"""
-                        <div class="price-row">
-                            <div class="model-name">{row['Модель']}</div>
-                            <div class="price-block">
-                                <span class="uah">{p_uah:,} ₴</span>
-                                <span class="usd">{p_usd:,} $</span>
-                            </div>
-                        </div>
-                    """, unsafe_allow_html=True)
+                pivot = f_df.pivot_table(index='Модель', columns='Магазин', values='Цена', aggfunc='first').fillna('—')
+                st.markdown(f'<div class="table-container">{pivot.to_html(escape=False)}</div>', unsafe_allow_html=True)
             else:
                 st.info("Нет данных")
 
-with st.expander("📜 Логи"):
-    if db:
-        target = st.selectbox("Девайс:", sorted(db.keys()))
-        for e in reversed(db[target]): st.write(f"{e['time']} — **{e['price']:,} ₴**")
+    # --- ЛОГИ С ФИЛЬТРОМ (ТО ЧТО ТЫ ПРОСИЛ) ---
+    st.markdown("---")
+    with st.expander("📜 ФИЛЬТР ЛОГОВ (История цен)"):
+        # Собираем общую базу для фильтров логов
+        log_items = []
+        for k, logs in db.items():
+            if logs:
+                m, s = k.split(" | ")
+                log_items.append({'Key': k, 'Model': m, 'Shop': s, 'Cat': logs[-1].get('cat', '1')})
+        
+        ldf = pd.DataFrame(log_items)
+        if not ldf.empty:
+            f1, f2, f3 = st.columns(3)
+            with f1:
+                l_cat = st.selectbox("1. Категория", sorted(ldf['Cat'].unique()))
+            with f2:
+                models_in_cat = ldf[ldf['Cat'] == l_cat]['Model'].unique()
+                l_mod = st.selectbox("2. Модель", sorted(models_in_cat))
+            with f3:
+                shops_for_mod = ldf[(ldf['Cat'] == l_cat) & (ldf['Model'] == l_mod)]['Shop'].unique()
+                l_shop = st.selectbox("3. Поставщик", sorted(shops_for_mod))
+            
+            # Вывод истории для выбранной комбинации
+            final_key = f"{l_mod} | {l_shop}"
+            if final_key in db:
+                st.write(f"История цен для **{l_mod}** у **{l_shop}**:")
+                for e in reversed(db[final_key]):
+                    st.write(f"📅 {e['time']} — **{e['price']:,} ₴**")
+else:
+    st.warning("База пуста.")
 
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == '--parse':
