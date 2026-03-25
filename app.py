@@ -4,61 +4,98 @@ import requests
 from bs4 import BeautifulSoup
 import re
 from datetime import datetime
-import numpy as np
 
 # Настройки страницы
-st.set_page_config(page_title="Мониторинг цен", layout="wide", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="iPhone Price Monitor", layout="wide", initial_sidebar_state="collapsed")
 
-# --- СТИЛИ (Кнопка и блоки) ---
+# Стили для таблицы
 st.markdown("""
     <style>
     [data-testid="stSidebar"] { display: none; }
-    .market-container { background-color: #f8f9fb; padding: 10px; border-radius: 12px; border: 1px solid #e1e4e8; text-align: center; min-height: 80px; }
-    .market-title { font-size: 13px; color: #586069; margin-bottom: 2px; }
-    .market-value { font-size: 18px; font-weight: bold; color: #0366d6; }
+    .uah { color: black; font-weight: bold; }
+    .usd { color: #FF4B4B; font-weight: bold; }
+    td { text-align: center !important; padding: 12px !important; }
+    th { background-color: #f0f2f6 !important; text-align: center !important; }
     </style>
     """, unsafe_allow_html=True)
 
-# --- ФУНКЦИЯ ПАРСИНГА ---
-@st.cache_data(ttl=300)
-def get_market_data():
-    url = "http://185.233.38.179:3000/"
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
-    res = {"kiev": "—", "chernivtsi": "—", "avg_white": "—", "avg_blue": "—"}
+st.title("📱 Мониторинг цен: iPhone")
+
+# --- УПРАВЛЕНИЕ ---
+col_rate, col_time = st.columns([2, 3])
+with col_rate:
+    user_rate = st.number_input("Введите курс для расчета ($):", value=44.55, step=0.01)
+with col_time:
+    st.write(f"Последнее обновление: **{datetime.now().strftime('%H:%M:%S')}**")
+
+# --- ФУНКЦИЯ ПАРСИНГА ТОВАРОВ ---
+@st.cache_data(ttl=3600)
+def fetch_prices(file_name, rate):
     try:
-        r = requests.get(url, headers=headers, timeout=10)
-        r.encoding = 'utf-8'
-        all_text = r.text
-        # Ищем все числа курса
-        nums = [float(n.replace(',', '.')) for n in re.findall(r'(\d{2}[.,]\d{2})', all_text)]
-        valid = [n for n in nums if 43.0 <= n <= 46.0]
-        if valid:
-            res["kiev"] = valid[0]
-            if len(valid) >= 9: res["chernivtsi"] = valid[8]
-            res["avg_white"] = round(np.mean(valid[1::3]), 2) if len(valid) > 1 else "—"
-            res["avg_blue"] = round(np.mean(valid[2::3]), 2) if len(valid) > 2 else "—"
-    except: pass
-    return res
+        # Читаем CSV и чистим названия колонок
+        df = pd.read_csv(file_name, sep=None, engine='python', encoding='utf-8-sig')
+        df.columns = [str(c).strip().lower() for c in df.columns]
+        
+        results = []
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+        
+        for _, row in df.iterrows():
+            price_uah = None
+            url = str(row.get('ссылка', '')).strip()
+            selector = str(row.get('селектор', '')).strip()
+            
+            if url.startswith('http'):
+                try:
+                    r = requests.get(url, headers=headers, timeout=10)
+                    soup = BeautifulSoup(r.text, 'html.parser')
+                    el = soup.select_one(selector)
+                    if el:
+                        # Убираем всё, кроме цифр
+                        digits = re.sub(r'\D', '', el.text.strip())
+                        if digits:
+                            price_uah = int(digits)
+                except:
+                    pass
 
-st.title("📱 Мониторинг цен")
+            # Формируем отображение цены
+            if price_uah:
+                price_usd = round(price_uah / rate, 1)
+                display_val = f'<span class="uah">{price_uah:,} ₴</span><br><span class="usd">{price_usd}$</span>'
+            else:
+                display_val = "—"
+            
+            results.append({
+                'Модель': row.get('модель', 'Неизвестно'),
+                'Магазин': row.get('магазин', '—'),
+                'Цена': display_val
+            })
+            
+        return pd.DataFrame(results)
+    except Exception as e:
+        st.error(f"Ошибка при чтении файла: {e}")
+        return pd.DataFrame()
 
-# --- ВЕРХНЯЯ ПАНЕЛЬ С КУРСАМИ ---
-m = get_market_data()
-c1, c2, c3, c4 = st.columns(4)
-with c1: st.markdown(f"<div class='market-container'><div class='market-title'>📍 Киев USD</div><div class='market-value'>{m['kiev']}</div></div>", unsafe_allow_html=True)
-with c2: st.markdown(f"<div class='market-container'><div class='market-title'>📍 Черновцы USD</div><div class='market-value'>{m['chernivtsi']}</div></div>", unsafe_allow_html=True)
-with c3: st.markdown(f"<div class='market-container'><div class='market-title'>⚪ Средний USDT</div><div class='market-value'>{m['avg_white']}</div></div>", unsafe_allow_html=True)
-with c4: st.markdown(f"<div class='market-container'><div class='market-title'>🔵 Средний USDT (синий)</div><div class='market-value'>{m['avg_blue']}</div></div>", unsafe_allow_html=True)
+# --- ВЫВОД ДАННЫХ ---
+data = fetch_prices('links.csv', user_rate)
 
-# --- УПРАВЛЕНИЕ И КНОПКА ---
-col_input, col_btn = st.columns([4, 1])
-with col_input:
-    user_rate = st.number_input("Ваш рабочий курс ($):", value=44.55, step=0.01)
-with col_btn:
-    st.write(" ") # Отступ для выравнивания
-    # ВОТ ОНА, ТВОЯ КНОПКА
-    if st.button("♻️ ОБНОВИТЬ ВСЁ"):
-        st.cache_data.clear()
-        st.rerun()
+if not data.empty:
+    # Определяем серию (например, 14, 15, 16) для фильтра
+    data['Серия'] = data['Модель'].apply(lambda x: re.search(r'\d+', str(x)).group() if re.search(r'\d+', str(x)) else "Прочее")
+    series_list = sorted(data['Серия'].unique(), key=lambda x: int(x) if str(x).isdigit() else 999)
+    
+    selected_series = st.selectbox("Выберите серию iPhone:", series_list, index=len(series_list)-1)
+    
+    # Фильтруем и строим таблицу
+    filtered = data[data['Серия'] == selected_series]
+    
+    # Убираем дубликаты перед сводной таблицей
+    pivot_df = filtered.drop_duplicates(subset=['Модель', 'Магазин'])
+    pivot_table = pivot_df.pivot(index='Модель', columns='Магазин', values='Цена').fillna("—")
+    
+    st.write(pivot_table.to_html(escape=False), unsafe_allow_html=True)
+else:
+    st.warning("Файл 'links.csv' пуст или не найден. Проверьте репозиторий.")
 
-st.info("Если курсы всё еще '—', нажмите кнопку 'ОБНОВИТЬ ВСЁ'. Это сбросит кэш и попробует достучаться до сайта заново.")
+if st.button("♻️ ОБНОВИТЬ ЦЕНЫ"):
+    st.cache_data.clear()
+    st.rerun()
