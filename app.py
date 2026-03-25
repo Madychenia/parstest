@@ -136,7 +136,7 @@ last_run = load_data(LAST_RUN_FILE)
 
 # ВЕРНУЛ КНОПКИ И КУРС
 c1, c2, c3, c4 = st.columns([1,1.5,1,1])
-with c1: user_rate = st.number_input("Курс $:", value=44.55, label_visibility="visible") 
+with c1: user_rate = st.number_input(value=44.3, label_visibility="visible") 
 with c2: 
     st.write(f"Обновлено: **{last_run.get('time', '—')}**")
     st.caption(f"Курс Минфина (продажа): **{minfin_rate}**") 
