@@ -107,9 +107,10 @@ st.markdown("""<style>
     th, td { padding: 4px 6px !important; border: 1px solid #eee !important; font-size: 0.85em; text-align: center !important; }
     tbody tr th { background-color: #f8f9fa !important; font-weight: bold; border-right: 2px solid #ddd !important; }
     
-    /* СКРЫВАЕМ ПУСТУЮ ВЕРХНЮЮ СТРОКУ (ТЕ САМЫЕ ЯЧЕЙКИ) */
-    thead tr:nth-child(1) { display: none; }
-    
+    /* СКРЫВАЕМ ТОЛЬКО ПУСТЫЕ ТЕХНИЧЕСКИЕ ЯЧЕЙКИ В ШАПКЕ */
+    thead tr:nth-child(2) { display: none; }
+    thead tr th:first-child { color: transparent; border: none !important; background: transparent !important; }
+
     .uah { color: #1a1a1a; font-weight: 800; display: block; }
     .usd { color: #FF4B4B; font-weight: 700; font-size: 0.9em; }
     .log-usd { color: #FF4B4B; font-weight: bold; }
@@ -122,7 +123,7 @@ last_run = load_data(LAST_RUN_FILE)
 
 c1, c2, c3, c4 = st.columns([1,1.5,1,1])
 with c1: 
-    # Поле ввода курса без текста "Курс $:"
+    # Убираем подпись "Курс $:"
     user_rate = st.number_input("", value=44.55, label_visibility="collapsed") 
 with c2: 
     st.write(f"Обновлено: **{last_run.get('time', '—')}**")
@@ -146,19 +147,20 @@ for i, t_tag in enumerate(tabs):
         for k, logs in db.items():
             if logs and logs[-1].get('type') == tag_key:
                 p = k.split(" | ")
+                # Убираем слова Магазин/Модель из данных
                 items.append({'M': p[0], 'S': p[1], 'Цена': logs[-1]['price'], 'Категория': logs[-1]['cat'], 'order': logs[-1].get('order', 999)})
         
         if items:
             df_tab = pd.DataFrame(items)
-            sel_cat = st.selectbox("Выбор категории:", df_tab['Категория'].unique(), key=f"s_{tag_key}")
+            sel_cat = st.selectbox("Категория:", df_tab['Категория'].unique(), key=f"s_{tag_key}")
             f_df = df_tab[df_tab['Категория'] == sel_cat].copy().sort_values('order')
             
             if not f_df.empty:
                 f_df['Display'] = f_df['Цена'].apply(lambda x: f'<span class="uah">{x:,} ₴</span><span class="usd">{int(x/user_rate):,} $</span>')
-                # Формируем таблицу без лишних названий
                 pivot = f_df.pivot_table(index='M', columns='S', values='Display', aggfunc='first', sort=False).fillna('—')
-                pivot.index.name = ""
-                pivot.columns.name = ""
+                # Удаляем подписи осей для чистоты
+                pivot.index.name = None
+                pivot.columns.name = None
                 st.markdown(f'<div class="table-container">{pivot.to_html(escape=False)}</div>', unsafe_allow_html=True)
         
         with st.expander(f"📜 История изменений"):
