@@ -7,8 +7,7 @@ from datetime import datetime
 import pytz
 import json
 import os
-import sys
-import time
+import io
 
 # --- КОНФИГ ---
 TELEGRAM_TOKEN = "8673005085:AAG-vDGUu4buhPHmMYoJt1a7UueVIywvAyQ"
@@ -50,113 +49,37 @@ def get_minfin_sell_rate():
     except:
         return 44.55
 
+def send_excel_to_tg(df_pivot, cat_name, user_rate, minfin_rate):
+    """Создает Excel и отправляет в Телеграм"""
+    try:
+        output = io.BytesIO()
+        # Убираем HTML-теги перед сохранением в Excel
+        clean_df = df_pivot.copy()
+        for col in clean_df.columns:
+            clean_df[col] = clean_df[col].apply(lambda x: re.sub('<[^<]+?>', ' ', str(x)) if x != '—' else x)
+        
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            clean_df.to_excel(writer, sheet_name='Цены')
+        
+        output.seek(0)
+        
+        now = datetime.now(KIEV_TZ).strftime('%d.%m %H:%M')
+        caption = f"📄 Таблица: {cat_name}\n📅 Дата: {now}\n👤 Ваш курс: {user_rate}\n🏦 Минфин: {minfin_rate}"
+        
+        url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendDocument"
+        files = {'document': (f"prices_{cat_name}_{now}.xlsx", output)}
+        data = {'chat_id': CHAT_ID, 'caption': caption}
+        requests.post(url, files=files, data=data)
+        st.success("✅ Файл отправлен в Telegram!")
+    except Exception as e:
+        st.error(f"Ошибка отправки файла: {e}")
+
 def load_data(file):
     if os.path.exists(file):
         try:
             with open(file, 'r', encoding='utf-8') as f: return json.load(f)
         except: return {}
     return {}
-
-def save_data(file, data):
-    with open(file, 'w', encoding='utf-8') as f: json.dump(data, f, ensure_ascii=False, indent=2)
-
-def clean_price(text):
-    if not text: return None
-    res = re.sub(r'[^\d.,]', '', text).replace(',', '.')
-    if '.' in res: res = res.split('.')[0]
-    try:
-        val = int(res)
-        return val if val > 1000 else None
-    except: return None
-
-# --- СКРИНШОТЕР ---
-def take_screenshot_and_send(cat_name, user_rate, minfin_rate):
-    from selenium import webdriver
-    from selenium.webdriver.chrome.options import Options
-    from selenium.webdriver.common.by import By
-    import requests
-
-    st.info("Формируем скриншот...")
-    
-    # Получаем URL текущего приложения
-    try:
-        # Streamlit cloud не всегда дает URL напрямую, пробуем получить его
-        report_url = st.get_option("server.baseUrlPath")
-        if not report_url:
-             report_url = "http://localhost:8501" # Запасной вариант для локального теста
-        else:
-             # На Streamlit Cloud URL выглядит сложнее, нужно формировать его
-             report_url = f"https://{st.get_option('server.address')}/{report_url}"
-    except:
-        report_url = "http://localhost:8501" 
-
-    chrome_options = Options()
-    chrome_options.add_argument("--headless") # Невидимый режим
-    chrome_options.add_argument("--no-sandbox")
-    chrome_options.add_argument("--disable-dev-shm-usage")
-    chrome_options.add_argument("--window-size=1920,1080")
-
-    driver = webdriver.Chrome(options=chrome_options)
-    
-    try:
-        driver.get(report_url)
-        time.sleep(10) # Даем время на отрисовку всего интерфейса
-        
-        # Находим саму таблицу по классу
-        table_element = driver.find_element(By.CLASS_NAME, "table-container")
-        screenshot = table_element.screenshot_as_png
-        
-        # Формируем текст сообщения
-        now = datetime.now(KIEV_TZ).strftime('%d.%m %H:%M:%S')
-        caption = f"📊 Отчет по категории: {cat_name}\n" \
-                  f"📅 Дата: {now}\n" \
-                  f"👤 Ваш курс: {user_rate}\n" \
-                  f"🏦 Курс Минфина (продажа): {minfin_rate}"
-        
-        # Отправляем в Телеграм
-        url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendPhoto"
-        files = {'photo': ('screenshot.png', screenshot)}
-        data = {'chat_id': CHAT_ID, 'caption': caption}
-        requests.post(url, files=files, data=data)
-        
-        st.success("Скриншот отправлен в Telegram!")
-        
-    except Exception as e:
-        st.error(f"Ошибка при создании скриншота: {e}")
-    finally:
-        driver.quit()
-
-def run_parsing():
-    history = load_data(HISTORY_FILE)
-    is_first = len(history) == 0
-    now = datetime.now(KIEV_TZ).strftime('%d.%m %H:%M')
-    mapping = {'links.csv': 'u', 'links_new.csv': 'n'}
-    for f_name, tag in mapping.items():
-        if not os.path.exists(f_name): continue
-        df = pd.read_csv(f_name, sep=None, engine='python', encoding='utf-8-sig')
-        df.columns = [c.strip().lower() for c in df.columns]
-        for _, row in df.iterrows():
-            m, s = str(row.get('модель', '—')).strip(), str(row.get('магазин', '—')).strip()
-            u, sel = str(row.get('ссылка', '')).strip(), str(row.get('селектор', ''))
-            c = str(row.get('категория', '1')).strip()
-            key = f"{m} | {s}"
-            if u.startswith('http'):
-                try:
-                    r = requests.get(u, headers={'User-Agent': 'Mozilla/5.0'}, timeout=10)
-                    soup = BeautifulSoup(r.text, 'html.parser')
-                    el = soup.select_one(sel)
-                    price = clean_price(el.text.strip()) if el else None
-                    if price:
-                        if key not in history: history[key] = []
-                        last = history[key][-1] if history[key] else None
-                        if not last or last['price'] != price:
-                            if last and not is_first:
-                                requests.post(f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage", 
-                                              data={"chat_id": CHAT_ID, "text": f"🔔 <b>{m}</b>\n{s}: <b>{price:,} ₴</b>", "parse_mode": "HTML"})
-                            history[key].append({'time': now, 'price': price, 'cat': c, 'type': tag})
-                except: continue
-    save_data(HISTORY_FILE, history)
-    save_data(LAST_RUN_FILE, {'time': datetime.now(KIEV_TZ).strftime('%d.%m %H:%M:%S')})
 
 # --- ИНТЕРФЕЙС ---
 st.title("📱 Мониторинг")
@@ -170,10 +93,7 @@ with c2:
     st.write(f"Обновлено: **{load_data(LAST_RUN_FILE).get('time', '—')}**")
     st.caption(f"Курс Минфина (продажа): {minfin_rate}")
 with c3:
-    if st.button("♻️ ОБНОВИТЬ ВСЁ"):
-        with st.spinner("..."):
-            run_parsing()
-            st.rerun()
+    st.write("") # Просто отступ
 
 db = load_data(HISTORY_FILE)
 
@@ -188,7 +108,7 @@ if db:
             for k, logs in db.items():
                 if logs and logs[-1].get('type') == t_tag:
                     m, s = k.split(" | ")
-                    rows.append({'Модель': m, 'Магазин': s, 'Цена_ГРН': logs[-1]['price'], 'Кат': logs[-1].get('cat', '1'), 'Key': k})
+                    rows.append({'Модель': m, 'Магазин': s, 'Цена_ГРН': logs[-1]['price'], 'Кат': logs[-1].get('cat', '1')})
             df_tab = pd.DataFrame(rows)
             
             if not df_tab.empty:
@@ -198,14 +118,12 @@ if db:
                 
                 f_df = df_tab[df_tab['Кат'] == sel_cat]
                 f_df['Цена'] = f_df['Цена_ГРН'].apply(lambda x: f'<span class="uah">{x:,} ₴</span><span class="usd">{int(x/user_rate):,} $</span>')
-                
                 pivot = f_df.pivot_table(index='Модель', columns='Магазин', values='Цена', aggfunc='first').fillna('—')
                 
-                # Кнопка скриншота
                 with col_btn:
-                    st.write("") # Отступ
-                    if st.button("📸 Скриншот в ТГ", key=f"scr_{t_tag}"):
-                        take_screenshot_and_send(sel_cat, user_rate, minfin_rate)
+                    st.write("") 
+                    if st.button("📊 Отправить таблицу в ТГ", key=f"file_{t_tag}"):
+                        send_excel_to_tg(pivot, sel_cat, user_rate, minfin_rate)
 
                 st.markdown(f'<div class="table-container">{pivot.to_html(escape=False)}</div>', unsafe_allow_html=True)
                 
@@ -233,7 +151,3 @@ if db:
                 st.info("Нет данных")
 else:
     st.warning("База пуста.")
-
-if __name__ == "__main__":
-    if len(sys.argv) > 1 and sys.argv[1] == '--parse':
-        run_parsing()
