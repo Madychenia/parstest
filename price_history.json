@@ -158,6 +158,13 @@
       "cat": "iPh 13",
       "type": "u",
       "order": 0
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 16524,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 76
     }
   ],
   "iPh 13 222 | Anika | u": [
@@ -176,6 +183,13 @@
       "cat": "iPh 13",
       "type": "u",
       "order": 6
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 21756,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 82
     }
   ],
   "iPh 13 Pro 256 | Anika | u": [
@@ -185,6 +199,13 @@
       "cat": "iPh 13",
       "type": "u",
       "order": 7
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 24372,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 83
     }
   ],
   "iPh 13 Pro 512 | Anika | u": [
@@ -194,6 +215,13 @@
       "cat": "iPh 13",
       "type": "u",
       "order": 8
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 26988,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 84
     }
   ],
   "iPh 13 Pro 1TB | Anika | u": [
@@ -203,6 +231,13 @@
       "cat": "iPh 13",
       "type": "u",
       "order": 9
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 29604,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 85
     }
   ],
   "iPh 13 Pro Max 128 | Anika | u": [
@@ -212,6 +247,13 @@
       "cat": "iPh 13",
       "type": "u",
       "order": 10
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 24372,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 86
     }
   ],
   "iPh 13 Pro Max 256 | Anika | u": [
@@ -221,6 +263,13 @@
       "cat": "iPh 13",
       "type": "u",
       "order": 11
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 26988,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 87
     }
   ],
   "iPh 13 Pro Max 512 | Anika | u": [
@@ -230,6 +279,13 @@
       "cat": "iPh 13",
       "type": "u",
       "order": 12
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 30040,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 88
     }
   ],
   "iPh 13 Pro Max 1TB | Anika | u": [
@@ -239,6 +295,13 @@
       "cat": "iPh 13",
       "type": "u",
       "order": 13
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 32656,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 89
     }
   ],
   "iPh 14 128 eSim | Anika | u": [
@@ -248,6 +311,13 @@
       "cat": "iPh 14 eSim",
       "type": "u",
       "order": 14
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 19576,
+      "cat": "iPh 14 eSim",
+      "type": "u",
+      "order": 90
     }
   ],
   "iPh 14 256 eSim | Anika | u": [
@@ -257,6 +327,13 @@
       "cat": "iPh 14 eSim",
       "type": "u",
       "order": 15
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 21756,
+      "cat": "iPh 14 eSim",
+      "type": "u",
+      "order": 91
     }
   ],
   "iPh 14 512 eSim | Anika | u": [
@@ -266,6 +343,13 @@
       "cat": "iPh 14 eSim",
       "type": "u",
       "order": 16
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 26116,
+      "cat": "iPh 14 eSim",
+      "type": "u",
+      "order": 92
     }
   ],
   "iPh 14 128 EU | Anika | u": [
@@ -275,6 +359,13 @@
       "cat": "iPh 14 EU",
       "type": "u",
       "order": 17
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 19576,
+      "cat": "iPh 14 EU",
+      "type": "u",
+      "order": 93
     }
   ],
   "iPh 14 256 EU | Anika | u": [
@@ -284,6 +375,13 @@
       "cat": "iPh 14 EU",
       "type": "u",
       "order": 18
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 21756,
+      "cat": "iPh 14 EU",
+      "type": "u",
+      "order": 94
     }
   ],
   "iPh 14 512 EU | Anika | u": [
@@ -293,11 +391,25 @@
       "cat": "iPh 14 EU",
       "type": "u",
       "order": 19
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 26116,
+      "cat": "iPh 14 EU",
+      "type": "u",
+      "order": 95
     }
   ],
   "iPh 13 128 | Anika | n": [
     {
       "time": "25.03 17:58",
+      "price": 16524,
+      "cat": "1",
+      "type": "n",
+      "order": 0
+    },
+    {
+      "time": "25.03 19:25",
       "price": 16524,
       "cat": "1",
       "type": "n",
@@ -311,11 +423,25 @@
       "cat": "2",
       "type": "n",
       "order": 1
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 16524,
+      "cat": "2",
+      "type": "n",
+      "order": 1
     }
   ],
   "iPh 13 512 | Anika | n": [
     {
       "time": "25.03 17:58",
+      "price": 16524,
+      "cat": "3",
+      "type": "n",
+      "order": 2
+    },
+    {
+      "time": "25.03 19:25",
       "price": 16524,
       "cat": "3",
       "type": "n",
@@ -329,6 +455,13 @@
       "cat": "4",
       "type": "n",
       "order": 3
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 16524,
+      "cat": "4",
+      "type": "n",
+      "order": 3
     }
   ],
   "iPh 13 256 | Anika | u": [
@@ -338,6 +471,13 @@
       "cat": "iPh 13",
       "type": "u",
       "order": 1
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 20012,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 77
     }
   ],
   "iPh 14 Pro 128 eSim | Anika | u": [
@@ -347,6 +487,13 @@
       "cat": "iPh 14 eSim",
       "type": "u",
       "order": 20
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 25680,
+      "cat": "iPh 14 eSim",
+      "type": "u",
+      "order": 96
     }
   ],
   "iPh 14 Pro 256 eSim | Anika | u": [
@@ -356,6 +503,13 @@
       "cat": "iPh 14 eSim",
       "type": "u",
       "order": 21
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 27424,
+      "cat": "iPh 14 eSim",
+      "type": "u",
+      "order": 97
     }
   ],
   "iPh 14 Pro 512 eSim | Anika | u": [
@@ -365,6 +519,13 @@
       "cat": "iPh 14 eSim",
       "type": "u",
       "order": 22
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 32656,
+      "cat": "iPh 14 eSim",
+      "type": "u",
+      "order": 98
     }
   ],
   "iPh 14 Pro 1TB eSim | Anika | u": [
@@ -374,6 +535,13 @@
       "cat": "iPh 14 eSim",
       "type": "u",
       "order": 23
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 36144,
+      "cat": "iPh 14 eSim",
+      "type": "u",
+      "order": 99
     }
   ],
   "iPh 14 Pro 128 EU | Anika | u": [
@@ -383,6 +551,13 @@
       "cat": "iPh 14 EU",
       "type": "u",
       "order": 24
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 28296,
+      "cat": "iPh 14 EU",
+      "type": "u",
+      "order": 100
     }
   ],
   "iPh 14 Pro 256 EU | Anika | u": [
@@ -392,6 +567,13 @@
       "cat": "iPh 14 EU",
       "type": "u",
       "order": 25
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 30476,
+      "cat": "iPh 14 EU",
+      "type": "u",
+      "order": 101
     }
   ],
   "iPh 14 Pro 512 EU | Anika | u": [
@@ -401,6 +583,13 @@
       "cat": "iPh 14 EU",
       "type": "u",
       "order": 26
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 32656,
+      "cat": "iPh 14 EU",
+      "type": "u",
+      "order": 102
     }
   ],
   "iPh 14 Pro 1TB EU | Anika | u": [
@@ -410,6 +599,13 @@
       "cat": "iPh 14 EU",
       "type": "u",
       "order": 27
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 36144,
+      "cat": "iPh 14 EU",
+      "type": "u",
+      "order": 103
     }
   ],
   "iPh 14 Pro Max 128 eSim | Anika | u": [
@@ -419,6 +615,13 @@
       "cat": "iPh 14 eSim",
       "type": "u",
       "order": 28
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 28732,
+      "cat": "iPh 14 eSim",
+      "type": "u",
+      "order": 104
     }
   ],
   "iPh 14 Pro Max 256 eSim | Anika | u": [
@@ -428,6 +631,13 @@
       "cat": "iPh 14 eSim",
       "type": "u",
       "order": 29
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 30476,
+      "cat": "iPh 14 eSim",
+      "type": "u",
+      "order": 105
     }
   ],
   "iPh 14 Pro Max 512 eSim | Anika | u": [
@@ -437,6 +647,13 @@
       "cat": "iPh 14 eSim",
       "type": "u",
       "order": 30
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 38324,
+      "cat": "iPh 14 eSim",
+      "type": "u",
+      "order": 106
     }
   ],
   "iPh 14 Pro Max 1TB eSim | Anika | u": [
@@ -446,6 +663,13 @@
       "cat": "iPh 14 eSim",
       "type": "u",
       "order": 31
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 42248,
+      "cat": "iPh 14 eSim",
+      "type": "u",
+      "order": 107
     }
   ],
   "iPh 14 Pro Max 128 EU | Anika | u": [
@@ -455,6 +679,13 @@
       "cat": "iPh 14 EU",
       "type": "u",
       "order": 32
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 29604,
+      "cat": "iPh 14 EU",
+      "type": "u",
+      "order": 108
     }
   ],
   "iPh 14 Pro Max 256 EU | Anika | u": [
@@ -464,6 +695,13 @@
       "cat": "iPh 14 EU",
       "type": "u",
       "order": 33
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 31784,
+      "cat": "iPh 14 EU",
+      "type": "u",
+      "order": 109
     }
   ],
   "iPh 14 Pro Max 512 EU | Anika | u": [
@@ -473,6 +711,13 @@
       "cat": "iPh 14 EU",
       "type": "u",
       "order": 34
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 38324,
+      "cat": "iPh 14 EU",
+      "type": "u",
+      "order": 110
     }
   ],
   "iPh 14 Pro Max 1TB EU | Anika | u": [
@@ -482,6 +727,13 @@
       "cat": "iPh 14 EU",
       "type": "u",
       "order": 35
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 42248,
+      "cat": "iPh 14 EU",
+      "type": "u",
+      "order": 111
     }
   ],
   "iPh 15 128 eSim | Anika | u": [
@@ -491,6 +743,13 @@
       "cat": "iPh 15 eSim",
       "type": "u",
       "order": 36
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 23936,
+      "cat": "iPh 15 eSim",
+      "type": "u",
+      "order": 112
     }
   ],
   "iPh 15 256 eSim | Anika | u": [
@@ -500,6 +759,13 @@
       "cat": "iPh 15 eSim",
       "type": "u",
       "order": 37
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 26988,
+      "cat": "iPh 15 eSim",
+      "type": "u",
+      "order": 113
     }
   ],
   "iPh 15 512 eSim | Anika | u": [
@@ -509,6 +775,13 @@
       "cat": "iPh 15 eSim",
       "type": "u",
       "order": 38
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 34836,
+      "cat": "iPh 15 eSim",
+      "type": "u",
+      "order": 114
     }
   ],
   "iPh 15 128 EU | Anika | u": [
@@ -518,6 +791,13 @@
       "cat": "iPh 15 EU",
       "type": "u",
       "order": 39
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 26116,
+      "cat": "iPh 15 EU",
+      "type": "u",
+      "order": 115
     }
   ],
   "iPh 15 256 EU | Anika | u": [
@@ -527,6 +807,13 @@
       "cat": "iPh 15 EU",
       "type": "u",
       "order": 40
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 28732,
+      "cat": "iPh 15 EU",
+      "type": "u",
+      "order": 116
     }
   ],
   "iPh 15 512 EU | Anika | u": [
@@ -536,6 +823,13 @@
       "cat": "iPh 15 EU",
       "type": "u",
       "order": 41
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 34836,
+      "cat": "iPh 15 EU",
+      "type": "u",
+      "order": 117
     }
   ],
   "iPh 15 Pro 128 eSim | Anika | u": [
@@ -545,6 +839,13 @@
       "cat": "iPh 15 eSim",
       "type": "u",
       "order": 42
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 30476,
+      "cat": "iPh 15 eSim",
+      "type": "u",
+      "order": 118
     }
   ],
   "iPh 15 Pro 256 eSim | Anika | u": [
@@ -554,6 +855,13 @@
       "cat": "iPh 15 eSim",
       "type": "u",
       "order": 43
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 34836,
+      "cat": "iPh 15 eSim",
+      "type": "u",
+      "order": 119
     }
   ],
   "iPh 15 Pro 512 eSim | Anika | u": [
@@ -563,6 +871,13 @@
       "cat": "iPh 15 eSim",
       "type": "u",
       "order": 44
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 40940,
+      "cat": "iPh 15 eSim",
+      "type": "u",
+      "order": 120
     }
   ],
   "iPh 15 Pro 1TB eSim | Anika | u": [
@@ -572,6 +887,13 @@
       "cat": "iPh 15 eSim",
       "type": "u",
       "order": 45
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 45300,
+      "cat": "iPh 15 eSim",
+      "type": "u",
+      "order": 121
     }
   ],
   "iPh 15 Pro 128 EU | Anika | u": [
@@ -581,6 +903,13 @@
       "cat": "iPh 15 EU",
       "type": "u",
       "order": 46
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 33964,
+      "cat": "iPh 15 EU",
+      "type": "u",
+      "order": 122
     }
   ],
   "iPh 15 Pro 256 EU | Anika | u": [
@@ -590,6 +919,13 @@
       "cat": "iPh 15 EU",
       "type": "u",
       "order": 47
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 38324,
+      "cat": "iPh 15 EU",
+      "type": "u",
+      "order": 123
     }
   ],
   "iPh 15 Pro 512 EU | Anika | u": [
@@ -599,6 +935,13 @@
       "cat": "iPh 15 EU",
       "type": "u",
       "order": 48
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 40940,
+      "cat": "iPh 15 EU",
+      "type": "u",
+      "order": 124
     }
   ],
   "iPh 15 Pro 1TB EU | Anika | u": [
@@ -608,6 +951,13 @@
       "cat": "iPh 15 EU",
       "type": "u",
       "order": 49
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 45300,
+      "cat": "iPh 15 EU",
+      "type": "u",
+      "order": 125
     }
   ],
   "iPh 15 Pro Max 256 eSim | Anika | u": [
@@ -617,6 +967,13 @@
       "cat": "iPh 15 eSim",
       "type": "u",
       "order": 50
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 37452,
+      "cat": "iPh 15 eSim",
+      "type": "u",
+      "order": 126
     }
   ],
   "iPh 15 Pro Max 512 eSim | Anika | u": [
@@ -626,6 +983,13 @@
       "cat": "iPh 15 eSim",
       "type": "u",
       "order": 51
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 40940,
+      "cat": "iPh 15 eSim",
+      "type": "u",
+      "order": 127
     }
   ],
   "iPh 15 Pro Max 1TB eSim | Anika | u": [
@@ -635,6 +999,13 @@
       "cat": "iPh 15 eSim",
       "type": "u",
       "order": 52
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 45736,
+      "cat": "iPh 15 eSim",
+      "type": "u",
+      "order": 128
     }
   ],
   "iPh 15 Pro Max 256 EU | Anika | u": [
@@ -644,6 +1015,13 @@
       "cat": "iPh 15 EU",
       "type": "u",
       "order": 53
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 41812,
+      "cat": "iPh 15 EU",
+      "type": "u",
+      "order": 129
     }
   ],
   "iPh 15 Pro Max 512 EU | Anika | u": [
@@ -653,6 +1031,13 @@
       "cat": "iPh 15 EU",
       "type": "u",
       "order": 54
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 43120,
+      "cat": "iPh 15 EU",
+      "type": "u",
+      "order": 130
     }
   ],
   "iPh 15 Pro Max 1TB EU | Anika | u": [
@@ -662,6 +1047,13 @@
       "cat": "iPh 15 EU",
       "type": "u",
       "order": 55
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 45736,
+      "cat": "iPh 15 EU",
+      "type": "u",
+      "order": 131
     }
   ],
   "iPh 16 128 EU | Anika | u": [
@@ -671,6 +1063,13 @@
       "cat": "iPh 16 EU",
       "type": "u",
       "order": 59
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 28732,
+      "cat": "iPh 16 EU",
+      "type": "u",
+      "order": 135
     }
   ],
   "iPh 16 256 EU | Anika | u": [
@@ -680,6 +1079,13 @@
       "cat": "iPh 16 EU",
       "type": "u",
       "order": 60
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 33092,
+      "cat": "iPh 16 EU",
+      "type": "u",
+      "order": 136
     }
   ],
   "iPh 16 Pro 128 EU | Anika | u": [
@@ -689,6 +1095,13 @@
       "cat": "iPh 16 EU",
       "type": "u",
       "order": 66
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 41812,
+      "cat": "iPh 16 EU",
+      "type": "u",
+      "order": 142
     }
   ],
   "iPh 16 Pro 256 EU | Anika | u": [
@@ -698,6 +1111,13 @@
       "cat": "iPh 16 EU",
       "type": "u",
       "order": 67
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 43556,
+      "cat": "iPh 16 EU",
+      "type": "u",
+      "order": 143
     }
   ],
   "iPh 16 Pro Max 256 EU | Anika | u": [
@@ -707,6 +1127,13 @@
       "cat": "iPh 16 EU",
       "type": "u",
       "order": 75
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 45736,
+      "cat": "iPh 16 EU",
+      "type": "u",
+      "order": 149
     }
   ],
   "iPh 16 Pro Max 512 EU | Anika | u": [
@@ -716,6 +1143,13 @@
       "cat": "iPh 16 EU",
       "type": "u",
       "order": 76
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 50096,
+      "cat": "iPh 16 EU",
+      "type": "u",
+      "order": 150
     }
   ],
   "iPh 16 Pro Max 1TB EU | Anika | u": [
@@ -725,11 +1159,25 @@
       "cat": "iPh 16 EU",
       "type": "u",
       "order": 77
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 54456,
+      "cat": "iPh 16 EU",
+      "type": "u",
+      "order": 151
     }
   ],
   "iPh 13 128 | Jabko | u": [
     {
       "time": "25.03 18:18",
+      "price": 16354,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 0
+    },
+    {
+      "time": "25.03 19:25",
       "price": 16354,
       "cat": "iPh 13",
       "type": "u",
@@ -743,11 +1191,25 @@
       "cat": "iPh 13",
       "type": "u",
       "order": 1
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 18122,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 1
     }
   ],
   "iPh 13 512 | Jabko | u": [
     {
       "time": "25.03 18:18",
+      "price": 18564,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 2
+    },
+    {
+      "time": "25.03 19:25",
       "price": 18564,
       "cat": "iPh 13",
       "type": "u",
@@ -761,11 +1223,25 @@
       "cat": "iPh 13",
       "type": "u",
       "order": 6
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 21216,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 6
     }
   ],
   "iPh 13 Pro 256 | Jabko | u": [
     {
       "time": "25.03 18:18",
+      "price": 22984,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 7
+    },
+    {
+      "time": "25.03 19:25",
       "price": 22984,
       "cat": "iPh 13",
       "type": "u",
@@ -779,11 +1255,25 @@
       "cat": "iPh 13",
       "type": "u",
       "order": 8
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 24310,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 8
     }
   ],
   "iPh 13 Pro 1TB | Jabko | u": [
     {
       "time": "25.03 18:18",
+      "price": 25194,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 9
+    },
+    {
+      "time": "25.03 19:25",
       "price": 25194,
       "cat": "iPh 13",
       "type": "u",
@@ -797,11 +1287,25 @@
       "cat": "iPh 13",
       "type": "u",
       "order": 10
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 22542,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 10
     }
   ],
   "iPh 13 Pro Max 256 | Jabko | u": [
     {
       "time": "25.03 18:18",
+      "price": 25194,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 11
+    },
+    {
+      "time": "25.03 19:25",
       "price": 25194,
       "cat": "iPh 13",
       "type": "u",
@@ -815,11 +1319,25 @@
       "cat": "iPh 13",
       "type": "u",
       "order": 12
+    },
+    {
+      "time": "25.03 19:25",
+      "price": 26520,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 12
     }
   ],
   "iPh 13 Pro Max 1TB | Jabko | u": [
     {
       "time": "25.03 18:18",
+      "price": 27404,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 13
+    },
+    {
+      "time": "25.03 19:25",
       "price": 27404,
       "cat": "iPh 13",
       "type": "u",
