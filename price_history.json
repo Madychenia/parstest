@@ -1,1 +1,29 @@
-{}
+{
+  "iPh 13 128 | Jabko | u": [
+    {
+      "time": "26.03 17:53",
+      "price": 16354,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 0
+    }
+  ],
+  "iPh 13 256 | Jabko | u": [
+    {
+      "time": "26.03 17:53",
+      "price": 18122,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 1
+    }
+  ],
+  "iPh 13 512 | Jabko | u": [
+    {
+      "time": "26.03 17:53",
+      "price": 18564,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 2
+    }
+  ]
+}
