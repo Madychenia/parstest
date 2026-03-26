@@ -147,8 +147,6 @@ with c1: user_rate = st.number_input("", value=44.55, label_visibility="collapse
 with c2: 
     st.write(f"Обновлено: **{last_run.get('time', '—')}**")
     st.write(f"Минфин (продажа): **{minfin_rate}**")
-with c3: 
-    if st.button("♻️ ОБНОВИТЬ"): run_parsing(); st.rerun()
 with c4:
     if st.button("🗑 СБРОСИТЬ"):
         if os.path.exists(HISTORY_FILE): os.remove(HISTORY_FILE)
