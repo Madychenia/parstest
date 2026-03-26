@@ -1,1 +1,6 @@
 
+Модель;Магазин;Ссылка;Селектор;Категория
+iPh 13 128;Jabko;https://jabko.ua/rus/iphone/b-u-iphone/b-u-apple-iphone-13/bu-iphone-13-128gb-midnight-idealnyi-stan-nova-batareya;#allproduct > div.wrapp-product__row > div.wrapp-product__row-info > div.top-product-info > div.price-sku-wrap > div.product-info__price > div > div.product-info__price-new > span;iPh 13
+iPh 13 256;Jabko;https://jabko.ua/rus/iphone/b-u-iphone/b-u-apple-iphone-13/bu-iphone-13-256gb-midnight-idealnyi-stan-nova-batareya;#allproduct > div.wrapp-product__row > div.wrapp-product__row-info > div.top-product-info > div.price-sku-wrap > div.product-info__price > div > div.product-info__price-new > span;iPh 13
+iPh 13 512;Jabko;https://jabko.ua/rus/product/bu-iphone-13-512gb-blue-yak-novyi;#allproduct > div.wrapp-product__row > div.wrapp-product__row-info > div.top-product-info > div.price-sku-wrap > div.product-info__price > div > div.product-info__price-new > span;iPh 13
+
