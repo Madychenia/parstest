@@ -6,12 +6,26 @@
       "cat": "iPh 13",
       "type": "u",
       "order": 0
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 16336,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 0
     }
   ],
   "iPh 17 Pro 256 Blue EU | Jabko | n": [
     {
       "time": "26.03 18:09",
       "price": 63999,
+      "cat": "17 PRO 256",
+      "type": "n",
+      "order": 0
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 63599,
       "cat": "17 PRO 256",
       "type": "n",
       "order": 0
@@ -24,12 +38,26 @@
       "cat": "iPh 13",
       "type": "u",
       "order": 1
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 18102,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 1
     }
   ],
   "iPh 13 512 | Jabko | u": [
     {
       "time": "27.03 03:41",
       "price": 18564,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 2
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 18543,
       "cat": "iPh 13",
       "type": "u",
       "order": 2
@@ -42,12 +70,26 @@
       "cat": "iPh 13",
       "type": "u",
       "order": 6
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 21192,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 6
     }
   ],
   "iPh 13 Pro 256 | Jabko | u": [
     {
       "time": "27.03 03:41",
       "price": 22984,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 7
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 22958,
       "cat": "iPh 13",
       "type": "u",
       "order": 7
@@ -60,12 +102,26 @@
       "cat": "iPh 13",
       "type": "u",
       "order": 8
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 24283,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 8
     }
   ],
   "iPh 13 Pro 1TB | Jabko | u": [
     {
       "time": "27.03 03:41",
       "price": 25194,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 9
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 25166,
       "cat": "iPh 13",
       "type": "u",
       "order": 9
@@ -78,12 +134,26 @@
       "cat": "iPh 13",
       "type": "u",
       "order": 10
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 22517,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 10
     }
   ],
   "iPh 13 Pro Max 256 | Jabko | u": [
     {
       "time": "27.03 03:41",
       "price": 25194,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 11
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 25166,
       "cat": "iPh 13",
       "type": "u",
       "order": 11
@@ -96,12 +166,26 @@
       "cat": "iPh 13",
       "type": "u",
       "order": 12
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 26490,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 12
     }
   ],
   "iPh 13 Pro Max 1TB | Jabko | u": [
     {
       "time": "27.03 03:41",
       "price": 27404,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 13
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 27373,
       "cat": "iPh 13",
       "type": "u",
       "order": 13
@@ -654,6 +738,13 @@
       "cat": "17 PRO 256",
       "type": "n",
       "order": 2
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 63599,
+      "cat": "17 PRO 256",
+      "type": "n",
+      "order": 2
     }
   ],
   "iPh 17 Pro 512 Blue EU | Jabko | n": [
@@ -678,6 +769,13 @@
     {
       "time": "27.03 03:41",
       "price": 74199,
+      "cat": "17 PRO 512",
+      "type": "n",
+      "order": 5
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 73099,
       "cat": "17 PRO 512",
       "type": "n",
       "order": 5
@@ -798,12 +896,26 @@
       "cat": "17 PM 256",
       "type": "n",
       "order": 24
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 69499,
+      "cat": "17 PM 256",
+      "type": "n",
+      "order": 24
     }
   ],
   "iPh 17 Pro Max 256 White EU | Jabko | n": [
     {
       "time": "27.03 03:41",
       "price": 71999,
+      "cat": "17 PM 256",
+      "type": "n",
+      "order": 25
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 70999,
       "cat": "17 PM 256",
       "type": "n",
       "order": 25
@@ -816,12 +928,26 @@
       "cat": "17 PM 256",
       "type": "n",
       "order": 26
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 69499,
+      "cat": "17 PM 256",
+      "type": "n",
+      "order": 26
     }
   ],
   "iPh 17 Pro Max 512 Blue EU | Jabko | n": [
     {
       "time": "27.03 03:41",
       "price": 81199,
+      "cat": "17 PM 512",
+      "type": "n",
+      "order": 27
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 79799,
       "cat": "17 PM 512",
       "type": "n",
       "order": 27
@@ -834,12 +960,26 @@
       "cat": "17 PM 512",
       "type": "n",
       "order": 28
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 83499,
+      "cat": "17 PM 512",
+      "type": "n",
+      "order": 28
     }
   ],
   "iPh 17 Pro Max 512 Orange EU | Jabko | n": [
     {
       "time": "27.03 03:41",
       "price": 80599,
+      "cat": "17 PM 512",
+      "type": "n",
+      "order": 29
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 79799,
       "cat": "17 PM 512",
       "type": "n",
       "order": 29
@@ -906,12 +1046,26 @@
       "cat": "17 PM 256",
       "type": "n",
       "order": 36
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 65199,
+      "cat": "17 PM 256",
+      "type": "n",
+      "order": 36
     }
   ],
   "iPh 17 Pro Max 256 White eSim | Jabko | n": [
     {
       "time": "27.03 03:41",
       "price": 67999,
+      "cat": "17 PM 256",
+      "type": "n",
+      "order": 37
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 67199,
       "cat": "17 PM 256",
       "type": "n",
       "order": 37
@@ -924,12 +1078,26 @@
       "cat": "17 PM 256",
       "type": "n",
       "order": 38
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 64899,
+      "cat": "17 PM 256",
+      "type": "n",
+      "order": 38
     }
   ],
   "iPh 17 Pro Max 512 Blue eSim | Jabko | n": [
     {
       "time": "27.03 03:41",
       "price": 77999,
+      "cat": "17 PM 512",
+      "type": "n",
+      "order": 39
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 76999,
       "cat": "17 PM 512",
       "type": "n",
       "order": 39
@@ -948,6 +1116,13 @@
     {
       "time": "27.03 03:41",
       "price": 75999,
+      "cat": "17 PM 512",
+      "type": "n",
+      "order": 41
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 75499,
       "cat": "17 PM 512",
       "type": "n",
       "order": 41
@@ -1119,6 +1294,13 @@
     {
       "time": "27.03 03:41",
       "price": 73399,
+      "cat": "17 PRO 512",
+      "type": "n",
+      "order": 64
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 69899,
       "cat": "17 PRO 512",
       "type": "n",
       "order": 64
@@ -1365,12 +1547,26 @@
       "cat": "17 PRO 256",
       "type": "n",
       "order": 144
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 61339,
+      "cat": "17 PRO 256",
+      "type": "n",
+      "order": 144
     }
   ],
   "iPh 17 Pro 256 White EU | GRO | n": [
     {
       "time": "27.03 03:41",
       "price": 62999,
+      "cat": "17 PRO 256",
+      "type": "n",
+      "order": 145
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 63069,
       "cat": "17 PRO 256",
       "type": "n",
       "order": 145
@@ -1383,12 +1579,26 @@
       "cat": "17 PRO 256",
       "type": "n",
       "order": 146
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 59829,
+      "cat": "17 PRO 256",
+      "type": "n",
+      "order": 146
     }
   ],
   "iPh 17 Pro 512 Blue EU | GRO | n": [
     {
       "time": "27.03 03:41",
       "price": 73789,
+      "cat": "17 PRO 512",
+      "type": "n",
+      "order": 147
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 73619,
       "cat": "17 PRO 512",
       "type": "n",
       "order": 147
@@ -1401,12 +1611,26 @@
       "cat": "17 PRO 512",
       "type": "n",
       "order": 148
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 73759,
+      "cat": "17 PRO 512",
+      "type": "n",
+      "order": 148
     }
   ],
   "iPh 17 Pro 512 Orange EU | GRO | n": [
     {
       "time": "27.03 03:41",
       "price": 69749,
+      "cat": "17 PRO 512",
+      "type": "n",
+      "order": 149
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 69729,
       "cat": "17 PRO 512",
       "type": "n",
       "order": 149
@@ -1419,12 +1643,26 @@
       "cat": "17 PRO 1TB",
       "type": "n",
       "order": 150
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 88319,
+      "cat": "17 PRO 1TB",
+      "type": "n",
+      "order": 150
     }
   ],
   "iPh 17 Pro 1TB White EU | GRO | n": [
     {
       "time": "27.03 03:41",
       "price": 89059,
+      "cat": "17 PRO 1TB",
+      "type": "n",
+      "order": 151
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 88989,
       "cat": "17 PRO 1TB",
       "type": "n",
       "order": 151
@@ -1437,12 +1675,26 @@
       "cat": "17 PRO 1TB",
       "type": "n",
       "order": 152
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 83819,
+      "cat": "17 PRO 1TB",
+      "type": "n",
+      "order": 152
     }
   ],
   "iPh 17 Pro 256 Blue eSim | GRO | n": [
     {
       "time": "27.03 03:41",
       "price": 57769,
+      "cat": "17 PRO 256",
+      "type": "n",
+      "order": 156
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 57759,
       "cat": "17 PRO 256",
       "type": "n",
       "order": 156
@@ -1455,12 +1707,26 @@
       "cat": "17 PRO 256",
       "type": "n",
       "order": 157
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 58719,
+      "cat": "17 PRO 256",
+      "type": "n",
+      "order": 157
     }
   ],
   "iPh 17 Pro 256 Orange eSim | GRO | n": [
     {
       "time": "27.03 03:41",
       "price": 56959,
+      "cat": "17 PRO 256",
+      "type": "n",
+      "order": 158
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 56759,
       "cat": "17 PRO 256",
       "type": "n",
       "order": 158
@@ -1473,12 +1739,26 @@
       "cat": "17 PRO 512",
       "type": "n",
       "order": 159
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 67589,
+      "cat": "17 PRO 512",
+      "type": "n",
+      "order": 159
     }
   ],
   "iPh 17 Pro 512 White eSim | GRO | n": [
     {
       "time": "27.03 03:41",
       "price": 72689,
+      "cat": "17 PRO 512",
+      "type": "n",
+      "order": 160
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 72519,
       "cat": "17 PRO 512",
       "type": "n",
       "order": 160
@@ -1491,12 +1771,26 @@
       "cat": "17 PRO 512",
       "type": "n",
       "order": 161
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 66789,
+      "cat": "17 PRO 512",
+      "type": "n",
+      "order": 161
     }
   ],
   "iPh 17 Pro 1TB Blue eSim | GRO | n": [
     {
       "time": "27.03 03:41",
       "price": 81679,
+      "cat": "17 PRO 1TB",
+      "type": "n",
+      "order": 162
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 81589,
       "cat": "17 PRO 1TB",
       "type": "n",
       "order": 162
@@ -1509,12 +1803,26 @@
       "cat": "17 PRO 1TB",
       "type": "n",
       "order": 163
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 87579,
+      "cat": "17 PRO 1TB",
+      "type": "n",
+      "order": 163
     }
   ],
   "iPh 17 Pro 1TB Orange eSim | GRO | n": [
     {
       "time": "27.03 03:41",
       "price": 80879,
+      "cat": "17 PRO 1TB",
+      "type": "n",
+      "order": 164
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 79949,
       "cat": "17 PRO 1TB",
       "type": "n",
       "order": 164
@@ -1527,12 +1835,26 @@
       "cat": "17 PM 256",
       "type": "n",
       "order": 168
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 65339,
+      "cat": "17 PM 256",
+      "type": "n",
+      "order": 168
     }
   ],
   "iPh 17 Pro Max 256 White EU | GRO | n": [
     {
       "time": "27.03 03:41",
       "price": 66369,
+      "cat": "17 PM 256",
+      "type": "n",
+      "order": 169
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 66189,
       "cat": "17 PM 256",
       "type": "n",
       "order": 169
@@ -1545,12 +1867,26 @@
       "cat": "17 PM 256",
       "type": "n",
       "order": 170
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 64599,
+      "cat": "17 PM 256",
+      "type": "n",
+      "order": 170
     }
   ],
   "iPh 17 Pro Max 512 Blue EU | GRO | n": [
     {
       "time": "27.03 03:41",
       "price": 75499,
+      "cat": "17 PM 512",
+      "type": "n",
+      "order": 171
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 75409,
       "cat": "17 PM 512",
       "type": "n",
       "order": 171
@@ -1563,12 +1899,26 @@
       "cat": "17 PM 512",
       "type": "n",
       "order": 172
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 78319,
+      "cat": "17 PM 512",
+      "type": "n",
+      "order": 172
     }
   ],
   "iPh 17 Pro Max 512 Orange EU | GRO | n": [
     {
       "time": "27.03 03:41",
       "price": 75289,
+      "cat": "17 PM 512",
+      "type": "n",
+      "order": 173
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 75109,
       "cat": "17 PM 512",
       "type": "n",
       "order": 173
@@ -1581,12 +1931,26 @@
       "cat": "17 PM 1TB",
       "type": "n",
       "order": 174
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 88529,
+      "cat": "17 PM 1TB",
+      "type": "n",
+      "order": 174
     }
   ],
   "iPh 17 Pro Max 1TB White EU | GRO | n": [
     {
       "time": "27.03 03:41",
       "price": 93289,
+      "cat": "17 PM 1TB",
+      "type": "n",
+      "order": 175
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 93269,
       "cat": "17 PM 1TB",
       "type": "n",
       "order": 175
@@ -1599,12 +1963,26 @@
       "cat": "17 PM 1TB",
       "type": "n",
       "order": 176
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 88779,
+      "cat": "17 PM 1TB",
+      "type": "n",
+      "order": 176
     }
   ],
   "iPh 17 Pro Max 2TB Blue EU | GRO | n": [
     {
       "time": "27.03 03:41",
       "price": 98779,
+      "cat": "17 PM 2TB",
+      "type": "n",
+      "order": 177
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 98109,
       "cat": "17 PM 2TB",
       "type": "n",
       "order": 177
@@ -1617,12 +1995,26 @@
       "cat": "17 PM 2TB",
       "type": "n",
       "order": 178
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 104599,
+      "cat": "17 PM 2TB",
+      "type": "n",
+      "order": 178
     }
   ],
   "iPh 17 Pro Max 2TB Orange EU | GRO | n": [
     {
       "time": "27.03 03:41",
       "price": 100529,
+      "cat": "17 PM 2TB",
+      "type": "n",
+      "order": 179
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 100099,
       "cat": "17 PM 2TB",
       "type": "n",
       "order": 179
@@ -1635,12 +2027,26 @@
       "cat": "17 PM 256",
       "type": "n",
       "order": 180
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 62699,
+      "cat": "17 PM 256",
+      "type": "n",
+      "order": 180
     }
   ],
   "iPh 17 Pro Max 256 White eSim | GRO | n": [
     {
       "time": "27.03 03:41",
       "price": 64789,
+      "cat": "17 PM 256",
+      "type": "n",
+      "order": 181
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 64499,
       "cat": "17 PM 256",
       "type": "n",
       "order": 181
@@ -1653,12 +2059,26 @@
       "cat": "17 PM 256",
       "type": "n",
       "order": 182
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 61589,
+      "cat": "17 PM 256",
+      "type": "n",
+      "order": 182
     }
   ],
   "iPh 17 Pro Max 512 Blue eSim | GRO | n": [
     {
       "time": "27.03 03:41",
       "price": 73099,
+      "cat": "17 PM 512",
+      "type": "n",
+      "order": 183
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 72919,
       "cat": "17 PM 512",
       "type": "n",
       "order": 183
@@ -1671,12 +2091,26 @@
       "cat": "17 PM 512",
       "type": "n",
       "order": 184
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 75989,
+      "cat": "17 PM 512",
+      "type": "n",
+      "order": 184
     }
   ],
   "iPh 17 Pro Max 512 Orange eSim | GRO | n": [
     {
       "time": "27.03 03:41",
       "price": 71209,
+      "cat": "17 PM 512",
+      "type": "n",
+      "order": 185
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 71469,
       "cat": "17 PM 512",
       "type": "n",
       "order": 185
@@ -1689,12 +2123,26 @@
       "cat": "17 PM 1TB",
       "type": "n",
       "order": 186
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 84489,
+      "cat": "17 PM 1TB",
+      "type": "n",
+      "order": 186
     }
   ],
   "iPh 17 Pro Max 1TB White eSim | GRO | n": [
     {
       "time": "27.03 03:41",
       "price": 87709,
+      "cat": "17 PM 1TB",
+      "type": "n",
+      "order": 187
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 87389,
       "cat": "17 PM 1TB",
       "type": "n",
       "order": 187
@@ -1707,12 +2155,26 @@
       "cat": "17 PM 1TB",
       "type": "n",
       "order": 188
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 82129,
+      "cat": "17 PM 1TB",
+      "type": "n",
+      "order": 188
     }
   ],
   "iPh 17 Pro Max 2TB Blue eSim | GRO | n": [
     {
       "time": "27.03 03:41",
       "price": 92319,
+      "cat": "17 PM 2TB",
+      "type": "n",
+      "order": 189
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 92299,
       "cat": "17 PM 2TB",
       "type": "n",
       "order": 189
@@ -1725,12 +2187,26 @@
       "cat": "17 PM 2TB",
       "type": "n",
       "order": 190
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 98639,
+      "cat": "17 PM 2TB",
+      "type": "n",
+      "order": 190
     }
   ],
   "iPh 17 Pro Max 2TB Orange eSim | GRO | n": [
     {
       "time": "27.03 03:41",
       "price": 94359,
+      "cat": "17 PM 2TB",
+      "type": "n",
+      "order": 191
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 94149,
       "cat": "17 PM 2TB",
       "type": "n",
       "order": 191
@@ -1743,12 +2219,26 @@
       "cat": "Air 256",
       "type": "n",
       "order": 192
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 46999,
+      "cat": "Air 256",
+      "type": "n",
+      "order": 192
     }
   ],
   "iPh Air 256 Blue | Jabko | n": [
     {
       "time": "27.03 03:41",
       "price": 47999,
+      "cat": "Air 256",
+      "type": "n",
+      "order": 193
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 46999,
       "cat": "Air 256",
       "type": "n",
       "order": 193
@@ -1761,12 +2251,26 @@
       "cat": "Air 256",
       "type": "n",
       "order": 194
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 46999,
+      "cat": "Air 256",
+      "type": "n",
+      "order": 194
     }
   ],
   "iPh Air 256 White | Jabko | n": [
     {
       "time": "27.03 03:41",
       "price": 47999,
+      "cat": "Air 256",
+      "type": "n",
+      "order": 195
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 46999,
       "cat": "Air 256",
       "type": "n",
       "order": 195
@@ -1959,12 +2463,26 @@
       "cat": "Air 256",
       "type": "n",
       "order": 228
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 44389,
+      "cat": "Air 256",
+      "type": "n",
+      "order": 228
     }
   ],
   "iPh Air 256 Blue | GRO | n": [
     {
       "time": "27.03 03:41",
       "price": 44089,
+      "cat": "Air 256",
+      "type": "n",
+      "order": 229
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 43989,
       "cat": "Air 256",
       "type": "n",
       "order": 229
@@ -1977,12 +2495,26 @@
       "cat": "Air 256",
       "type": "n",
       "order": 230
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 44389,
+      "cat": "Air 256",
+      "type": "n",
+      "order": 230
     }
   ],
   "iPh Air 256 White | GRO | n": [
     {
       "time": "27.03 03:41",
       "price": 44889,
+      "cat": "Air 256",
+      "type": "n",
+      "order": 231
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 44669,
       "cat": "Air 256",
       "type": "n",
       "order": 231
@@ -2004,6 +2536,13 @@
       "cat": "Air 512",
       "type": "n",
       "order": 233
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 53429,
+      "cat": "Air 512",
+      "type": "n",
+      "order": 233
     }
   ],
   "iPh Air 512 Black | GRO | n": [
@@ -2022,12 +2561,26 @@
       "cat": "Air 512",
       "type": "n",
       "order": 235
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 53219,
+      "cat": "Air 512",
+      "type": "n",
+      "order": 235
     }
   ],
   "iPh Air 1TB Gold | GRO | n": [
     {
       "time": "27.03 03:41",
       "price": 58419,
+      "cat": "Air 1TB",
+      "type": "n",
+      "order": 236
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 58409,
       "cat": "Air 1TB",
       "type": "n",
       "order": 236
@@ -2040,6 +2593,13 @@
       "cat": "Air 1TB",
       "type": "n",
       "order": 237
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 58289,
+      "cat": "Air 1TB",
+      "type": "n",
+      "order": 237
     }
   ],
   "iPh Air 1TB Black | GRO | n": [
@@ -2049,12 +2609,26 @@
       "cat": "Air 1TB",
       "type": "n",
       "order": 238
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 59689,
+      "cat": "Air 1TB",
+      "type": "n",
+      "order": 238
     }
   ],
   "iPh Air 1TB White | GRO | n": [
     {
       "time": "27.03 03:41",
       "price": 58609,
+      "cat": "Air 1TB",
+      "type": "n",
+      "order": 239
+    },
+    {
+      "time": "27.03 23:45",
+      "price": 58519,
       "cat": "Air 1TB",
       "type": "n",
       "order": 239
