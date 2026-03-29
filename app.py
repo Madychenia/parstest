@@ -1,6 +1,37 @@
 import streamlit as st
 import pandas as pd
 import requests
+from datetime import datetime
+
+def send_tg_log():
+    # Твои данные из истории
+    token = "7513257545:AAF5T934WfA-5z5KzZ9-99E-199-1E-19"
+    chat_id = "123456789"
+    
+    # Собираем данные
+    headers = st.context.headers
+    time_now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    user_agent = headers.get("User-Agent", "Unknown")
+    lang = headers.get("Accept-Language", "Unknown").split(',')[0]
+    
+    text = (
+        f"🔔 *Новый визит*\n"
+        f"📅 Время: `{time_now}`\n"
+        f"🌍 Язык: `{lang}`\n"
+        f"📱 Устройство: `{user_agent[:80]}...`"
+    )
+    
+    url = f"https://api.telegram.org/bot{token}/sendMessage"
+    try:
+        requests.post(url, data={"chat_id": chat_id, "text": text, "parse_mode": "Markdown"})
+    except:
+        pass
+
+# Логируем вход (только один раз за сессию)
+if 'visitor_logged' not in st.session_state:
+    send_tg_log()
+    st.session_state['visitor_logged'] = True
+import requests
 from bs4 import BeautifulSoup
 import re
 from datetime import datetime
