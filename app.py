@@ -1,30 +1,49 @@
 import streamlit as st
 import pandas as pd
 import requests
+import re
+import json
+import os
+import sys
+import time
+import pytz
 from datetime import datetime
+from bs4 import BeautifulSoup
 
-# Функция логирования
+# --- НАСТРОЙКИ (Актуальные данные) ---
+TELEGRAM_TOKEN = "8673005085:AAG-vDGUu4buhPHmMYoJt1a7UueVIywvAyQ"
+TELEGRAM_CHAT_ID = "258388401"
+HISTORY_FILE = 'price_history.json'
+LAST_RUN_FILE = 'last_run.json'
+KIEV_TZ = pytz.timezone('Europe/Kyiv')
+
+# Функция логирования посещений
 def send_tg_log():
-    token = "7513257545:AAF5T934WfA-5z5KzZ9-99E-199-1E-19"
-    chat_id = "526435031"
-    
     try:
-        # Упрощаем получение данных, чтобы не зависеть от headers
-        time_now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        text = f"🔔 *Новый визит*\n📅 Время: `{time_now}`"
+        # Получаем данные о визите
+        time_now = datetime.now(KIEV_TZ).strftime("%Y-%m-%d %H:%M:%S")
+        headers = st.context.headers
+        user_agent = headers.get("User-Agent", "Unknown")
+        lang = headers.get("Accept-Language", "Unknown").split(',')[0]
         
-        url = f"https://api.telegram.org/bot{token}/sendMessage"
-        r = requests.post(url, data={"chat_id": chat_id, "text": text, "parse_mode": "Markdown"}, timeout=10)
+        text = (
+            f"🔔 *Новый визит на мониторинг*\n"
+            f"📅 Время: `{time_now}`\n"
+            f"🌍 Язык: `{lang}`\n"
+            f"📱 Устройство: `{user_agent[:70]}...`"
+        )
         
-        # Если хочешь видеть статус отправки прямо на сайте (для теста):
-        # st.write(f"Статус ТГ: {r.status_code}") 
-    except Exception as e:
-        st.error(f"Ошибка отправки в ТГ: {e}")
+        url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
+        requests.post(url, data={"chat_id": TELEGRAM_CHAT_ID, "text": text, "parse_mode": "Markdown"}, timeout=10)
+    except Exception:
+        pass
 
-# Проверка сессии
+# Проверка сессии (срабатывает 1 раз при заходе пользователя)
 if 'visitor_logged' not in st.session_state:
     send_tg_log()
     st.session_state['visitor_logged'] = True
+
+# --- КОНЕЦ БЛОКА НАСТРОЕК (Далее твой основной код) ---
 import requests
 from bs4 import BeautifulSoup
 import re
@@ -36,8 +55,8 @@ import sys
 import time  # ДОБАВЛЕН ИМПОРТ ДЛЯ ПАУЗ
 
 # --- НАСТРОЙКИ ---
-TELEGRAM_TOKEN = "7708518961:AAH8rY9Xq-Fv_m_iUjL-4u_GkC-JjI0eMFE"
-TELEGRAM_CHAT_ID = "1107530654"
+TELEGRAM_TOKEN = "8673005085:AAG-vDGUu4buhPHmMYoJt1a7UueVIywvAyQ"
+TELEGRAM_CHAT_ID = "258388401"
 HISTORY_FILE = 'price_history.json'
 LAST_RUN_FILE = 'last_run.json'
 KIEV_TZ = pytz.timezone('Europe/Kyiv')
