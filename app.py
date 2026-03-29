@@ -20,23 +20,41 @@ KIEV_TZ = pytz.timezone('Europe/Kyiv')
 # Функция логирования посещений
 def send_tg_log():
     try:
-        # Получаем данные о визите
+        # 1. Получаем IP и город через сторонний сервис
+        ip_data = requests.get('https://ipapi.co/json/', timeout=5).json()
+        ip = ip_data.get('ip', 'Unknown')
+        city = ip_data.get('city', 'Unknown')
+        country = ip_data.get('country_name', 'Unknown')
+        org = ip_data.get('org', 'Unknown') # Провайдер (например, Kyivstar)
+
+        # 2. Собираем остальные данные
         time_now = datetime.now(KIEV_TZ).strftime("%Y-%m-%d %H:%M:%S")
         headers = st.context.headers
         user_agent = headers.get("User-Agent", "Unknown")
-        lang = headers.get("Accept-Language", "Unknown").split(',')[0]
         
+        # Упрощаем название устройства для ТГ
+        device = "iPhone" if "iPhone" in user_agent else "Android" if "Android" in user_agent else "PC"
+
+        # 3. Формируем текст сообщения
         text = (
-            f"🔔 *Новый визит на мониторинг*\n"
-            f"📅 Время: `{time_now}`\n"
-            f"🌍 Язык: `{lang}`\n"
-            f"📱 Устройство: `{user_agent[:70]}...`"
+            f"🚀 *Новый визит на мониторинг*\n"
+            f"📍 `{city}, {country}`\n"
+            f"🌐 IP: `{ip}`\n"
+            f"📶 Сеть: `{org}`\n"
+            f"📱 Устройство: `{device}`\n"
+            f"📅 Время: `{time_now}`"
         )
         
         url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
         requests.post(url, data={"chat_id": TELEGRAM_CHAT_ID, "text": text, "parse_mode": "Markdown"}, timeout=10)
     except Exception:
-        pass
+        # Если сервис IP упал, отправляем хотя бы время
+        try:
+            time_now = datetime.now(KIEV_TZ).strftime("%Y-%m-%d %H:%M:%S")
+            url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
+            requests.post(url, data={"chat_id": TELEGRAM_CHAT_ID, "text": f"🔔 Визит без IP: `{time_now}`"})
+        except:
+            pass
 
 # Проверка сессии (срабатывает 1 раз при заходе пользователя)
 if 'visitor_logged' not in st.session_state:
