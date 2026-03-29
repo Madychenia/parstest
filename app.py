@@ -3,23 +3,25 @@ import pandas as pd
 import requests
 from datetime import datetime
 
+# Функция логирования
 def send_tg_log():
-    # Твой токен и ПРАВИЛЬНЫЙ ID
     token = "7513257545:AAF5T934WfA-5z5KzZ9-99E-199-1E-19"
-    chat_id = "526435031" # Твой реальный ID, куда приходят уведомления
+    chat_id = "526435031"
     
     try:
-        headers = st.context.headers
+        # Упрощаем получение данных, чтобы не зависеть от headers
         time_now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        user_agent = headers.get("User-Agent", "Unknown")
+        text = f"🔔 *Новый визит*\n📅 Время: `{time_now}`"
         
-        text = f"🔔 *Новый визит*\n📅 `{time_now}`\n📱 `{user_agent[:60]}...`"
         url = f"https://api.telegram.org/bot{token}/sendMessage"
-        requests.post(url, data={"chat_id": chat_id, "text": text, "parse_mode": "Markdown"}, timeout=5)
-    except:
-        pass
+        r = requests.post(url, data={"chat_id": chat_id, "text": text, "parse_mode": "Markdown"}, timeout=10)
+        
+        # Если хочешь видеть статус отправки прямо на сайте (для теста):
+        # st.write(f"Статус ТГ: {r.status_code}") 
+    except Exception as e:
+        st.error(f"Ошибка отправки в ТГ: {e}")
 
-# Логируем вход (только один раз за сессию)
+# Проверка сессии
 if 'visitor_logged' not in st.session_state:
     send_tg_log()
     st.session_state['visitor_logged'] = True
