@@ -191,10 +191,10 @@ with c1: user_rate = st.number_input("", value=44.3, label_visibility="collapsed
 with c2: 
     st.write(f"Обновлено: **{last_run.get('time', '—')}**")
     st.write(f"Минфин (продажа): **{minfin_rate}**")
-with c4:
-    if st.button("🗑 СБРОСИТЬ"):
-        if os.path.exists(HISTORY_FILE): os.remove(HISTORY_FILE)
-        st.rerun()
+#with c4:
+#    if st.button("🗑 СБРОСИТЬ"):
+#        if os.path.exists(HISTORY_FILE): os.remove(HISTORY_FILE)
+#        st.rerun()
 
 tabs = st.tabs(["Used (Б/У)", "New (Новые)"])
 tags = ['u', 'n']
