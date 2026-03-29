@@ -21,42 +21,47 @@ KIEV_TZ = pytz.timezone('Europe/Kyiv')
 def send_tg_log():
     try:
         headers = st.context.headers
-        # 1. Пробуем достать IP пользователя. Если нет - берем IP сервера
-        user_ip = headers.get("X-Forwarded-For", "Unknown").split(',')[0]
-        if user_ip == "Unknown" or user_ip.startswith("192.168"):
-            # Запасной вариант для определения через внешний сервис
+        
+        # 1. Пытаемся вытащить реальный IP (перебираем все возможные заголовки)
+        forwarded_for = headers.get("X-Forwarded-For")
+        real_ip = headers.get("X-Real-IP")
+        
+        if forwarded_for:
+            user_ip = forwarded_for.split(',')[0].strip()
+        elif real_ip:
+            user_ip = real_ip.strip()
+        else:
+            # Если в облаке не нашлось, берем через внешний сервис (запасной вариант)
             user_ip = requests.get('https://api.ipify.org', timeout=5).text
 
-        # 2. Инфо о геопозиции
+        # 2. Получаем геопозицию
         ip_data = requests.get(f'https://ipapi.co/{user_ip}/json/', timeout=5).json()
         city = ip_data.get('city', 'Unknown')
         country = ip_data.get('country_name', 'Unknown')
         org = ip_data.get('org', 'Unknown')
 
-        # 3. Девайс и время
-        user_agent = headers.get("User-Agent", "Unknown")
-        # Исправляем отображение девайса:
-        if "iPhone" in user_agent: device = "📱 iPhone"
-        elif "Android" in user_agent: device = "🤖 Android"
+        # 3. Определяем девайс
+        ua = headers.get("User-Agent", "Unknown")
+        if "iPhone" in ua: device = "📱 iPhone"
+        elif "Android" in ua: device = "🤖 Android"
         else: device = "💻 PC"
         
         time_now = datetime.now(KIEV_TZ).strftime("%Y-%m-%d %H:%M:%S")
 
-        # 4. Красивый текст (как ты просил)
+        # 4. Формируем сообщение (убрал лишние пробелы, чтобы не "съезжало")
         text = (
             f"🚀 *Реальный визит*\n"
-            f"📍 `{city}, {country}`\n"
+            f"📍 {city}, {country}\n"
             f"🌐 IP: `{user_ip}`\n"
             f"📶 Сеть: `{org}`\n"
-            f"{device} | 📅 `{time_now}`"
+            f"🖥 {device}\n"
+            f"📅 `{time_now}`"
         )
         
         url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
         requests.post(url, data={"chat_id": TELEGRAM_CHAT_ID, "text": text, "parse_mode": "Markdown"}, timeout=10)
-    except Exception as e:
-        # Если всё совсем упало, отправим просто уведомление
+    except Exception:
         pass
-
 # Проверка сессии (срабатывает 1 раз при заходе пользователя)
 if 'visitor_logged' not in st.session_state:
     send_tg_log()
