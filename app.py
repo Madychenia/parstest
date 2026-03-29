@@ -20,41 +20,33 @@ KIEV_TZ = pytz.timezone('Europe/Kyiv')
 # Функция логирования посещений
 def send_tg_log():
     try:
-        # 1. Получаем IP и город через сторонний сервис
-        ip_data = requests.get('https://ipapi.co/json/', timeout=5).json()
-        ip = ip_data.get('ip', 'Unknown')
+        # 1. Достаем реальный IP пользователя из заголовков Streamlit
+        headers = st.context.headers
+        user_ip = headers.get("X-Forwarded-For", "Unknown").split(',')[0]
+        
+        # 2. Теперь спрашиваем инфо именно про ЭТОТ IP
+        ip_data = requests.get(f'https://ipapi.co/{user_ip}/json/', timeout=5).json()
         city = ip_data.get('city', 'Unknown')
         country = ip_data.get('country_name', 'Unknown')
-        org = ip_data.get('org', 'Unknown') # Провайдер (например, Kyivstar)
+        org = ip_data.get('org', 'Unknown')
 
-        # 2. Собираем остальные данные
+        # Остальной код (время, устройство и отправка)
         time_now = datetime.now(KIEV_TZ).strftime("%Y-%m-%d %H:%M:%S")
-        headers = st.context.headers
         user_agent = headers.get("User-Agent", "Unknown")
-        
-        # Упрощаем название устройства для ТГ
         device = "iPhone" if "iPhone" in user_agent else "Android" if "Android" in user_agent else "PC"
 
-        # 3. Формируем текст сообщения
         text = (
-            f"🚀 *Новый визит на мониторинг*\n"
+            f"🚀 *Реальный визит*\n"
             f"📍 `{city}, {country}`\n"
-            f"🌐 IP: `{ip}`\n"
+            f"🌐 IP: `{user_ip}`\n"
             f"📶 Сеть: `{org}`\n"
-            f"📱 Устройство: `{device}`\n"
-            f"📅 Время: `{time_now}`"
+            f"📱 `{device}` | 📅 `{time_now}`"
         )
         
         url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
         requests.post(url, data={"chat_id": TELEGRAM_CHAT_ID, "text": text, "parse_mode": "Markdown"}, timeout=10)
     except Exception:
-        # Если сервис IP упал, отправляем хотя бы время
-        try:
-            time_now = datetime.now(KIEV_TZ).strftime("%Y-%m-%d %H:%M:%S")
-            url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
-            requests.post(url, data={"chat_id": TELEGRAM_CHAT_ID, "text": f"🔔 Визит без IP: `{time_now}`"})
-        except:
-            pass
+        pass
 
 # Проверка сессии (срабатывает 1 раз при заходе пользователя)
 if 'visitor_logged' not in st.session_state:
