@@ -99,32 +99,32 @@ def send_telegram(message):
 
 def get_minfin_rate():
     try:
-        # Прямая ссылка на аукцион (Киев, Доллар, Продажа)
-        url = "https://minfin.com.ua/currency/auction/usd/sell/kiev/"
+        url = "https://minfin.com.ua/currency/kiev/"
         r = requests.get(url, headers=HEADERS, timeout=10)
         soup = BeautifulSoup(r.text, 'html.parser')
         
-        # Ищем через регулярку или более стабильный класс
-        # На Минфине курс часто лежит в span внутри определенных блоков
-        rate_el = soup.find('span', class_=re.compile(r'Typography.*Headline.*'))
+        # Находим все строки таблиц на странице
+        rows = soup.find_all('tr')
         
-        if not rate_el:
-            # Запасной поиск по специфическому селектору, если первый не сработал
-            rate_el = soup.select_one('.sc-1x32wa2-9') 
-
-        if rate_el:
-            # Очищаем текст от мусора, оставляем только цифры и точку
-            val = re.sub(r'[^\d.]', '', rate_el.text.replace(',', '.'))
-            new_rate = float(val)
-            print(f"✅ Курс Минфина успешно спарсен: {new_rate}")
-            return new_rate
-            
+        for row in rows:
+            # Ищем строку, в которой есть упоминание USD
+            if 'USD' in row.text:
+                cols = row.find_all('td')
+                # В таблице Минфина: 0-Валюта, 1-Покупка, 2-Продажа
+                if len(cols) >= 3:
+                    sell_cell = cols[2].text
+                    # Очищаем от мусора, оставляем только цифры и точку
+                    val = re.sub(r'[^\d.]', '', sell_cell.replace(',', '.'))
+                    if val:
+                        new_rate = float(val)
+                        print(f"✅ Курс Минфина (Банки - Продажа) успешно спарсен: {new_rate}")
+                        return new_rate
+                        
     except Exception as e:
         print(f"❌ Ошибка парсинга Минфина: {e}")
     
-    # Если всё упало, пусть вернет 0.0, чтобы ты сразу увидел ошибку в интерфейсе, 
-    # а не думал, что всё работает (вместо старых 44.15)
     return 0.0
+
 
 def load_data(file):
     if os.path.exists(file):
