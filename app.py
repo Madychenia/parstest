@@ -220,7 +220,7 @@ minfin_rate = get_minfin_rate()
 db, last_run = load_data(HISTORY_FILE), load_data(LAST_RUN_FILE)
 
 c1, c2, c3, c4 = st.columns([1,1.5,1,1])
-with c1: user_rate = st.number_input("", value=44.3, label_visibility="collapsed") 
+with c1: user_rate = st.number_input("", value=minfin_rate, step=0.1, label_visibility="collapsed")
 with c2: 
     st.write(f"Обновлено: **{last_run.get('time', '—')}**")
     st.write(f"Минфин (продажа): **{minfin_rate}**")
