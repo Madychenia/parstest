@@ -99,22 +99,32 @@ def send_telegram(message):
 
 def get_minfin_rate():
     try:
-        url = "https://minfin.com.ua/currency/auction/usd/buy/kiev/"
+        # Прямая ссылка на аукцион (Киев, Доллар, Продажа)
+        url = "https://minfin.com.ua/currency/auction/usd/sell/kiev/"
         r = requests.get(url, headers=HEADERS, timeout=10)
         soup = BeautifulSoup(r.text, 'html.parser')
-        rate_el = soup.select_one('.sc-1x32wa2-9') 
-        if rate_el:
-            val = re.sub(r'[^\d.]', '', rate_el.text.replace(',', '.'))
-            return float(val)
-    except: pass
-    return 44.15
+        
+        # Ищем через регулярку или более стабильный класс
+        # На Минфине курс часто лежит в span внутри определенных блоков
+        rate_el = soup.find('span', class_=re.compile(r'Typography.*Headline.*'))
+        
+        if not rate_el:
+            # Запасной поиск по специфическому селектору, если первый не сработал
+            rate_el = soup.select_one('.sc-1x32wa2-9') 
 
-def load_data(file):
-    if os.path.exists(file):
-        try:
-            with open(file, 'r', encoding='utf-8') as f: return json.load(f)
-        except: return {}
-    return {}
+        if rate_el:
+            # Очищаем текст от мусора, оставляем только цифры и точку
+            val = re.sub(r'[^\d.]', '', rate_el.text.replace(',', '.'))
+            new_rate = float(val)
+            print(f"✅ Курс Минфина успешно спарсен: {new_rate}")
+            return new_rate
+            
+    except Exception as e:
+        print(f"❌ Ошибка парсинга Минфина: {e}")
+    
+    # Если всё упало, пусть вернет 0.0, чтобы ты сразу увидел ошибку в интерфейсе, 
+    # а не думал, что всё работает (вместо старых 44.15)
+    return 0.0
 
 def save_data(file, data):
     with open(file, 'w', encoding='utf-8') as f: json.dump(data, f, ensure_ascii=False, indent=2)
