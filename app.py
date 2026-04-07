@@ -99,29 +99,21 @@ def send_telegram(message):
 
 def get_minfin_rate():
     try:
-        url = "https://minfin.com.ua/currency/kiev/"
-        r = requests.get(url, headers=HEADERS, timeout=10)
-        soup = BeautifulSoup(r.text, 'html.parser')
+        # Официальный открытый API ПриватБанка (курс в отделениях)
+        url = "https://api.privatbank.ua/p24api/pubinfo?exchange&coursid=5"
         
-        # Находим все строки таблиц на странице
-        rows = soup.find_all('tr')
+        r = requests.get(url, timeout=10)
+        data = r.json()
         
-        for row in rows:
-            # Ищем строку, в которой есть упоминание USD
-            if 'USD' in row.text:
-                cols = row.find_all('td')
-                # В таблице Минфина: 0-Валюта, 1-Покупка, 2-Продажа
-                if len(cols) >= 3:
-                    sell_cell = cols[2].text
-                    # Очищаем от мусора, оставляем только цифры и точку
-                    val = re.sub(r'[^\d.]', '', sell_cell.replace(',', '.'))
-                    if val:
-                        new_rate = float(val)
-                        print(f"✅ Курс Минфина (Банки - Продажа) успешно спарсен: {new_rate}")
-                        return new_rate
-                        
+        for item in data:
+            if item['ccy'] == 'USD':
+                # Берем курс продажи
+                new_rate = float(item['sale'])
+                print(f"✅ Курс USD (ПриватБанк) успешно получен: {new_rate}")
+                return new_rate
+                
     except Exception as e:
-        print(f"❌ Ошибка парсинга Минфина: {e}")
+        print(f"❌ Ошибка получения курса: {e}")
     
     return 0.0
 
