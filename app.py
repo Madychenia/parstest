@@ -224,6 +224,10 @@ with c1: user_rate = st.number_input("", value=minfin_rate, step=0.1, label_visi
 with c2: 
     st.write(f"Обновлено: **{last_run.get('time', '—')}**")
     st.write(f"Минфин (продажа): **{minfin_rate}**")
+with c3:
+    # Вот эта новая строчка!
+    st.markdown("💡 Предложить поставщика:<br>[**@madychenia**](http://t.me/madychenia)", unsafe_allow_html=True)
+    
 #with c4:
 #    if st.button("🗑 СБРОСИТЬ"):
 #        if os.path.exists(HISTORY_FILE): os.remove(HISTORY_FILE)
