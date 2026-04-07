@@ -126,6 +126,13 @@ def get_minfin_rate():
     # а не думал, что всё работает (вместо старых 44.15)
     return 0.0
 
+def load_data(file):
+    if os.path.exists(file):
+        try:
+            with open(file, 'r', encoding='utf-8') as f: return json.load(f)
+        except: return {}
+    return {}
+
 def save_data(file, data):
     with open(file, 'w', encoding='utf-8') as f: json.dump(data, f, ensure_ascii=False, indent=2)
 
