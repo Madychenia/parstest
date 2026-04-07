@@ -193,7 +193,7 @@ def run_parsing():
 
         if is_ui: prog_bar.progress((i + 1) / len(all_tasks))
     
-    history = {k: v for k, v in history.items() if k in current_keys}
+   # history = {k: v for k, v in history.items() if k in current_keys}
     save_data(HISTORY_FILE, history)
     save_data(LAST_RUN_FILE, {'time': now})
     if is_ui: st_text.empty(); prog_bar.empty()
