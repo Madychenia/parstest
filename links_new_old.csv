@@ -1,4 +1,52 @@
 Модель;Магазин;Ссылка;Селектор;Категория
+iPh 17 Pro 256 Blue EU;iStore;https://www.istore.ua/ua/item/iphone-17-pro-256gb-deep-blue/;.element_product_price span.product_price;17 PRO 256
+iPh 17 Pro 256 White EU;iStore;https://www.istore.ua/ua/item/iphone-17-pro-256gb-silver/;.element_product_price span.product_price;17 PRO 256
+iPh 17 Pro 256 Orange EU;iStore;https://www.istore.ua/ua/item/iphone-17-pro-256gb-cosmic-orange/;.element_product_price span.product_price;17 PRO 256
+iPh 17 Pro 512 Blue EU;iStore;https://www.istore.ua/ua/item/iphone-17-pro-512gb-deep-blue/;.element_product_price span.product_price;17 PRO 512
+iPh 17 Pro 512 White EU;iStore;https://www.istore.ua/ua/item/iphone-17-pro-512-gb-silver/;.element_product_price span.product_price;17 PRO 512
+iPh 17 Pro 512 Orange EU;iStore;https://www.istore.ua/ua/item/iphone-17-pro-512-gb-cosmic-orange/;.element_product_price span.product_price;17 PRO 512
+iPh 17 Pro 1TB Blue EU;iStore;https://www.istore.ua/ua/item/iphone-17-pro-1-tb-deep-blue/;.element_product_price span.product_price;17 PRO 1TB
+iPh 17 Pro 1TB White EU;iStore;https://www.istore.ua/ua/item/iphone-17-pro-1-tb-silver/;.element_product_price span.product_price;17 PRO 1TB
+iPh 17 Pro 1TB Orange EU;iStore;https://www.istore.ua/ua/item/iphone-17-pro-1-tb-cosmic-orange/;.element_product_price span.product_price;17 PRO 1TB
+iPh 17 Pro 2TB Blue EU;iStore;;.element_product_price span.product_price;17 PRO 2TB
+iPh 17 Pro 2TB White EU;iStore;;.element_product_price span.product_price;17 PRO 2TB
+iPh 17 Pro 2TB Orange EU;iStore;;.element_product_price span.product_price;17 PRO 2TB
+iPh 17 Pro 256 Blue eSim;iStore;https://www.istore.ua/ua/item/iphone-17-pro-256gb-esim-deep-blue/;.element_product_price span.product_price;17 PRO 256
+iPh 17 Pro 256 White eSim;iStore;https://www.istore.ua/ua/item/iphone-17-pro-256gb-esim-silver/;.element_product_price span.product_price;17 PRO 256
+iPh 17 Pro 256 Orange eSim;iStore;https://www.istore.ua/ua/item/iphone-17-pro-256gb-esim-cosmic-orange/;.element_product_price span.product_price;17 PRO 256
+iPh 17 Pro 512 Blue eSim;iStore;https://www.istore.ua/ua/item/iphone-17-pro-512gb-esim-deep-blue/;.element_product_price span.product_price;17 PRO 512
+iPh 17 Pro 512 White eSim;iStore;https://www.istore.ua/ua/item/iphone-17-pro-512gb-esim-silver/;.element_product_price span.product_price;17 PRO 512
+iPh 17 Pro 512 Orange eSim;iStore;https://www.istore.ua/ua/item/iphone-17-pro-512gb-esim-cosmic-orange/;.element_product_price span.product_price;17 PRO 512
+iPh 17 Pro 1TB Blue eSim;iStore;https://www.istore.ua/ua/item/iphone-17-pro-1tb-esim-deep-blue/;.element_product_price span.product_price;17 PRO 1TB
+iPh 17 Pro 1TB White eSim;iStore;https://www.istore.ua/ua/item/iphone-17-pro-1tb-esim-silver/;.element_product_price span.product_price;17 PRO 1TB
+iPh 17 Pro 1TB Orange eSim;iStore;https://www.istore.ua/ua/item/iphone-17-pro-1tb-esim-cosmic-orange/;.element_product_price span.product_price;17 PRO 1TB
+iPh 17 Pro 2TB Blue eSim;iStore;;.element_product_price span.product_price;17 PRO 2TB
+iPh 17 Pro 2TB White eSim;iStore;;.element_product_price span.product_price;17 PRO 2TB
+iPh 17 Pro 2TB Orange eSim;iStore;;.element_product_price span.product_price;17 PRO 2TB
+iPh 17 Pro Max 256 Blue EU;iStore;https://www.istore.ua/ua/item/iphone-17-pro-max-256gb-deep-blue/;.element_product_price span.product_price;17 PM 256
+iPh 17 Pro Max 256 White EU;iStore;https://www.istore.ua/ua/item/iphone-17-pro-max-256gb-silver/;.element_product_price span.product_price;17 PM 256
+iPh 17 Pro Max 256 Orange EU;iStore;https://www.istore.ua/ua/item/iphone-17-pro-max-256gb-cosmic-orange/;.element_product_price span.product_price;17 PM 256
+iPh 17 Pro Max 512 Blue EU;iStore;https://www.istore.ua/ua/item/iphone-17-pro-max-512-gb-deep-blue/;.element_product_price span.product_price;17 PM 512
+iPh 17 Pro Max 512 White EU;iStore;https://www.istore.ua/ua/item/iphone-17-pro-max-512gb-silver/;.element_product_price span.product_price;17 PM 512
+iPh 17 Pro Max 512 Orange EU;iStore;https://www.istore.ua/ua/item/iphone-17-pro-max-512gb-cosmic-orange/;.element_product_price span.product_price;17 PM 512
+iPh 17 Pro Max 1TB Blue EU;iStore;https://www.istore.ua/ua/item/iphone-17-pro-max-1-tb-deep-blue/;.element_product_price span.product_price;17 PM 1TB
+iPh 17 Pro Max 1TB White EU;iStore;https://www.istore.ua/ua/item/iphone-17-pro-max-1tb-silver/;.element_product_price span.product_price;17 PM 1TB
+iPh 17 Pro Max 1TB Orange EU;iStore;https://www.istore.ua/ua/item/iphone-17-pro-max-1tb-cosmic-orange/;.element_product_price span.product_price;17 PM 1TB
+iPh 17 Pro Max 2TB Blue EU;iStore;https://www.istore.ua/ua/item/iphone-17-pro-max-2-tb-deep-blue/;.element_product_price span.product_price;17 PM 2TB
+iPh 17 Pro Max 2TB White EU;iStore;https://www.istore.ua/ua/item/iphone-17-pro-max-2tb-silver/;.element_product_price span.product_price;17 PM 2TB
+iPh 17 Pro Max 2TB Orange EU;iStore;https://www.istore.ua/ua/item/iphone-17-pro-max-2tb-cosmic-orange/;.element_product_price span.product_price;17 PM 2TB
+iPh 17 Pro Max 256 Blue eSim;iStore;https://www.istore.ua/ua/item/iphone-17-pro-max-256gb-esim-deep-blue/;.element_product_price span.product_price;17 PM 256
+iPh 17 Pro Max 256 White eSim;iStore;https://www.istore.ua/ua/item/iphone-17-pro-max-256gb-esim-silver/;.element_product_price span.product_price;17 PM 256
+iPh 17 Pro Max 256 Orange eSim;iStore;https://www.istore.ua/ua/item/iphone-17-pro-max-256gb-esim-cosmic-orange/;.element_product_price span.product_price;17 PM 256
+iPh 17 Pro Max 512 Blue eSim;iStore;https://www.istore.ua/ua/item/iphone-17-pro-max-512gb-esim-deep-blue/;.element_product_price span.product_price;17 PM 512
+iPh 17 Pro Max 512 White eSim;iStore;https://www.istore.ua/ua/item/iphone-17-pro-max-512gb-esim-silver/;.element_product_price span.product_price;17 PM 512
+iPh 17 Pro Max 512 Orange eSim;iStore;https://www.istore.ua/ua/item/iphone-17-pro-max-512gb-esim-cosmic-orange/;.element_product_price span.product_price;17 PM 512
+iPh 17 Pro Max 1TB Blue eSim;iStore;https://www.istore.ua/ua/item/iphone-17-pro-max-1tb-esim-deep-blue/;.element_product_price span.product_price;17 PM 1TB
+iPh 17 Pro Max 1TB White eSim;iStore;https://www.istore.ua/ua/item/iphone-17-pro-max-1tb-esim-silver/;.element_product_price span.product_price;17 PM 1TB
+iPh 17 Pro Max 1TB Orange eSim;iStore;https://www.istore.ua/ua/item/iphone-17-pro-max-1tb-esim-cosmic-orange/;.element_product_price span.product_price;17 PM 1TB
+iPh 17 Pro Max 2TB Blue eSim;iStore;https://www.istore.ua/ua/item/iphone-17-pro-max-2tb-esim-deep-blue/;.element_product_price span.product_price;17 PM 2TB
+iPh 17 Pro Max 2TB White eSim;iStore;https://www.istore.ua/ua/item/iphone-17-pro-max-2tb-esim-silver/;.element_product_price span.product_price;17 PM 2TB
+iPh 17 Pro Max 2TB Orange eSim;iStore;https://www.istore.ua/ua/item/iphone-17-pro-max-2tb-esim-cosmic-orange/;.element_product_price span.product_price;17 PM 2TB
 iPh 17 Pro 256 Blue EU;Jabko;https://jabko.ua/rus/product/apple-iphone-17-pro-256gb-dark-blue;.price-new__uah;17 PRO 256
 iPh 17 Pro 256 White EU;Jabko;https://jabko.ua/rus/product/apple-iphone-17-pro-256gb-gray;.price-new__uah;17 PRO 256
 iPh 17 Pro 256 Orange EU;Jabko;https://jabko.ua/rus/product/apple-iphone-17-pro-256gb-orange;.price-new__uah;17 PRO 256
@@ -143,6 +191,18 @@ iPh 17 Pro Max 1TB Orange eSim;GRO;https://grokholsky.com/ua/product/apple/iphon
 iPh 17 Pro Max 2TB Blue eSim;GRO;https://grokholsky.com/ua/product/apple/iphone/iphone-17-pro-max/smartfon-apple-iphone-17-pro-max-2tb-esim-deep-blue-mfxu4/;.product-price-value;17 PM 2TB
 iPh 17 Pro Max 2TB White eSim;GRO;https://grokholsky.com/ua/product/apple/iphone/iphone-17-pro-max/smartfon-apple-iphone-17-pro-max-2tb-esim-silver-mfxr4/;.product-price-value;17 PM 2TB
 iPh 17 Pro Max 2TB Orange eSim;GRO;https://grokholsky.com/ua/product/apple/iphone/iphone-17-pro-max/smartfon-apple-iphone-17-pro-max-2tb-esim-cosmic-orange-mfxt4/;.product-price-value;17 PM 2TB
+iPh Air 256 Gold;iStore;https://www.istore.ua/ua/item/iphone-air-256gb-light-gold/;.element_product_price span.product_price;Air 256
+iPh Air 256 Blue;iStore;https://www.istore.ua/ua/item/iphone-air-256gb-sky-blue/;.element_product_price span.product_price;Air 256
+iPh Air 256 Black;iStore;https://www.istore.ua/ua/item/iphone-air-256gb-space-black/;.element_product_price span.product_price;Air 256
+iPh Air 256 White;iStore;https://www.istore.ua/ua/item/iphone-air-256gb-cloud-white/;.element_product_price span.product_price;Air 256
+iPh Air 512 Gold;iStore;https://www.istore.ua/ua/item/iphone-air-512-gb-light-gold/;.element_product_price span.product_price;Air 512
+iPh Air 512 Blue;iStore;https://www.istore.ua/ua/item/iphone-air-512-gb-sky-blue/;.element_product_price span.product_price;Air 512
+iPh Air 512 Black;iStore;https://www.istore.ua/ua/item/iphone-air-512-gb-space-black/;.element_product_price span.product_price;Air 512
+iPh Air 512 White;iStore;https://www.istore.ua/ua/item/iphone-air-512-gb-cloud-white/;.element_product_price span.product_price;Air 512
+iPh Air 1TB Gold;iStore;https://www.istore.ua/ua/item/iphone-air-1-tb-light-gold/;.element_product_price span.product_price;Air 1TB
+iPh Air 1TB Blue;iStore;https://www.istore.ua/ua/item/iphone-air-1-tb-sky-blue/;.element_product_price span.product_price;Air 1TB
+iPh Air 1TB Black;iStore;https://www.istore.ua/ua/item/iphone-air-1-tb-space-black/;.element_product_price span.product_price;Air 1TB
+iPh Air 1TB White;iStore;https://www.istore.ua/ua/item/iphone-air-1tb-cloud-white/;.element_product_price span.product_price;Air 1TB
 iPh Air 256 Gold;Jabko;https://jabko.ua/rus/product/apple-iphone-17-air-256gb-light-gold-e-sim;.price-new__uah;Air 256
 iPh Air 256 Blue;Jabko;https://jabko.ua/rus/product/apple-iphone-17-air-256gb-light-blue-e-sim;.price-new__uah;Air 256
 iPh Air 256 Black;Jabko;https://jabko.ua/rus/product/apple-iphone-17-air-256gb-black-e-sim;.price-new__uah;Air 256
