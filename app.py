@@ -213,6 +213,9 @@ st.markdown("""<style>
     .usd { color: #FF4B4B; font-weight: 700; font-size: 0.9em; }
     .log-line { font-family: monospace; font-size: 0.95em; margin: 2px 0; }
     .log-usd { color: #FF4B4B; font-weight: bold; }
+    
+    /* НОВЫЕ СТИЛИ ДЛЯ ЛУЧШЕЙ ЦЕНЫ */
+    td:has(.best-price) { background-color: #f0fdf4 !important; border: 2px solid #22c55e !important; }
 </style>""", unsafe_allow_html=True)
 
 st.title("📱 Мониторинг")
@@ -251,13 +254,28 @@ for i, tab_ui in enumerate(tabs):
             sel_cat = st.selectbox("Категория:", cats, key=f"cat_{tag_key}")
             f_df = df_tab[df_tab['Категория'] == sel_cat].copy().sort_values('order')
             
-            if not f_df.empty:
-                f_df['Display'] = f_df['Цена'].apply(lambda x: f'<span class="uah">{x:,} ₴</span><span class="usd">{int(x/user_rate):,} $</span>')
+           if not f_df.empty:
+                # 1. Находим минимальную цену для каждой модели
+                min_prices = f_df.groupby('M')['Цена'].transform('min')
+                f_df['is_min'] = f_df['Цена'] == min_prices
+                
+                # 2. Формируем ячейки (добавляем класс best-price для минимума)
+                def format_cell(row):
+                    uah = f"{row['Цена']:,} ₴"
+                    usd = f"{int(row['Цена'] / user_rate):,} $"
+                    if row['is_min']:
+                        return f'<div class="best-price"><span class="uah">{uah}</span><span class="usd">{usd}</span></div>'
+                    else:
+                        return f'<div><span class="uah">{uah}</span><span class="usd">{usd}</span></div>'
+
+                f_df['Display'] = f_df.apply(format_cell, axis=1)
+                
+                # 3. Собираем таблицу
                 f_df['M'] = pd.Categorical(f_df['M'], categories=f_df['M'].unique(), ordered=True)
                 pivot = f_df.pivot_table(index='M', columns='S', values='Display', aggfunc='first', sort=False).fillna('—')
                 pivot.index.name = pivot.columns.name = None
                 st.markdown(f'<div class="table-container">{pivot.to_html(escape=False)}</div>', unsafe_allow_html=True)
-
+               
                 st.markdown("---")
                 with st.expander("Отслеживание цены"):
                     hc1, hc2, hc3 = st.columns(3)
