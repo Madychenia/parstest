@@ -254,9 +254,9 @@ for i, tab_ui in enumerate(tabs):
             sel_cat = st.selectbox("Категория:", cats, key=f"cat_{tag_key}")
             f_df = df_tab[df_tab['Категория'] == sel_cat].copy().sort_values('order')
         if not f_df.empty:
-            # 1. Находим минимальную цену для каждой модели
-            min_prices = f_df.groupby('M')['Цена'].transform('min')
-            f_df['is_min'] = f_df['Цена'] == min_prices
+                # 1. Находим минимальную цену для каждой модели
+                min_prices = f_df.groupby('M')['Цена'].transform('min')
+                f_df['is_min'] = f_df['Цена'] == min_prices
                 
                 # 2. Формируем ячейки (добавляем класс best-price для минимума)
                 def format_cell(row):
