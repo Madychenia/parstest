@@ -1,4 +1,80 @@
 Модель;Магазин;Ссылка;Селектор;Категория
+iPh 13 128;iStore;https://www.istore.ua/ua/item/apple-iphone-13-128-gb-b-u-starlight-otlichnoe-sostoyanie-mlq73sf42h4rwxgr/;.element_product_price span.product_price;iPh 13
+iPh 13 256;iStore;https://www.istore.ua/ua/item/apple-iphone-13-256-gb-b-u-starlight-idelnoe-sostoyanie-mlq73sltj9t7vd2p/;.element_product_price span.product_price;iPh 13
+iPh 13 512;iStore;;.element_product_price span.product_price;iPh 13
+iPh 13 Mini 128;iStore;https://www.istore.ua/ua/item/apple-iphone-13-mini-128-gb-b-u-pink-otlichnoe-sostoyanie-mlk23svjmwgxf60g/;.element_product_price span.product_price;iPh 13
+iPh 13 Mini 256;iStore;;.element_product_price span.product_price;iPh 13
+iPh 13 Mini 512;iStore;;.element_product_price span.product_price;iPh 13
+iPh 13 Pro 128;iStore;;.element_product_price span.product_price;iPh 13
+iPh 13 Pro 256;iStore;https://www.istore.ua/ua/item/apple-iphone-13-pro-256-gb-b-u-sierra-blue-otlichnoe-sostoyanie-mlvd3smxr9xn4725/;.element_product_price span.product_price;iPh 13
+iPh 13 Pro 512;iStore;https://www.istore.ua/ua/item/apple-iphone-13-pro-512-gb-b-u-gold-idealnoe-sostoyanie-mlvk3sy7032c6fc3/;.element_product_price span.product_price;iPh 13
+iPh 13 Pro 1TB;iStore;;.element_product_price span.product_price;iPh 13
+iPh 13 Pro Max 128;iStore;https://www.istore.ua/ua/item/apple-iphone-13-pro-max-128-gb-b-u-sierra-blue-otlichnoe-sostoyanie-mll93sm24vct26ml/;.element_product_price span.product_price;iPh 13
+iPh 13 Pro Max 256;iStore;https://www.istore.ua/ua/item/apple-iphone-13-pro-max-256-gb-b-u-gold-idealnoe-sostoyanie-mll83sl2wcd2fdvq/;.element_product_price span.product_price;iPh 13
+iPh 13 Pro Max 512;iStore;;.element_product_price span.product_price;iPh 13
+iPh 13 Pro Max 1TB;iStore;;.element_product_price span.product_price;iPh 13
+iPh 14 128 eSim;iStore;https://www.istore.ua/ua/item/apple-iphone-14-128-gb-b-u-esim-purple-idealnoe-sostoyanie-mpv03sgynykqv6dg/;.element_product_price span.product_price;iPh 14 eSim
+iPh 14 256 eSim;iStore;;.element_product_price span.product_price;iPh 14 eSim
+iPh 14 512 eSim;iStore;;.element_product_price span.product_price;iPh 14 eSim
+iPh 14 128 EU;iStore;https://www.istore.ua/ua/item/apple-iphone-14-128-gb-b-u-midnight-idealnoe-sostoyanie-mpuf3smpqgh1h064/;.element_product_price span.product_price;iPh 14 EU
+iPh 14 256 EU;iStore;;.element_product_price span.product_price;iPh 14 EU
+iPh 14 512 EU;iStore;;.element_product_price span.product_price;iPh 14 EU
+iPh 14 Pro 128 eSim;iStore;https://www.istore.ua/ua/item/apple-iphone-14-pro-128-gb-b-u-esim-deep-purple-otlichnoe-sostoyanie-mq0e3sf6x0r9kmhf/;.element_product_price span.product_price;iPh 14 eSim
+iPh 14 Pro 256 eSim;iStore;;.element_product_price span.product_price;iPh 14 eSim
+iPh 14 Pro 512 eSim;iStore;;.element_product_price span.product_price;iPh 14 eSim
+iPh 14 Pro 1TB eSim;iStore;;.element_product_price span.product_price;iPh 14 eSim
+iPh 14 Pro 128 EU;iStore;https://www.istore.ua/ua/item/apple-iphone-14-pro-128-gb-b-u-space-black-otlichnoe-sostoyanie-mpxv3sk52d49f4g3/;.element_product_price span.product_price;iPh 14 EU
+iPh 14 Pro 256 EU;iStore;https://www.istore.ua/ua/item/apple-iphone-14-pro-256-gb-b-u-deep-purple-otlichnoe-sostoyanie-mq1f3slqnf2gp9y3/;.element_product_price span.product_price;iPh 14 EU
+iPh 14 Pro 512 EU;iStore;https://www.istore.ua/ua/item/apple-iphone-14-pro-512-gb-b-u-silver-otlichnoe-sostoyanie-mq1w3sk2xfcy7c6c/;.element_product_price span.product_price;iPh 14 EU
+iPh 14 Pro 1TB EU;iStore;;.element_product_price span.product_price;iPh 14 EU
+iPh 14 Pro Max 128 eSim;iStore;https://www.istore.ua/ua/item/apple-iphone-14-pro-max-128-gb-b-u-deep-purple-otlichnoe-sostoyanie-mq8r3sdwrqyf2rcm/;.element_product_price span.product_price;iPh 14 eSim
+iPh 14 Pro Max 256 eSim;iStore;https://www.istore.ua/ua/item/apple-iphone-14-pro-max-256-gb-b-u-esim-deep-purple-otlichnoe-sostoyanie-mq8r3sjrgdlq16gr/;.element_product_price span.product_price;iPh 14 eSim
+iPh 14 Pro Max 512 eSim;iStore;;.element_product_price span.product_price;iPh 14 eSim
+iPh 14 Pro Max 1TB eSim;iStore;;.element_product_price span.product_price;iPh 14 eSim
+iPh 14 Pro Max 128 EU;iStore;https://www.istore.ua/ua/item/apple-iphone-14-pro-max-128-gb-b-u-space-black-idealnoe-sostoyanie-mq9p3sk73j2kq1fy/;.element_product_price span.product_price;iPh 14 EU
+iPh 14 Pro Max 256 EU;iStore;https://www.istore.ua/ua/item/apple-iphone-14-pro-max-256-gb-b-u-silver-idealnoe-sostoyanie-mq9v3sdg4v3q9mfc/;.element_product_price span.product_price;iPh 14 EU
+iPh 14 Pro Max 512 EU;iStore;;.element_product_price span.product_price;iPh 14 EU
+iPh 14 Pro Max 1TB EU;iStore;;.element_product_price span.product_price;iPh 14 EU
+iPh 15 128 eSim;iStore;;.element_product_price span.product_price;iPh 15 eSim
+iPh 15 256 eSim;iStore;;.element_product_price span.product_price;iPh 15 eSim
+iPh 15 512 eSim;iStore;;.element_product_price span.product_price;iPh 15 eSim
+iPh 15 128 EU;iStore;;.element_product_price span.product_price;iPh 15 EU
+iPh 15 256 EU;iStore;;.element_product_price span.product_price;iPh 15 EU
+iPh 15 512 EU;iStore;;.element_product_price span.product_price;iPh 15 EU
+iPh 15 Pro 128 eSim;iStore;;.element_product_price span.product_price;iPh 15 eSim
+iPh 15 Pro 256 eSim;iStore;;.element_product_price span.product_price;iPh 15 eSim
+iPh 15 Pro 512 eSim;iStore;;.element_product_price span.product_price;iPh 15 eSim
+iPh 15 Pro 1TB eSim;iStore;;.element_product_price span.product_price;iPh 15 eSim
+iPh 15 Pro 128 EU;iStore;https://www.istore.ua/ua/item/apple-iphone-15-pro-128-gb-b-u-natural-titanium-idealnoe-sostoyanie-mtux3sgkvncfpqxv/;.element_product_price span.product_price;iPh 15 EU
+iPh 15 Pro 256 EU;iStore;https://www.istore.ua/ua/item/apple-iphone-15-pro-256-gb-b-u-natural-titanium-idealnoe-sostoyanie-mtv53sjj4x60c42j/;.element_product_price span.product_price;iPh 15 EU
+iPh 15 Pro 512 EU;iStore;;.element_product_price span.product_price;iPh 15 EU
+iPh 15 Pro 1TB EU;iStore;;.element_product_price span.product_price;iPh 15 EU
+iPh 15 Pro Max 256 eSim;iStore;;.element_product_price span.product_price;iPh 15 eSim
+iPh 15 Pro Max 512 eSim;iStore;;.element_product_price span.product_price;iPh 15 eSim
+iPh 15 Pro Max 1TB eSim;iStore;;.element_product_price span.product_price;iPh 15 eSim
+iPh 15 Pro Max 256 EU;iStore;https://www.istore.ua/ua/item/apple-iphone-15-pro-max-256-gb-b-u-black-titanium-idealnoe-sostoyanie-mu773scxk770f279/;.element_product_price span.product_price;iPh 15 EU
+iPh 15 Pro Max 512 EU;iStore;;.element_product_price span.product_price;iPh 15 EU
+iPh 15 Pro Max 1TB EU;iStore;https://www.istore.ua/ua/item/apple-iphone-15-pro-max-1-tb-b-u-blue-titanium-otlichnoe-sostoyanie-mu7k3sm7fdvfh40p/;.element_product_price span.product_price;iPh 15 EU
+iPh 16 128 eSim;iStore;;.element_product_price span.product_price;iPh 16 eSim
+iPh 16 256 eSim;iStore;;.element_product_price span.product_price;iPh 16 eSim
+iPh 16 512 eSim;iStore;;.element_product_price span.product_price;iPh 16 eSim
+iPh 16 128 EU;iStore;https://www.istore.ua/ua/item/iphone-16-128-gb-black-b-u-idealniy-stan-mye73sj9cyfyc2jd-mye73sf5x2w2r4lq/;.element_product_price span.product_price;iPh 16 EU
+iPh 16 256 EU;iStore;;.element_product_price span.product_price;iPh 16 EU
+iPh 16 512 EU;iStore;;.element_product_price span.product_price;iPh 16 EU
+iPh 16 Pro 128 eSim;iStore;https://www.istore.ua/ua/item/iphone-16-pro-128-gb-esim-black-titanium-b-u-idealnoe-sostoyanie-mym93skmw0xw76nd/;.element_product_price span.product_price;iPh 16 eSim
+iPh 16 Pro 256 eSim;iStore;;.element_product_price span.product_price;iPh 16 eSim
+iPh 16 Pro 512 eSim;iStore;;.element_product_price span.product_price;iPh 16 eSim
+iPh 16 Pro 1TB eSim;iStore;;.element_product_price span.product_price;iPh 16 eSim
+iPh 16 Pro 128 EU;iStore;https://www.istore.ua/ua/item/iphone-16-pro-128-gb-natural-titanium-b-u-idealnoe-sostoyanie-myng3sgl6k7221pm/;.element_product_price span.product_price;iPh 16 EU
+iPh 16 Pro 256 EU;iStore;https://www.istore.ua/ua/item/iphone-16-pro-256-gb-black-titanium-b-u-idealnoe-sostoyanie-mynh3skycqgfkq5x/;.element_product_price span.product_price;iPh 16 EU
+iPh 16 Pro 512 EU;iStore;;.element_product_price span.product_price;iPh 16 EU
+iPh 16 Pro 1TB EU;iStore;;.element_product_price span.product_price;iPh 16 EU
+iPh 16 Pro Max 256 eSim;iStore;;.element_product_price span.product_price;iPh 16 eSim
+iPh 16 Pro Max 512 eSim;iStore;;.element_product_price span.product_price;iPh 16 eSim
+iPh 16 Pro Max 1TB eSim;iStore;;.element_product_price span.product_price;iPh 16 eSim
+iPh 16 Pro Max 256 EU;iStore;https://www.istore.ua/ua/item/iphone-16-pro-max-256-gb-black-titanium-b-u-idealnoe-sostoyanie-mywv3sjqnq7w6t71/;.element_product_price span.product_price;iPh 16 EU
+iPh 16 Pro Max 512 EU;iStore;https://www.istore.ua/ua/item/iphone-16-pro-max-512-gb-desert-titanium-b-u-idealnoe-sostoyanie-myx23sgk0x1d43qx/;.element_product_price span.product_price;iPh 16 EU
+iPh 16 Pro Max 1TB EU;iStore;;.element_product_price span.product_price;iPh 16 EU
 iPh 13 128;Jabko;https://jabko.ua/rus/iphone/b-u-iphone/b-u-apple-iphone-13/bu-iphone-13-128gb-midnight-idealnyi-stan-nova-batareya;.price-new__uah;iPh 13
 iPh 13 256;Jabko;https://jabko.ua/rus/iphone/b-u-iphone/b-u-apple-iphone-13/bu-iphone-13-256gb-midnight-idealnyi-stan-nova-batareya;.price-new__uah;iPh 13
 iPh 13 512;Jabko;https://jabko.ua/rus/product/bu-iphone-13-512gb-blue-yak-novyi;.price-new__uah;iPh 13
