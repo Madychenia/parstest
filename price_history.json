@@ -62,6 +62,13 @@
       "cat": "iPh 13",
       "type": "u",
       "order": 0
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 16151,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 76
     }
   ],
   "iPh 17 Pro 256 Blue EU | Jabko | n": [
@@ -157,6 +164,13 @@
       "cat": "iPh 13",
       "type": "u",
       "order": 1
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 17897,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 77
     }
   ],
   "iPh 13 512 | Jabko | u": [
@@ -222,6 +236,13 @@
       "cat": "iPh 13",
       "type": "u",
       "order": 2
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 18333,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 78
     }
   ],
   "iPh 13 Pro 128 | Jabko | u": [
@@ -294,6 +315,13 @@
       "cat": "iPh 13",
       "type": "u",
       "order": 6
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 20516,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 82
     }
   ],
   "iPh 13 Pro 256 | Jabko | u": [
@@ -366,6 +394,13 @@
       "cat": "iPh 13",
       "type": "u",
       "order": 7
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 22262,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 83
     }
   ],
   "iPh 13 Pro 512 | Jabko | u": [
@@ -438,6 +473,13 @@
       "cat": "iPh 13",
       "type": "u",
       "order": 8
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 23571,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 84
     }
   ],
   "iPh 13 Pro 1TB | Jabko | u": [
@@ -510,6 +552,13 @@
       "cat": "iPh 13",
       "type": "u",
       "order": 9
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 24444,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 85
     }
   ],
   "iPh 13 Pro Max 128 | Jabko | u": [
@@ -575,6 +624,13 @@
       "cat": "iPh 13",
       "type": "u",
       "order": 10
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 22262,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 86
     }
   ],
   "iPh 13 Pro Max 256 | Jabko | u": [
@@ -640,6 +696,13 @@
       "cat": "iPh 13",
       "type": "u",
       "order": 11
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 24881,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 87
     }
   ],
   "iPh 13 Pro Max 512 | Jabko | u": [
@@ -705,6 +768,13 @@
       "cat": "iPh 13",
       "type": "u",
       "order": 12
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 26190,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 88
     }
   ],
   "iPh 13 Pro Max 1TB | Jabko | u": [
@@ -770,6 +840,13 @@
       "cat": "iPh 13",
       "type": "u",
       "order": 13
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 27063,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 89
     }
   ],
   "iPh 13 128 | Anika | u": [
@@ -2716,6 +2793,13 @@
       "cat": "17 PRO 256",
       "type": "n",
       "order": 144
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 60289,
+      "cat": "17 PRO 256",
+      "type": "n",
+      "order": 144
     }
   ],
   "iPh 17 Pro 256 White EU | GRO | n": [
@@ -2778,6 +2862,13 @@
     {
       "time": "09.04 00:53",
       "price": 63149,
+      "cat": "17 PRO 256",
+      "type": "n",
+      "order": 145
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 64379,
       "cat": "17 PRO 256",
       "type": "n",
       "order": 145
@@ -2857,6 +2948,13 @@
     {
       "time": "09.04 00:53",
       "price": 58789,
+      "cat": "17 PRO 256",
+      "type": "n",
+      "order": 146
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 58489,
       "cat": "17 PRO 256",
       "type": "n",
       "order": 146
@@ -2943,6 +3041,13 @@
     {
       "time": "09.04 00:53",
       "price": 71659,
+      "cat": "17 PRO 512",
+      "type": "n",
+      "order": 147
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 71609,
       "cat": "17 PRO 512",
       "type": "n",
       "order": 147
@@ -3046,6 +3151,13 @@
       "cat": "17 PRO 512",
       "type": "n",
       "order": 148
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 72969,
+      "cat": "17 PRO 512",
+      "type": "n",
+      "order": 148
     }
   ],
   "iPh 17 Pro 512 Orange EU | GRO | n": [
@@ -3118,6 +3230,13 @@
       "cat": "17 PRO 512",
       "type": "n",
       "order": 149
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 68129,
+      "cat": "17 PRO 512",
+      "type": "n",
+      "order": 149
     }
   ],
   "iPh 17 Pro 1TB Blue EU | GRO | n": [
@@ -3187,6 +3306,13 @@
     {
       "time": "09.04 00:53",
       "price": 84079,
+      "cat": "17 PRO 1TB",
+      "type": "n",
+      "order": 150
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 83989,
       "cat": "17 PRO 1TB",
       "type": "n",
       "order": 150
@@ -3280,6 +3406,13 @@
     {
       "time": "09.04 00:53",
       "price": 86629,
+      "cat": "17 PRO 1TB",
+      "type": "n",
+      "order": 151
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 86389,
       "cat": "17 PRO 1TB",
       "type": "n",
       "order": 151
@@ -3383,6 +3516,13 @@
       "cat": "17 PRO 1TB",
       "type": "n",
       "order": 152
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 82499,
+      "cat": "17 PRO 1TB",
+      "type": "n",
+      "order": 152
     }
   ],
   "iPh 17 Pro 256 Blue eSim | GRO | n": [
@@ -3483,6 +3623,13 @@
       "cat": "17 PRO 256",
       "type": "n",
       "order": 156
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 57109,
+      "cat": "17 PRO 256",
+      "type": "n",
+      "order": 156
     }
   ],
   "iPh 17 Pro 256 White eSim | GRO | n": [
@@ -3576,6 +3723,13 @@
       "cat": "17 PRO 256",
       "type": "n",
       "order": 157
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 58729,
+      "cat": "17 PRO 256",
+      "type": "n",
+      "order": 157
     }
   ],
   "iPh 17 Pro 256 Orange eSim | GRO | n": [
@@ -3659,6 +3813,13 @@
     {
       "time": "09.04 00:53",
       "price": 56179,
+      "cat": "17 PRO 256",
+      "type": "n",
+      "order": 158
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 55929,
       "cat": "17 PRO 256",
       "type": "n",
       "order": 158
@@ -3762,6 +3923,13 @@
       "cat": "17 PRO 512",
       "type": "n",
       "order": 159
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 65939,
+      "cat": "17 PRO 512",
+      "type": "n",
+      "order": 159
     }
   ],
   "iPh 17 Pro 512 White eSim | GRO | n": [
@@ -3845,6 +4013,13 @@
     {
       "time": "09.04 00:53",
       "price": 70119,
+      "cat": "17 PRO 512",
+      "type": "n",
+      "order": 160
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 70039,
       "cat": "17 PRO 512",
       "type": "n",
       "order": 160
@@ -3948,6 +4123,13 @@
       "cat": "17 PRO 512",
       "type": "n",
       "order": 161
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 65649,
+      "cat": "17 PRO 512",
+      "type": "n",
+      "order": 161
     }
   ],
   "iPh 17 Pro 1TB Blue eSim | GRO | n": [
@@ -4041,6 +4223,13 @@
       "cat": "17 PRO 1TB",
       "type": "n",
       "order": 114
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 79789,
+      "cat": "17 PRO 1TB",
+      "type": "n",
+      "order": 162
     }
   ],
   "iPh 17 Pro 1TB White eSim | GRO | n": [
@@ -4141,6 +4330,13 @@
       "cat": "17 PRO 1TB",
       "type": "n",
       "order": 163
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 84189,
+      "cat": "17 PRO 1TB",
+      "type": "n",
+      "order": 163
     }
   ],
   "iPh 17 Pro 1TB Orange eSim | GRO | n": [
@@ -4234,6 +4430,13 @@
       "cat": "17 PRO 1TB",
       "type": "n",
       "order": 164
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 75679,
+      "cat": "17 PRO 1TB",
+      "type": "n",
+      "order": 164
     }
   ],
   "iPh 17 Pro Max 256 Blue EU | GRO | n": [
@@ -4317,6 +4520,13 @@
     {
       "time": "09.04 00:53",
       "price": 64069,
+      "cat": "17 PM 256",
+      "type": "n",
+      "order": 168
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 63999,
       "cat": "17 PM 256",
       "type": "n",
       "order": 168
@@ -4410,6 +4620,13 @@
     {
       "time": "09.04 00:53",
       "price": 65549,
+      "cat": "17 PM 256",
+      "type": "n",
+      "order": 169
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 65909,
       "cat": "17 PM 256",
       "type": "n",
       "order": 169
@@ -4513,6 +4730,13 @@
       "cat": "17 PM 256",
       "type": "n",
       "order": 170
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 63659,
+      "cat": "17 PM 256",
+      "type": "n",
+      "order": 170
     }
   ],
   "iPh 17 Pro Max 512 Blue EU | GRO | n": [
@@ -4589,6 +4813,13 @@
     {
       "time": "09.04 00:53",
       "price": 74049,
+      "cat": "17 PM 512",
+      "type": "n",
+      "order": 171
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 73789,
       "cat": "17 PM 512",
       "type": "n",
       "order": 171
@@ -4699,6 +4930,13 @@
       "cat": "17 PM 512",
       "type": "n",
       "order": 172
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 76949,
+      "cat": "17 PM 512",
+      "type": "n",
+      "order": 172
     }
   ],
   "iPh 17 Pro Max 512 Orange EU | GRO | n": [
@@ -4775,6 +5013,13 @@
     {
       "time": "09.04 00:53",
       "price": 73909,
+      "cat": "17 PM 512",
+      "type": "n",
+      "order": 173
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 73569,
       "cat": "17 PM 512",
       "type": "n",
       "order": 173
@@ -4878,6 +5123,13 @@
       "cat": "17 PM 1TB",
       "type": "n",
       "order": 174
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 87089,
+      "cat": "17 PM 1TB",
+      "type": "n",
+      "order": 174
     }
   ],
   "iPh 17 Pro Max 1TB White EU | GRO | n": [
@@ -4975,6 +5227,13 @@
     {
       "time": "09.04 00:53",
       "price": 92289,
+      "cat": "17 PM 1TB",
+      "type": "n",
+      "order": 175
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 91189,
       "cat": "17 PM 1TB",
       "type": "n",
       "order": 175
@@ -5150,6 +5409,13 @@
       "cat": "17 PM 2TB",
       "type": "n",
       "order": 177
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 98089,
+      "cat": "17 PM 2TB",
+      "type": "n",
+      "order": 177
     }
   ],
   "iPh 17 Pro Max 2TB White EU | GRO | n": [
@@ -5243,6 +5509,13 @@
       "cat": "17 PM 2TB",
       "type": "n",
       "order": 178
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 101979,
+      "cat": "17 PM 2TB",
+      "type": "n",
+      "order": 178
     }
   ],
   "iPh 17 Pro Max 2TB Orange EU | GRO | n": [
@@ -5326,6 +5599,13 @@
     {
       "time": "09.04 00:53",
       "price": 98999,
+      "cat": "17 PM 2TB",
+      "type": "n",
+      "order": 179
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 98949,
       "cat": "17 PM 2TB",
       "type": "n",
       "order": 179
@@ -5422,6 +5702,13 @@
       "cat": "17 PM 256",
       "type": "n",
       "order": 180
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 62209,
+      "cat": "17 PM 256",
+      "type": "n",
+      "order": 180
     }
   ],
   "iPh 17 Pro Max 256 White eSim | GRO | n": [
@@ -5498,6 +5785,13 @@
     {
       "time": "09.04 00:53",
       "price": 63809,
+      "cat": "17 PM 256",
+      "type": "n",
+      "order": 181
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 63729,
       "cat": "17 PM 256",
       "type": "n",
       "order": 181
@@ -5591,6 +5885,13 @@
     {
       "time": "09.04 00:53",
       "price": 60489,
+      "cat": "17 PM 256",
+      "type": "n",
+      "order": 182
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 60379,
       "cat": "17 PM 256",
       "type": "n",
       "order": 182
@@ -5780,6 +6081,13 @@
       "cat": "17 PM 512",
       "type": "n",
       "order": 184
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 73679,
+      "cat": "17 PM 512",
+      "type": "n",
+      "order": 184
     }
   ],
   "iPh 17 Pro Max 512 Orange eSim | GRO | n": [
@@ -5866,6 +6174,13 @@
       "cat": "17 PM 512",
       "type": "n",
       "order": 185
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 69759,
+      "cat": "17 PM 512",
+      "type": "n",
+      "order": 185
     }
   ],
   "iPh 17 Pro Max 1TB Blue eSim | GRO | n": [
@@ -5945,6 +6260,13 @@
       "cat": "17 PM 1TB",
       "type": "n",
       "order": 186
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 81449,
+      "cat": "17 PM 1TB",
+      "type": "n",
+      "order": 186
     }
   ],
   "iPh 17 Pro Max 1TB White eSim | GRO | n": [
@@ -6014,6 +6336,13 @@
     {
       "time": "09.04 00:53",
       "price": 84789,
+      "cat": "17 PM 1TB",
+      "type": "n",
+      "order": 187
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 84579,
       "cat": "17 PM 1TB",
       "type": "n",
       "order": 187
@@ -6100,6 +6429,13 @@
     {
       "time": "09.04 00:53",
       "price": 80409,
+      "cat": "17 PM 1TB",
+      "type": "n",
+      "order": 188
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 80309,
       "cat": "17 PM 1TB",
       "type": "n",
       "order": 188
@@ -6193,6 +6529,13 @@
     {
       "time": "09.04 00:53",
       "price": 90579,
+      "cat": "17 PM 2TB",
+      "type": "n",
+      "order": 189
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 90339,
       "cat": "17 PM 2TB",
       "type": "n",
       "order": 189
@@ -6296,6 +6639,13 @@
       "cat": "17 PM 2TB",
       "type": "n",
       "order": 190
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 94959,
+      "cat": "17 PM 2TB",
+      "type": "n",
+      "order": 190
     }
   ],
   "iPh 17 Pro Max 2TB Orange eSim | GRO | n": [
@@ -6379,6 +6729,13 @@
     {
       "time": "09.04 00:53",
       "price": 89909,
+      "cat": "17 PM 2TB",
+      "type": "n",
+      "order": 191
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 89889,
       "cat": "17 PM 2TB",
       "type": "n",
       "order": 191
@@ -6840,6 +7197,13 @@
       "cat": "Air 256",
       "type": "n",
       "order": 229
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 42159,
+      "cat": "Air 256",
+      "type": "n",
+      "order": 229
     }
   ],
   "iPh Air 256 Black | GRO | n": [
@@ -7019,6 +7383,13 @@
       "cat": "Air 256",
       "type": "n",
       "order": 231
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 42699,
+      "cat": "Air 256",
+      "type": "n",
+      "order": 231
     }
   ],
   "iPh Air 512 Gold | GRO | n": [
@@ -7102,6 +7473,13 @@
     {
       "time": "09.04 00:53",
       "price": 50989,
+      "cat": "Air 512",
+      "type": "n",
+      "order": 232
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 50979,
       "cat": "Air 512",
       "type": "n",
       "order": 232
@@ -7205,6 +7583,13 @@
       "cat": "Air 512",
       "type": "n",
       "order": 233
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 51989,
+      "cat": "Air 512",
+      "type": "n",
+      "order": 233
     }
   ],
   "iPh Air 512 Black | GRO | n": [
@@ -7291,6 +7676,13 @@
       "cat": "Air 512",
       "type": "n",
       "order": 234
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 52379,
+      "cat": "Air 512",
+      "type": "n",
+      "order": 234
     }
   ],
   "iPh Air 512 White | GRO | n": [
@@ -7374,6 +7766,13 @@
     {
       "time": "09.04 00:53",
       "price": 53089,
+      "cat": "Air 512",
+      "type": "n",
+      "order": 235
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 52999,
       "cat": "Air 512",
       "type": "n",
       "order": 235
@@ -7477,6 +7876,13 @@
       "cat": "Air 1TB",
       "type": "n",
       "order": 236
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 56589,
+      "cat": "Air 1TB",
+      "type": "n",
+      "order": 236
     }
   ],
   "iPh Air 1TB Blue | GRO | n": [
@@ -7570,6 +7976,13 @@
       "cat": "Air 1TB",
       "type": "n",
       "order": 177
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 54819,
+      "cat": "Air 1TB",
+      "type": "n",
+      "order": 237
     }
   ],
   "iPh Air 1TB Black | GRO | n": [
@@ -7663,6 +8076,13 @@
       "cat": "Air 1TB",
       "type": "n",
       "order": 238
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 57739,
+      "cat": "Air 1TB",
+      "type": "n",
+      "order": 238
     }
   ],
   "iPh Air 1TB White | GRO | n": [
@@ -7728,6 +8148,13 @@
       "cat": "Air 1TB",
       "type": "n",
       "order": 239
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 56779,
+      "cat": "Air 1TB",
+      "type": "n",
+      "order": 239
     }
   ],
   "iPh 13 Mini 128 | Jabko | u": [
@@ -7779,6 +8206,13 @@
       "cat": "iPh 13",
       "type": "u",
       "order": 3
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 12659,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 79
     }
   ],
   "iPh 13 Mini 256 | Jabko | u": [
@@ -7830,6 +8264,13 @@
       "cat": "iPh 13",
       "type": "u",
       "order": 4
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 14841,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 80
     }
   ],
   "iPh 13 Mini 512 | Jabko | u": [
@@ -7881,6 +8322,13 @@
       "cat": "iPh 13",
       "type": "u",
       "order": 5
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 14841,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 81
     }
   ],
   "iPh 14 128 eSim | Jabko | u": [
@@ -7932,6 +8380,13 @@
       "cat": "iPh 14 eSim",
       "type": "u",
       "order": 14
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 17242,
+      "cat": "iPh 14 eSim",
+      "type": "u",
+      "order": 90
     }
   ],
   "iPh 14 256 eSim | Jabko | u": [
@@ -7983,6 +8438,13 @@
       "cat": "iPh 14 eSim",
       "type": "u",
       "order": 15
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 19861,
+      "cat": "iPh 14 eSim",
+      "type": "u",
+      "order": 91
     }
   ],
   "iPh 14 512 eSim | Jabko | u": [
@@ -8034,6 +8496,13 @@
       "cat": "iPh 14 eSim",
       "type": "u",
       "order": 16
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 20734,
+      "cat": "iPh 14 eSim",
+      "type": "u",
+      "order": 92
     }
   ],
   "iPh 14 128 EU | Jabko | u": [
@@ -8085,6 +8554,13 @@
       "cat": "iPh 14 EU",
       "type": "u",
       "order": 17
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 18551,
+      "cat": "iPh 14 EU",
+      "type": "u",
+      "order": 93
     }
   ],
   "iPh 14 256 EU | Jabko | u": [
@@ -8136,6 +8612,13 @@
       "cat": "iPh 14 EU",
       "type": "u",
       "order": 18
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 21170,
+      "cat": "iPh 14 EU",
+      "type": "u",
+      "order": 94
     }
   ],
   "iPh 14 512 EU | Jabko | u": [
@@ -8187,6 +8670,13 @@
       "cat": "iPh 14 EU",
       "type": "u",
       "order": 19
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 22043,
+      "cat": "iPh 14 EU",
+      "type": "u",
+      "order": 95
     }
   ],
   "iPh 14 Pro 128 eSim | Jabko | u": [
@@ -8238,6 +8728,13 @@
       "cat": "iPh 14 eSim",
       "type": "u",
       "order": 20
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 23135,
+      "cat": "iPh 14 eSim",
+      "type": "u",
+      "order": 96
     }
   ],
   "iPh 14 Pro 256 eSim | Jabko | u": [
@@ -8289,6 +8786,13 @@
       "cat": "iPh 14 eSim",
       "type": "u",
       "order": 21
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 25317,
+      "cat": "iPh 14 eSim",
+      "type": "u",
+      "order": 97
     }
   ],
   "iPh 14 Pro 512 eSim | Jabko | u": [
@@ -8340,6 +8844,13 @@
       "cat": "iPh 14 eSim",
       "type": "u",
       "order": 22
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 26627,
+      "cat": "iPh 14 eSim",
+      "type": "u",
+      "order": 98
     }
   ],
   "iPh 14 Pro 1TB eSim | Jabko | u": [
@@ -8391,6 +8902,13 @@
       "cat": "iPh 14 eSim",
       "type": "u",
       "order": 23
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 26627,
+      "cat": "iPh 14 eSim",
+      "type": "u",
+      "order": 99
     }
   ],
   "iPh 14 Pro 128 EU | Jabko | u": [
@@ -8449,6 +8967,13 @@
       "cat": "iPh 14 EU",
       "type": "u",
       "order": 24
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 26190,
+      "cat": "iPh 14 EU",
+      "type": "u",
+      "order": 100
     }
   ],
   "iPh 14 Pro 256 EU | Jabko | u": [
@@ -8507,6 +9032,13 @@
       "cat": "iPh 14 EU",
       "type": "u",
       "order": 25
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 28373,
+      "cat": "iPh 14 EU",
+      "type": "u",
+      "order": 101
     }
   ],
   "iPh 14 Pro 512 EU | Jabko | u": [
@@ -8565,6 +9097,13 @@
       "cat": "iPh 14 EU",
       "type": "u",
       "order": 26
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 29682,
+      "cat": "iPh 14 EU",
+      "type": "u",
+      "order": 102
     }
   ],
   "iPh 14 Pro 1TB EU | Jabko | u": [
@@ -8623,6 +9162,13 @@
       "cat": "iPh 14 EU",
       "type": "u",
       "order": 27
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 30555,
+      "cat": "iPh 14 EU",
+      "type": "u",
+      "order": 103
     }
   ],
   "iPh 14 Pro Max 128 eSim | Jabko | u": [
@@ -8674,6 +9220,13 @@
       "cat": "iPh 14 eSim",
       "type": "u",
       "order": 28
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 25317,
+      "cat": "iPh 14 eSim",
+      "type": "u",
+      "order": 104
     }
   ],
   "iPh 14 Pro Max 256 eSim | Jabko | u": [
@@ -8725,6 +9278,13 @@
       "cat": "iPh 14 eSim",
       "type": "u",
       "order": 29
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 27063,
+      "cat": "iPh 14 eSim",
+      "type": "u",
+      "order": 105
     }
   ],
   "iPh 14 Pro Max 512 eSim | Jabko | u": [
@@ -8776,6 +9336,13 @@
       "cat": "iPh 14 eSim",
       "type": "u",
       "order": 30
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 28373,
+      "cat": "iPh 14 eSim",
+      "type": "u",
+      "order": 106
     }
   ],
   "iPh 14 Pro Max 1TB eSim | Jabko | u": [
@@ -8827,6 +9394,13 @@
       "cat": "iPh 14 eSim",
       "type": "u",
       "order": 31
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 29246,
+      "cat": "iPh 14 eSim",
+      "type": "u",
+      "order": 107
     }
   ],
   "iPh 14 Pro Max 128 EU | Jabko | u": [
@@ -8878,6 +9452,13 @@
       "cat": "iPh 14 EU",
       "type": "u",
       "order": 32
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 27936,
+      "cat": "iPh 14 EU",
+      "type": "u",
+      "order": 108
     }
   ],
   "iPh 14 Pro Max 256 EU | Jabko | u": [
@@ -8929,6 +9510,13 @@
       "cat": "iPh 14 EU",
       "type": "u",
       "order": 33
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 30555,
+      "cat": "iPh 14 EU",
+      "type": "u",
+      "order": 109
     }
   ],
   "iPh 14 Pro Max 512 EU | Jabko | u": [
@@ -8980,6 +9568,13 @@
       "cat": "iPh 14 EU",
       "type": "u",
       "order": 34
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 31865,
+      "cat": "iPh 14 EU",
+      "type": "u",
+      "order": 110
     }
   ],
   "iPh 14 Pro Max 1TB EU | Jabko | u": [
@@ -9031,6 +9626,13 @@
       "cat": "iPh 14 EU",
       "type": "u",
       "order": 35
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 32738,
+      "cat": "iPh 14 EU",
+      "type": "u",
+      "order": 111
     }
   ],
   "iPh 15 128 eSim | Jabko | u": [
@@ -9089,6 +9691,13 @@
       "cat": "iPh 15 eSim",
       "type": "u",
       "order": 36
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 23571,
+      "cat": "iPh 15 eSim",
+      "type": "u",
+      "order": 112
     }
   ],
   "iPh 15 256 eSim | Jabko | u": [
@@ -9140,6 +9749,13 @@
       "cat": "iPh 15 eSim",
       "type": "u",
       "order": 37
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 27500,
+      "cat": "iPh 15 eSim",
+      "type": "u",
+      "order": 113
     }
   ],
   "iPh 15 512 eSim | Jabko | u": [
@@ -9191,6 +9807,13 @@
       "cat": "iPh 15 eSim",
       "type": "u",
       "order": 38
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 28373,
+      "cat": "iPh 15 eSim",
+      "type": "u",
+      "order": 114
     }
   ],
   "iPh 15 128 EU | Jabko | u": [
@@ -9249,6 +9872,13 @@
       "cat": "iPh 15 EU",
       "type": "u",
       "order": 39
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 24881,
+      "cat": "iPh 15 EU",
+      "type": "u",
+      "order": 115
     }
   ],
   "iPh 15 256 EU | Jabko | u": [
@@ -9300,6 +9930,13 @@
       "cat": "iPh 15 EU",
       "type": "u",
       "order": 40
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 28809,
+      "cat": "iPh 15 EU",
+      "type": "u",
+      "order": 116
     }
   ],
   "iPh 15 512 EU | Jabko | u": [
@@ -9351,6 +9988,13 @@
       "cat": "iPh 15 EU",
       "type": "u",
       "order": 41
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 29682,
+      "cat": "iPh 15 EU",
+      "type": "u",
+      "order": 117
     }
   ],
   "iPh 15 Pro 128 eSim | Jabko | u": [
@@ -9416,6 +10060,13 @@
       "cat": "iPh 15 eSim",
       "type": "u",
       "order": 42
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 29900,
+      "cat": "iPh 15 eSim",
+      "type": "u",
+      "order": 118
     }
   ],
   "iPh 15 Pro 256 eSim | Jabko | u": [
@@ -9474,6 +10125,13 @@
       "cat": "iPh 15 eSim",
       "type": "u",
       "order": 43
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 32083,
+      "cat": "iPh 15 eSim",
+      "type": "u",
+      "order": 119
     }
   ],
   "iPh 15 Pro 512 eSim | Jabko | u": [
@@ -9539,6 +10197,13 @@
       "cat": "iPh 15 eSim",
       "type": "u",
       "order": 44
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 34265,
+      "cat": "iPh 15 eSim",
+      "type": "u",
+      "order": 120
     }
   ],
   "iPh 15 Pro 1TB eSim | Jabko | u": [
@@ -9604,6 +10269,13 @@
       "cat": "iPh 15 eSim",
       "type": "u",
       "order": 45
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 35138,
+      "cat": "iPh 15 eSim",
+      "type": "u",
+      "order": 121
     }
   ],
   "iPh 15 Pro 128 EU | Jabko | u": [
@@ -9669,6 +10341,13 @@
       "cat": "iPh 15 EU",
       "type": "u",
       "order": 46
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 32519,
+      "cat": "iPh 15 EU",
+      "type": "u",
+      "order": 122
     }
   ],
   "iPh 15 Pro 256 EU | Jabko | u": [
@@ -9727,6 +10406,13 @@
       "cat": "iPh 15 EU",
       "type": "u",
       "order": 47
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 36011,
+      "cat": "iPh 15 EU",
+      "type": "u",
+      "order": 123
     }
   ],
   "iPh 15 Pro 512 EU | Jabko | u": [
@@ -9792,6 +10478,13 @@
       "cat": "iPh 15 EU",
       "type": "u",
       "order": 48
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 37757,
+      "cat": "iPh 15 EU",
+      "type": "u",
+      "order": 124
     }
   ],
   "iPh 15 Pro 1TB EU | Jabko | u": [
@@ -9857,6 +10550,13 @@
       "cat": "iPh 15 EU",
       "type": "u",
       "order": 49
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 39067,
+      "cat": "iPh 15 EU",
+      "type": "u",
+      "order": 125
     }
   ],
   "iPh 15 Pro Max 256 eSim | Jabko | u": [
@@ -9915,6 +10615,13 @@
       "cat": "iPh 15 eSim",
       "type": "u",
       "order": 50
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 34702,
+      "cat": "iPh 15 eSim",
+      "type": "u",
+      "order": 126
     }
   ],
   "iPh 15 Pro Max 512 eSim | Jabko | u": [
@@ -9973,6 +10680,13 @@
       "cat": "iPh 15 eSim",
       "type": "u",
       "order": 51
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 36884,
+      "cat": "iPh 15 eSim",
+      "type": "u",
+      "order": 127
     }
   ],
   "iPh 15 Pro Max 1TB eSim | Jabko | u": [
@@ -10031,6 +10745,13 @@
       "cat": "iPh 15 eSim",
       "type": "u",
       "order": 52
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 38194,
+      "cat": "iPh 15 eSim",
+      "type": "u",
+      "order": 128
     }
   ],
   "iPh 15 Pro Max 256 EU | Jabko | u": [
@@ -10089,6 +10810,13 @@
       "cat": "iPh 15 EU",
       "type": "u",
       "order": 53
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 37321,
+      "cat": "iPh 15 EU",
+      "type": "u",
+      "order": 129
     }
   ],
   "iPh 15 Pro Max 512 EU | Jabko | u": [
@@ -10147,6 +10875,13 @@
       "cat": "iPh 15 EU",
       "type": "u",
       "order": 54
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 39940,
+      "cat": "iPh 15 EU",
+      "type": "u",
+      "order": 130
     }
   ],
   "iPh 15 Pro Max 1TB EU | Jabko | u": [
@@ -10205,6 +10940,13 @@
       "cat": "iPh 15 EU",
       "type": "u",
       "order": 55
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 40813,
+      "cat": "iPh 15 EU",
+      "type": "u",
+      "order": 131
     }
   ],
   "iPh 16 128 eSim | Jabko | u": [
@@ -10270,6 +11012,13 @@
       "cat": "iPh 16 eSim",
       "type": "u",
       "order": 56
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 28809,
+      "cat": "iPh 16 eSim",
+      "type": "u",
+      "order": 132
     }
   ],
   "iPh 16 256 eSim | Jabko | u": [
@@ -10335,6 +11084,13 @@
       "cat": "iPh 16 eSim",
       "type": "u",
       "order": 57
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 31865,
+      "cat": "iPh 16 eSim",
+      "type": "u",
+      "order": 133
     }
   ],
   "iPh 16 512 eSim | Jabko | u": [
@@ -10400,6 +11156,13 @@
       "cat": "iPh 16 eSim",
       "type": "u",
       "order": 58
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 32738,
+      "cat": "iPh 16 eSim",
+      "type": "u",
+      "order": 134
     }
   ],
   "iPh 16 128 EU | Jabko | u": [
@@ -10458,6 +11221,13 @@
       "cat": "iPh 16 EU",
       "type": "u",
       "order": 59
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 30992,
+      "cat": "iPh 16 EU",
+      "type": "u",
+      "order": 135
     }
   ],
   "iPh 16 256 EU | Jabko | u": [
@@ -10516,6 +11286,13 @@
       "cat": "iPh 16 EU",
       "type": "u",
       "order": 60
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 34047,
+      "cat": "iPh 16 EU",
+      "type": "u",
+      "order": 136
     }
   ],
   "iPh 16 512 EU | Jabko | u": [
@@ -10574,6 +11351,13 @@
       "cat": "iPh 16 EU",
       "type": "u",
       "order": 61
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 34920,
+      "cat": "iPh 16 EU",
+      "type": "u",
+      "order": 137
     }
   ],
   "iPh 16 Pro 128 eSim | Jabko | u": [
@@ -10639,6 +11423,13 @@
       "cat": "iPh 16 eSim",
       "type": "u",
       "order": 62
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 37539,
+      "cat": "iPh 16 eSim",
+      "type": "u",
+      "order": 138
     }
   ],
   "iPh 16 Pro 256 eSim | Jabko | u": [
@@ -10704,6 +11495,13 @@
       "cat": "iPh 16 eSim",
       "type": "u",
       "order": 63
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 41904,
+      "cat": "iPh 16 eSim",
+      "type": "u",
+      "order": 139
     }
   ],
   "iPh 16 Pro 512 eSim | Jabko | u": [
@@ -10769,6 +11567,13 @@
       "cat": "iPh 16 eSim",
       "type": "u",
       "order": 64
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 45833,
+      "cat": "iPh 16 eSim",
+      "type": "u",
+      "order": 140
     }
   ],
   "iPh 16 Pro 1TB eSim | Jabko | u": [
@@ -10834,6 +11639,13 @@
       "cat": "iPh 16 eSim",
       "type": "u",
       "order": 65
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 46706,
+      "cat": "iPh 16 eSim",
+      "type": "u",
+      "order": 141
     }
   ],
   "iPh 16 Pro 128 EU | Jabko | u": [
@@ -10899,6 +11711,13 @@
       "cat": "iPh 16 EU",
       "type": "u",
       "order": 66
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 38849,
+      "cat": "iPh 16 EU",
+      "type": "u",
+      "order": 142
     }
   ],
   "iPh 16 Pro 256 EU | Jabko | u": [
@@ -10964,6 +11783,13 @@
       "cat": "iPh 16 EU",
       "type": "u",
       "order": 67
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 43650,
+      "cat": "iPh 16 EU",
+      "type": "u",
+      "order": 143
     }
   ],
   "iPh 16 Pro 512 EU | Jabko | u": [
@@ -11029,6 +11855,13 @@
       "cat": "iPh 16 EU",
       "type": "u",
       "order": 68
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 47579,
+      "cat": "iPh 16 EU",
+      "type": "u",
+      "order": 144
     }
   ],
   "iPh 16 Pro 1TB EU | Jabko | u": [
@@ -11094,6 +11927,13 @@
       "cat": "iPh 16 EU",
       "type": "u",
       "order": 69
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 48888,
+      "cat": "iPh 16 EU",
+      "type": "u",
+      "order": 145
     }
   ],
   "iPh 16 Pro Max 256 eSim | Jabko | u": [
@@ -11159,6 +11999,13 @@
       "cat": "iPh 16 eSim",
       "type": "u",
       "order": 70
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 42777,
+      "cat": "iPh 16 eSim",
+      "type": "u",
+      "order": 146
     }
   ],
   "iPh 16 Pro Max 512 eSim | Jabko | u": [
@@ -11217,6 +12064,13 @@
       "cat": "iPh 16 eSim",
       "type": "u",
       "order": 71
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 46269,
+      "cat": "iPh 16 eSim",
+      "type": "u",
+      "order": 147
     }
   ],
   "iPh 16 Pro Max 1TB eSim | Jabko | u": [
@@ -11275,6 +12129,13 @@
       "cat": "iPh 16 eSim",
       "type": "u",
       "order": 72
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 48452,
+      "cat": "iPh 16 eSim",
+      "type": "u",
+      "order": 148
     }
   ],
   "iPh 16 Pro Max 256 EU | Jabko | u": [
@@ -11340,6 +12201,13 @@
       "cat": "iPh 16 EU",
       "type": "u",
       "order": 73
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 44960,
+      "cat": "iPh 16 EU",
+      "type": "u",
+      "order": 149
     }
   ],
   "iPh 16 Pro Max 512 EU | Jabko | u": [
@@ -11405,6 +12273,13 @@
       "cat": "iPh 16 EU",
       "type": "u",
       "order": 74
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 48452,
+      "cat": "iPh 16 EU",
+      "type": "u",
+      "order": 150
     }
   ],
   "iPh 16 Pro Max 1TB EU | Jabko | u": [
@@ -11470,6 +12345,13 @@
       "cat": "iPh 16 EU",
       "type": "u",
       "order": 75
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 50198,
+      "cat": "iPh 16 EU",
+      "type": "u",
+      "order": 151
     }
   ],
   "iPh 13 128 | Yablyka | u": [
@@ -12750,6 +13632,13 @@
       "cat": "iPh 13",
       "type": "u",
       "order": 304
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 15278,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 380
     }
   ],
   "iPh 13 256 | AR | u": [
@@ -12801,6 +13690,13 @@
       "cat": "iPh 13",
       "type": "u",
       "order": 305
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 17024,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 381
     }
   ],
   "iPh 13 Mini 128 | AR | u": [
@@ -12852,6 +13748,13 @@
       "cat": "iPh 13",
       "type": "u",
       "order": 307
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 13095,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 383
     }
   ],
   "iPh 13 Mini 256 | AR | u": [
@@ -12903,6 +13806,13 @@
       "cat": "iPh 13",
       "type": "u",
       "order": 308
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 14405,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 384
     }
   ],
   "iPh 13 Pro 128 | AR | u": [
@@ -12961,6 +13871,13 @@
       "cat": "iPh 13",
       "type": "u",
       "order": 310
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 19643,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 386
     }
   ],
   "iPh 13 Pro 256 | AR | u": [
@@ -13019,6 +13936,13 @@
       "cat": "iPh 13",
       "type": "u",
       "order": 311
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 21389,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 387
     }
   ],
   "iPh 13 Pro Max 128 | AR | u": [
@@ -13070,6 +13994,13 @@
       "cat": "iPh 13",
       "type": "u",
       "order": 314
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 21389,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 390
     }
   ],
   "iPh 13 Pro Max 256 | AR | u": [
@@ -13121,6 +14052,13 @@
       "cat": "iPh 13",
       "type": "u",
       "order": 315
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 24008,
+      "cat": "iPh 13",
+      "type": "u",
+      "order": 391
     }
   ],
   "iPh 14 128 eSim | AR | u": [
@@ -13172,6 +14110,13 @@
       "cat": "iPh 14 eSim",
       "type": "u",
       "order": 318
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 16587,
+      "cat": "iPh 14 eSim",
+      "type": "u",
+      "order": 394
     }
   ],
   "iPh 14 128 EU | AR | u": [
@@ -13223,6 +14168,13 @@
       "cat": "iPh 14 EU",
       "type": "u",
       "order": 321
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 17897,
+      "cat": "iPh 14 EU",
+      "type": "u",
+      "order": 397
     }
   ],
   "iPh 14 256 EU | AR | u": [
@@ -13274,6 +14226,13 @@
       "cat": "iPh 14 EU",
       "type": "u",
       "order": 322
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 20516,
+      "cat": "iPh 14 EU",
+      "type": "u",
+      "order": 398
     }
   ],
   "iPh 14 Pro 128 eSim | AR | u": [
@@ -13325,6 +14284,13 @@
       "cat": "iPh 14 eSim",
       "type": "u",
       "order": 324
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 22698,
+      "cat": "iPh 14 eSim",
+      "type": "u",
+      "order": 400
     }
   ],
   "iPh 14 Pro 256 eSim | AR | u": [
@@ -13376,6 +14342,13 @@
       "cat": "iPh 14 eSim",
       "type": "u",
       "order": 325
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 24881,
+      "cat": "iPh 14 eSim",
+      "type": "u",
+      "order": 401
     }
   ],
   "iPh 14 Pro 128 EU | AR | u": [
@@ -13434,6 +14407,13 @@
       "cat": "iPh 14 EU",
       "type": "u",
       "order": 328
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 25754,
+      "cat": "iPh 14 EU",
+      "type": "u",
+      "order": 404
     }
   ],
   "iPh 14 Pro 256 EU | AR | u": [
@@ -13492,6 +14472,13 @@
       "cat": "iPh 14 EU",
       "type": "u",
       "order": 329
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 27936,
+      "cat": "iPh 14 EU",
+      "type": "u",
+      "order": 405
     }
   ],
   "iPh 14 Pro Max 128 eSim | AR | u": [
@@ -13543,6 +14530,13 @@
       "cat": "iPh 14 eSim",
       "type": "u",
       "order": 332
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 24881,
+      "cat": "iPh 14 eSim",
+      "type": "u",
+      "order": 408
     }
   ],
   "iPh 14 Pro Max 256 eSim | AR | u": [
@@ -13594,6 +14588,13 @@
       "cat": "iPh 14 eSim",
       "type": "u",
       "order": 333
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 26627,
+      "cat": "iPh 14 eSim",
+      "type": "u",
+      "order": 409
     }
   ],
   "iPh 14 Pro Max 128 EU | AR | u": [
@@ -13645,6 +14646,13 @@
       "cat": "iPh 14 EU",
       "type": "u",
       "order": 336
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 27500,
+      "cat": "iPh 14 EU",
+      "type": "u",
+      "order": 412
     }
   ],
   "iPh 14 Pro Max 256 EU | AR | u": [
@@ -13696,6 +14704,13 @@
       "cat": "iPh 14 EU",
       "type": "u",
       "order": 337
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 30119,
+      "cat": "iPh 14 EU",
+      "type": "u",
+      "order": 413
     }
   ],
   "iPh 14 Pro Max 512 EU | AR | u": [
@@ -13747,6 +14762,13 @@
       "cat": "iPh 14 EU",
       "type": "u",
       "order": 338
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 31428,
+      "cat": "iPh 14 EU",
+      "type": "u",
+      "order": 414
     }
   ],
   "iPh 15 128 EU | AR | u": [
@@ -13805,6 +14827,13 @@
       "cat": "iPh 15 EU",
       "type": "u",
       "order": 343
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 24008,
+      "cat": "iPh 15 EU",
+      "type": "u",
+      "order": 419
     }
   ],
   "iPh 15 256 EU | AR | u": [
@@ -13856,6 +14885,13 @@
       "cat": "iPh 15 EU",
       "type": "u",
       "order": 344
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 27936,
+      "cat": "iPh 15 EU",
+      "type": "u",
+      "order": 420
     }
   ],
   "iPh 15 Pro 256 eSim | AR | u": [
@@ -13914,6 +14950,13 @@
       "cat": "iPh 15 eSim",
       "type": "u",
       "order": 347
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 30992,
+      "cat": "iPh 15 eSim",
+      "type": "u",
+      "order": 423
     }
   ],
   "iPh 15 Pro 128 EU | AR | u": [
@@ -13972,6 +15015,13 @@
       "cat": "iPh 15 EU",
       "type": "u",
       "order": 350
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 31428,
+      "cat": "iPh 15 EU",
+      "type": "u",
+      "order": 426
     }
   ],
   "iPh 15 Pro 256 EU | AR | u": [
@@ -14023,6 +15073,13 @@
       "cat": "iPh 15 EU",
       "type": "u",
       "order": 351
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 34920,
+      "cat": "iPh 15 EU",
+      "type": "u",
+      "order": 427
     }
   ],
   "iPh 15 Pro 512 EU | AR | u": [
@@ -14081,6 +15138,13 @@
       "cat": "iPh 15 EU",
       "type": "u",
       "order": 352
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 36666,
+      "cat": "iPh 15 EU",
+      "type": "u",
+      "order": 428
     }
   ],
   "iPh 15 Pro Max 256 eSim | AR | u": [
@@ -14132,6 +15196,13 @@
       "cat": "iPh 15 eSim",
       "type": "u",
       "order": 354
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 33611,
+      "cat": "iPh 15 eSim",
+      "type": "u",
+      "order": 430
     }
   ],
   "iPh 15 Pro Max 512 eSim | AR | u": [
@@ -14183,6 +15254,13 @@
       "cat": "iPh 15 eSim",
       "type": "u",
       "order": 355
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 35793,
+      "cat": "iPh 15 eSim",
+      "type": "u",
+      "order": 431
     }
   ],
   "iPh 15 Pro Max 256 EU | AR | u": [
@@ -14234,6 +15312,13 @@
       "cat": "iPh 15 EU",
       "type": "u",
       "order": 357
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 36230,
+      "cat": "iPh 15 EU",
+      "type": "u",
+      "order": 433
     }
   ],
   "iPh 15 Pro Max 512 EU | AR | u": [
@@ -14285,6 +15370,13 @@
       "cat": "iPh 15 EU",
       "type": "u",
       "order": 358
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 38849,
+      "cat": "iPh 15 EU",
+      "type": "u",
+      "order": 434
     }
   ],
   "iPh 16 Pro 128 eSim | AR | u": [
@@ -14343,6 +15435,13 @@
       "cat": "iPh 16 eSim",
       "type": "u",
       "order": 366
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 36666,
+      "cat": "iPh 16 eSim",
+      "type": "u",
+      "order": 442
     }
   ],
   "iPh 16 Pro 256 eSim | AR | u": [
@@ -14394,6 +15493,13 @@
       "cat": "iPh 16 eSim",
       "type": "u",
       "order": 367
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 41031,
+      "cat": "iPh 16 eSim",
+      "type": "u",
+      "order": 443
     }
   ],
   "iPh 16 Pro 512 eSim | AR | u": [
@@ -14445,6 +15551,13 @@
       "cat": "iPh 16 eSim",
       "type": "u",
       "order": 368
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 44960,
+      "cat": "iPh 16 eSim",
+      "type": "u",
+      "order": 444
     }
   ],
   "iPh 16 Pro 1TB eSim | AR | u": [
@@ -14496,6 +15609,13 @@
       "cat": "iPh 16 eSim",
       "type": "u",
       "order": 369
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 45833,
+      "cat": "iPh 16 eSim",
+      "type": "u",
+      "order": 445
     }
   ],
   "iPh 16 Pro 128 EU | AR | u": [
@@ -14554,6 +15674,13 @@
       "cat": "iPh 16 EU",
       "type": "u",
       "order": 370
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 37976,
+      "cat": "iPh 16 EU",
+      "type": "u",
+      "order": 446
     }
   ],
   "iPh 16 Pro 256 EU | AR | u": [
@@ -14605,6 +15732,13 @@
       "cat": "iPh 16 EU",
       "type": "u",
       "order": 371
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 42777,
+      "cat": "iPh 16 EU",
+      "type": "u",
+      "order": 447
     }
   ],
   "iPh 16 Pro 512 EU | AR | u": [
@@ -14656,6 +15790,13 @@
       "cat": "iPh 16 EU",
       "type": "u",
       "order": 372
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 46706,
+      "cat": "iPh 16 EU",
+      "type": "u",
+      "order": 448
     }
   ],
   "iPh 16 Pro 1TB EU | AR | u": [
@@ -14707,6 +15848,13 @@
       "cat": "iPh 16 EU",
       "type": "u",
       "order": 373
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 48015,
+      "cat": "iPh 16 EU",
+      "type": "u",
+      "order": 449
     }
   ],
   "iPh 16 Pro Max 256 eSim | AR | u": [
@@ -14765,6 +15913,13 @@
       "cat": "iPh 16 eSim",
       "type": "u",
       "order": 374
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 42777,
+      "cat": "iPh 16 eSim",
+      "type": "u",
+      "order": 450
     }
   ],
   "iPh 16 Pro Max 512 eSim | AR | u": [
@@ -14823,6 +15978,13 @@
       "cat": "iPh 16 eSim",
       "type": "u",
       "order": 375
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 45396,
+      "cat": "iPh 16 eSim",
+      "type": "u",
+      "order": 451
     }
   ],
   "iPh 16 Pro Max 1TB eSim | AR | u": [
@@ -14881,6 +16043,13 @@
       "cat": "iPh 16 eSim",
       "type": "u",
       "order": 376
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 47579,
+      "cat": "iPh 16 eSim",
+      "type": "u",
+      "order": 452
     }
   ],
   "iPh 16 Pro Max 256 EU | AR | u": [
@@ -14939,6 +16108,13 @@
       "cat": "iPh 16 EU",
       "type": "u",
       "order": 377
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 44960,
+      "cat": "iPh 16 EU",
+      "type": "u",
+      "order": 453
     }
   ],
   "iPh 16 Pro Max 512 EU | AR | u": [
@@ -14990,6 +16166,13 @@
       "cat": "iPh 16 EU",
       "type": "u",
       "order": 378
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 47579,
+      "cat": "iPh 16 EU",
+      "type": "u",
+      "order": 454
     }
   ],
   "iPh 16 Pro Max 1TB EU | AR | u": [
@@ -15041,6 +16224,13 @@
       "cat": "iPh 16 EU",
       "type": "u",
       "order": 379
+    },
+    {
+      "time": "10.04 00:52",
+      "price": 49325,
+      "cat": "iPh 16 EU",
+      "type": "u",
+      "order": 455
     }
   ],
   "iPh 13 128 | iStore | u": [
