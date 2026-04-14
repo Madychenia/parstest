@@ -345,96 +345,71 @@ with t_analytics:
             stat_data.append({
                 'Модель': model,
                 'Магазин': store,
-                'Текущая цена': curr_p,
-                'Цена $': int(curr_p / minfin_rate),
-                'Падение ₴': diff_total,
-                'Падение $': int(diff_total / minfin_rate),
-                'Изменение ₴': diff_recent,
-                'Изменение $': int(diff_recent / minfin_rate)
+                'Цена_uah': curr_p,
+                'Цена_usd': int(curr_p / minfin_rate),
+                'Drop_uah': diff_total,
+                'Drop_usd': int(diff_total / minfin_rate),
+                'Change_uah': diff_recent,
+                'Change_usd': int(diff_recent / minfin_rate)
             })
 
     if stat_data:
         df_stat = pd.DataFrame(stat_data)
         
-        # --- БЛОК 1: Метрики в ряд ---
-        total_drops = len(df_stat[df_stat['Падение ₴'] < 0])
+        # --- БЛОК 1: Метрики ---
+        total_drops = len(df_stat[df_stat['Drop_uah'] < 0])
         
         c1, c2, c3, c4 = st.columns(4)
-        
-        with c1:
-            st.metric("📉 Подешевело", f"{total_drops} шт.")
-        
+        with c1: st.metric("📉 Подешевело", f"{total_drops} шт.")
         with c2:
             if total_drops > 0:
-                best_drop = df_stat.loc[df_stat['Падение ₴'].idxmin()]
-                st.metric(f"🔥 Рекорд ({best_drop['Магазин']})", 
-                          f"{best_drop['Падение ₴']:,.0f} ₴", 
-                          f"{best_drop['Падение $']} $", delta_color="inverse")
+                best_drop = df_stat.loc[df_stat['Drop_uah'].idxmin()]
+                st.metric(f"🔥 Рекорд ({best_drop['Магазин']})", f"{best_drop['Drop_uah']:,.0f} ₴", f"{best_drop['Drop_usd']} $", delta_color="inverse")
             else: st.metric("🔥 Рекорд", "0 ₴")
-
         with c3:
-            store_drops = df_stat[df_stat['Падение ₴'] < 0].groupby('Магазин')['Падение ₴'].sum()
+            store_drops = df_stat[df_stat['Drop_uah'] < 0].groupby('Магазин')['Drop_uah'].sum()
             if not store_drops.empty:
                 top_s = store_drops.idxmin()
                 st.metric("👑 Агрессор", top_s, f"{store_drops.min():,.0f} ₴", delta_color="inverse")
             else: st.metric("👑 Агрессор", "-")
-
         with c4:
-            avg_drop = df_stat[df_stat['Падение ₴'] < 0]['Падение ₴'].mean()
-            st.metric("📊 Средний чек скидки", f"{avg_drop:,.0f} ₴" if not pd.isna(avg_drop) else "0 ₴")
+            avg_drop = df_stat[df_stat['Drop_uah'] < 0]['Drop_uah'].mean()
+            st.metric("📊 Средний чек", f"{avg_drop:,.0f} ₴" if not pd.isna(avg_drop) else "0 ₴")
         
         st.divider()
 
         # --- БЛОК 2: Рейтинги ---
         col1, col2 = st.columns(2)
-        
         with col1:
             st.markdown("#### 🛒 Рейтинг щедрости")
-            store_agg = df_stat[df_stat['Падение ₴'] < 0].groupby('Магазин').agg(
-                Скидок=('Падение ₴', 'count'),
-                Сумма_₴=('Падение ₴', 'sum')
-            ).reset_index().sort_values('Сумма_₴')
+            store_agg = df_stat[df_stat['Drop_uah'] < 0].groupby('Магазин').agg(
+                Скидок=('Drop_uah', 'count'),
+                Сумма_uah=('Drop_uah', 'sum')
+            ).reset_index().sort_values('Сумма_uah')
+            store_agg['Сумма_usd'] = (store_agg['Сумма_uah'] / minfin_rate).astype(int)
             
-            # Добавляем колонку в долларах в рейтинг магазинов
-            store_agg['Сумма_$'] = (store_agg['Сумма_₴'] / minfin_rate).astype(int)
-            
-            st.dataframe(
-                store_agg,
-                column_config={
-                    "Сумма_₴": st.column_config.NumberColumn("Всего ₴", format="%d ₴"),
-                    "Сумма_$": st.column_config.NumberColumn("Всего $", format="%d $")
-                },
-                hide_index=True, use_container_width=True
-            )
+            st.dataframe(store_agg, column_config={
+                "Сумма_uah": st.column_config.NumberColumn("Всего ₴", format="%d ₴"),
+                "Сумма_usd": st.column_config.NumberColumn("Всего $", format="%d $")
+            }, hide_index=True, use_container_width=True)
 
         with col2:
             st.markdown("#### 🚀 Топ-10 падений")
-            top_10 = df_stat[df_stat['Падение ₴'] < 0].sort_values('Падение ₴').head(10).copy()
-            # Переименовываем для красоты в таблице
-            top_10_view = top_10[['Модель', 'Магазин', 'Падение ₴', 'Падение $']]
-            
-            st.dataframe(
-                top_10_view,
-                column_config={
-                    "Падение ₴": st.column_config.NumberColumn("Скидка ₴", format="%d ₴"),
-                    "Падение $": st.column_config.NumberColumn("Скидка $", format="%d $")
-                },
-                hide_index=True, use_container_width=True
-            )
+            top_10 = df_stat[df_stat['Drop_uah'] < 0].sort_values('Drop_uah').head(10).copy()
+            st.dataframe(top_10[['Модель', 'Магазин', 'Drop_uah', 'Drop_usd']], column_config={
+                "Drop_uah": st.column_config.NumberColumn("Скидка ₴", format="%d ₴"),
+                "Drop_usd": st.column_config.NumberColumn("Скидка $", format="%d $")
+            }, hide_index=True, use_container_width=True)
             
         st.divider()
         
         # --- БЛОК 3: Полная база ---
         st.markdown("#### 📋 Полная динамика рынка")
-        st.dataframe(
-            df_stat.sort_values('Падение ₴'),
-            column_config={
-                "Текущая цена": st.column_config.NumberColumn(format="%d ₴"),
-                "Цена $": st.column_config.NumberColumn(format="%d $"),
-                "Падение ₴": st.column_config.NumberColumn(format="%d ₴"),
-                "Падение $": st.column_config.NumberColumn(format="%d $"),
-                "Изменение ₴": st.column_config.NumberColumn(format="%d ₴"),
-                "Изменение $": st.column_config.NumberColumn(format="%d $")
-            },
-            hide_index=True, use_container_width=True
-        )
+        st.dataframe(df_stat.sort_values('Drop_uah'), column_config={
+                "Цена_uah": st.column_config.NumberColumn("Тек. цена ₴", format="%d ₴"),
+                "Цена_usd": st.column_config.NumberColumn("Тек. цена $", format="%d $"),
+                "Drop_uah": st.column_config.NumberColumn("Падение ₴", format="%d ₴"),
+                "Drop_usd": st.column_config.NumberColumn("Падение $", format="%d $"),
+                "Change_uah": st.column_config.NumberColumn("Изм. ₴", format="%d ₴"),
+                "Change_usd": st.column_config.NumberColumn("Изм. $", format="%d $")
+            }, hide_index=True, use_container_width=True)
