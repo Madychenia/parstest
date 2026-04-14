@@ -270,8 +270,27 @@ for i, tab_ui in enumerate(tabs):
                 f_df['Display'] = f_df.apply(format_cell, axis=1)
                 
                 # 3. Собираем таблицу
-                f_df['M'] = pd.Categorical(f_df['M'], categories=f_df['M'].unique(), ordered=True)
-                pivot = f_df.pivot_table(index='M', columns='S', values='Display', aggfunc='first', sort=False).fillna('—')
+                # Читаем эталонный порядок моделей напрямую из твоих CSV файлов
+                master_order = []
+                for file in ['links.csv', 'links_new.csv']:
+                    if os.path.exists(file):
+                        with open(file, 'r', encoding='utf-8') as f:
+                            for line in f:
+                                parts = line.split(';')
+                                if len(parts) > 0:
+                                    m = parts[0].strip()
+                                    # Добавляем название модели, если его еще нет в списке
+                                    if m and m != 'Модель' and m not in master_order:
+                                        master_order.append(m)
+                
+                # Оставляем в списке только те модели, которые есть в текущей выбранной категории
+                cat_models = [m for m in master_order if m in f_df['M'].values]
+                
+                # Принудительно задаем порядок строк
+                f_df['M'] = pd.Categorical(f_df['M'], categories=cat_models, ordered=True)
+                
+                # Генерируем таблицу (sort=True теперь будет использовать наш порядок из Categorical)
+                pivot = f_df.pivot_table(index='M', columns='S', values='Display', aggfunc='first', sort=True).fillna('—')
                 pivot.index.name = pivot.columns.name = None
                 st.markdown(f'<div class="table-container">{pivot.to_html(escape=False)}</div>', unsafe_allow_html=True)
                
