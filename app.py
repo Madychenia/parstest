@@ -346,85 +346,83 @@ with t_analytics:
     if stat_data:
         df_stat = pd.DataFrame(stat_data)
 
-        # --- БЛОК 1: Метрики (уплотненные) ---
+        # --- БЛОК 1: Метрики ---
         total_drops = len(df_stat[df_stat['Всего ₴'] < 0])
         c1, c2, c3, c4 = st.columns(4)
         c1.metric("📉 Подешевело", f"{total_drops} шт.")
-        
         if total_drops > 0:
             best = df_stat.loc[df_stat['Всего ₴'].idxmin()]
             c2.metric(f"🔥 Рекорд ({best['Магазин']})", f"{best['Всего ₴']:,} ₴", f"{best['Всего $']} $", delta_color="inverse")
-            
             store_drops = df_stat[df_stat['Всего ₴'] < 0].groupby('Магазин')['Всего ₴'].sum()
             c3.metric("👑 Агрессор", store_drops.idxmin(), f"{store_drops.min():,.0f} ₴", delta_color="inverse")
-            
             avg_d = df_stat[df_stat['Всего ₴'] < 0]['Всего ₴'].mean()
             c4.metric("📊 Средний чек", f"{avg_d:,.0f} ₴")
         
         st.divider()
 
-        # --- БЛОК 2: Таблицы рейтинга ---
+        # --- БЛОК 2: Рейтинги ---
         col1, col2 = st.columns(2)
         with col1:
             st.markdown("#### 🛒 Рейтинг щедрости")
-            # Меняем 🏷 на латинское слово Count
             store_agg = df_stat[df_stat['Всего ₴'] < 0].groupby('Магазин').agg(
-                Count=('Всего ₴', 'count'), 
-                Сумма_uah=('Всего ₴', 'sum')
-            ).reset_index().sort_values('Сумма_uah')
-            
-            store_agg['Сумма_usd'] = (store_agg['Сумма_uah'] / minfin_rate).astype(int)
-            
+                Count=('Всего ₴', 'count'), Sum_uah=('Всего ₴', 'sum')
+            ).reset_index().sort_values('Sum_uah')
+            store_agg['Sum_usd'] = (store_agg['Sum_uah'] / minfin_rate).astype(int)
             st.dataframe(store_agg, column_config={
-                "Магазин": "🏪 Магазин", 
-                "Count": "🏷 Скидок", # А вот тут уже возвращаем эмодзи для красоты
-                "Сумма_uah": st.column_config.NumberColumn("💸 Всего ₴", format="%d ₴"),
-                "Сумма_usd": st.column_config.NumberColumn("🏦 Всего $", format="%d $")
+                "Магазин": "🏪 Магазин", "Count": "🏷 Скидок",
+                "Sum_uah": st.column_config.NumberColumn("💸 ₴", format="%d ₴"),
+                "Sum_usd": st.column_config.NumberColumn("🏦 $", format="%d $")
             }, hide_index=True, use_container_width=True)
 
         with col2:
             st.markdown("#### 🚀 Топ-10 падений")
             top_10 = df_stat[df_stat['Всего ₴'] < 0].sort_values('Всего ₴').head(10)
             st.dataframe(top_10[['Модель', 'Магазин', 'Всего ₴', 'Всего $']], column_config={
-                "Всего ₴": st.column_config.NumberColumn("📉 Скидка ₴", format="%d ₴"),
-                "Всего $": st.column_config.NumberColumn("📉 Скидка $", format="%d $")
+                "Модель": "📱 Модель", "Магазин": "🏪 Магазин",
+                "Всего ₴": st.column_config.NumberColumn("📉 ₴", format="%d ₴"),
+                "Всего $": st.column_config.NumberColumn("📉 $", format="%d $")
             }, hide_index=True, use_container_width=True)
 
         st.divider()
 
-        # --- БЛОК 3: ПОЛНАЯ ДИНАМИКА С ПОДСВЕТКОЙ ---
+        # --- БЛОК 3: ПОЛНАЯ ДИНАМИКА ---
         st.markdown("#### 📋 Полная динамика рынка")
         
-        # Функция для раскраски
-        def style_dynamic(row):
-            styles = [''] * len(row)
-            # Подсветка падения (Всего ₴ - индекс 4, Изменение ₴ - индекс 6)
-            if row['Всего ₴'] < 0: styles[4] = 'color: #22c55e; font-weight: bold'
-            elif row['Всего ₴'] > 0: styles[4] = 'color: #ef4444; font-weight: bold'
-            
-            if row['Изменение ₴'] < 0: styles[6] = 'background-color: #f0fdf4; color: #22c55e; font-weight: bold'
-            elif row['Изменение ₴'] > 0: styles[6] = 'background-color: #fef2f2; color: #ef4444; font-weight: bold'
-            
-            return styles
-
-        # Находим лучшие цены для каждой модели
+        # Находим лучшие цены (подготовка для функции стиля)
         min_prices = df_stat.groupby('Модель')['Цена ₴'].transform('min')
         df_stat['is_best'] = df_stat['Цена ₴'] == min_prices
 
-        def highlight_best_price(s):
-            return ['background-color: #dcfce7' if s.is_best and (name in ['Цена ₴', 'Цена $']) else '' for name in s.index]
+        # Исправленные функции стилизации (без ошибокgetattr)
+        def style_rows(s):
+            style = [''] * len(s)
+            idx_total = s.index.get_loc('Всего ₴')
+            idx_change = s.index.get_loc('Изменение ₴')
+            
+            # Красим "Всего"
+            if s['Всего ₴'] < 0: style[idx_total] = 'color: #22c55e; font-weight: bold'
+            elif s['Всего ₴'] > 0: style[idx_total] = 'color: #ef4444; font-weight: bold'
+            
+            # Красим "Последнее изменение"
+            if s['Изменение ₴'] < 0: style[idx_change] = 'background-color: #f0fdf4; color: #22c55e; font-weight: bold'
+            elif s['Изменение ₴'] > 0: style[idx_change] = 'background-color: #fef2f2; color: #ef4444; font-weight: bold'
+            
+            # Подсветка лучшей цены
+            if s['is_best']:
+                for name in ['Цена ₴', 'Цена $']:
+                    style[s.index.get_loc(name)] = 'background-color: #dcfce7; font-weight: bold'
+            return style
 
-        styled_df = df_stat.drop(columns=['is_best']).style\
-            .apply(style_dynamic, axis=1)\
-            .apply(highlight_best_price, axis=1)
+        # Применяем стили и скрываем служебную колонку is_best через column_config
+        styled_df = df_stat.style.apply(style_rows, axis=1)
 
         st.dataframe(styled_df, column_config={
             "Модель": "📱 Модель", "Магазин": "🏪 Магазин",
-            "Цена ₴": st.column_config.NumberColumn("💰 Цена ₴", format="%d ₴"),
-            "Цена $": st.column_config.NumberColumn("💵 Цена $", format="%d $"),
-            "Всего ₴": st.column_config.NumberColumn("🏁 Весь срок", format="%d ₴"),
-            "Всего $": st.column_config.NumberColumn("🏦 Весь срок $", format="%d $"),
-            "Изменение ₴": st.column_config.NumberColumn("🔄 Последнее", format="%d ₴"),
+            "Цена ₴": st.column_config.NumberColumn("💰 ₴", format="%d ₴"),
+            "Цена $": st.column_config.NumberColumn("💵 $", format="%d $"),
+            "Всего ₴": st.column_config.NumberColumn("🏁 ₴", format="%d ₴"),
+            "Всего $": st.column_config.NumberColumn("🏦 $", format="%d $"),
+            "Изменение ₴": st.column_config.NumberColumn("🔄 ₴", format="%d ₴"),
+            "is_best": None # Скрываем эту колонку
         }, hide_index=True, use_container_width=True)
         
     else:
