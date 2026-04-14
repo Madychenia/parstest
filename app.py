@@ -236,10 +236,11 @@ with c3:
 #        if os.path.exists(HISTORY_FILE): os.remove(HISTORY_FILE)
 #        st.rerun()
 
-tabs = st.tabs(["Used (Б/У)", "New (Новые)"])
+# Распаковываем вкладки в отдельные переменные
+t_used, t_new, t_analytics = st.tabs(["Used (Б/У)", "New (Новые)", "📊 Аналитика"])
 tags = ['u', 'n']
 
-for i, tab_ui in enumerate(tabs):
+for i, tab_ui in enumerate([t_used, t_new]):
     tag_key = tags[i]
     with tab_ui:
         items = []
@@ -318,3 +319,109 @@ for i, tab_ui in enumerate(tabs):
                                     color = "red" if diff > 0 else "green"
                                     diff_str = f' <span style="color:{color}; font-size:0.85em;">({"+" if diff>0 else ""}{diff:.1f}%)</span>'
                             st.markdown(f'<div class="log-line">└ {entry["time"]}: {entry["price"]:,} ₴ (<span class="log-usd">{usd_min:,} $</span>){diff_str}</div>', unsafe_allow_html=True)
+                            
+# --- Вкладка 3: АНАЛИТИКА ---
+with t_analytics:
+    st.markdown("### 📈 Динамика рынка и скидки")
+    
+    stat_data = []
+    # Перебираем всю историю цен
+    for k, logs in db.items():
+        parts = k.split(' | ')
+        if len(parts) >= 2:
+            model = parts[0]
+            store = parts[1]
+            
+            curr_p = logs[-1]['price']
+            
+            # Если есть история, сравниваем текущую цену с самой первой
+            if len(logs) > 1:
+                start_p = logs[0]['price']
+                prev_p = logs[-2]['price']
+            else:
+                start_p = curr_p
+                prev_p = curr_p
+                
+            # Отрицательное значение = цена упала
+            diff_total = curr_p - start_p
+            diff_recent = curr_p - prev_p
+            
+            stat_data.append({
+                'Модель': model,
+                'Магазин': store,
+                'Текущая цена': curr_p,
+                'Падение за всё время': diff_total,
+                'Последнее изменение': diff_recent
+            })
+
+    if stat_data:
+        df_stat = pd.DataFrame(stat_data)
+        
+        # --- БЛОК 1: Главные показатели ---
+        total_drops = len(df_stat[df_stat['Падение за всё время'] < 0])
+        
+        # Высчитываем рекордсменов
+        if total_drops > 0:
+            best_drop_idx = df_stat['Падение за всё время'].idxmin()
+            best_drop_model = df_stat.loc[best_drop_idx, 'Модель']
+            best_drop_val = df_stat.loc[best_drop_idx, 'Падение за всё время']
+            best_drop_store = df_stat.loc[best_drop_idx, 'Магазин']
+            
+            # Магазин с наибольшей суммой скидок (агрессивность)
+            store_drops = df_stat[df_stat['Падение за всё время'] < 0].groupby('Магазин')['Падение за всё время'].sum()
+            top_store = store_drops.idxmin()
+            top_store_val = store_drops.min()
+        else:
+            best_drop_model, best_drop_val, best_drop_store = "Нет данных", 0, "-"
+            top_store, top_store_val = "Нет данных", 0
+
+        c1, c2, c3 = st.columns(3)
+        c1.metric("📉 Подешевело позиций", f"{total_drops} шт.")
+        c2.metric(f"🔥 Рекорд скидки ({best_drop_store})", best_drop_model, f"{best_drop_val:,.0f} ₴", delta_color="inverse")
+        c3.metric("👑 Самый агрессивный магазин", top_store, f"Сумма скидок: {top_store_val:,.0f} ₴", delta_color="inverse")
+        
+        st.divider()
+
+        # --- БЛОК 2: Рейтинги ---
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.markdown("#### 🛒 Рейтинг щедрости магазинов")
+            st.caption("Кто чаще и глубже режет цены")
+            store_agg = df_stat[df_stat['Падение за всё время'] < 0].groupby('Магазин').agg(
+                Кол_во_скидок=('Падение за всё время', 'count'),
+                Общая_скидка=('Падение за всё время', 'sum')
+            ).reset_index().sort_values('Общая_скидка')
+            
+            st.dataframe(
+                store_agg,
+                column_config={"Общая_скидка": st.column_config.NumberColumn("Сумма скидок", format="%d ₴")},
+                hide_index=True, use_container_width=True
+            )
+
+        with col2:
+            st.markdown("#### 🚀 Топ-10 стремительно дешевеющих")
+            st.caption("Модели с максимальным падением цены")
+            top_10 = df_stat[df_stat['Падение за всё время'] < 0].sort_values('Падение за всё время').head(10)
+            
+            st.dataframe(
+                top_10[['Модель', 'Магазин', 'Падение за всё время']],
+                column_config={"Падение за всё время": st.column_config.NumberColumn("Скидка", format="%d ₴")},
+                hide_index=True, use_container_width=True
+            )
+            
+        st.divider()
+        
+        # --- БЛОК 3: Полная база ---
+        st.markdown("#### 📋 Полная динамика рынка")
+        st.dataframe(
+            df_stat.sort_values('Падение за всё время'),
+            column_config={
+                "Текущая цена": st.column_config.NumberColumn(format="%d ₴"),
+                "Падение за всё время": st.column_config.NumberColumn(format="%d ₴"),
+                "Последнее изменение": st.column_config.NumberColumn(format="%d ₴")
+            },
+            hide_index=True, use_container_width=True
+        )
+    else:
+        st.info("Пока нет истории изменения цен для аналитики.")
