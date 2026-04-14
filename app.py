@@ -367,12 +367,18 @@ with t_analytics:
         col1, col2 = st.columns(2)
         with col1:
             st.markdown("#### 🛒 Рейтинг щедрости")
+            # Меняем 🏷 на латинское слово Count
             store_agg = df_stat[df_stat['Всего ₴'] < 0].groupby('Магазин').agg(
-                🏷=('Всего ₴', 'count'), Сумма_uah=('Всего ₴', 'sum')
+                Count=('Всего ₴', 'count'), 
+                Сумма_uah=('Всего ₴', 'sum')
             ).reset_index().sort_values('Сумма_uah')
+            
             store_agg['Сумма_usd'] = (store_agg['Сумма_uah'] / minfin_rate).astype(int)
+            
             st.dataframe(store_agg, column_config={
-                "Магазин": "🏪 Магазин", "Сумма_uah": st.column_config.NumberColumn("💸 Всего ₴", format="%d ₴"),
+                "Магазин": "🏪 Магазин", 
+                "Count": "🏷 Скидок", # А вот тут уже возвращаем эмодзи для красоты
+                "Сумма_uah": st.column_config.NumberColumn("💸 Всего ₴", format="%d ₴"),
                 "Сумма_usd": st.column_config.NumberColumn("🏦 Всего $", format="%d $")
             }, hide_index=True, use_container_width=True)
 
