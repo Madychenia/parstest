@@ -3321,6 +3321,13 @@
       "cat": "17 PRO 512",
       "type": "n",
       "order": 99
+    },
+    {
+      "time": "23.04 08:36",
+      "price": 74599,
+      "cat": "17 PRO 512",
+      "type": "n",
+      "order": 99
     }
   ],
   "iPh 17 Pro 512 White EU | Yablyka | n": [
@@ -12402,6 +12409,13 @@
     {
       "time": "22.04 00:53",
       "price": 41779,
+      "cat": "Air 256",
+      "type": "n",
+      "order": 229
+    },
+    {
+      "time": "23.04 08:36",
+      "price": 41529,
       "cat": "Air 256",
       "type": "n",
       "order": 229
