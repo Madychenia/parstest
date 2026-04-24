@@ -29488,6 +29488,13 @@
       "cat": "17 PRO 512",
       "type": "n",
       "order": 3
+    },
+    {
+      "time": "24.04 08:41",
+      "price": 72699,
+      "cat": "17 PRO 512",
+      "type": "n",
+      "order": 3
     }
   ],
   "iPh 17 Pro 512 White EU | iStore | n": [
@@ -29604,6 +29611,13 @@
       "cat": "17 PRO 512",
       "type": "n",
       "order": 5
+    },
+    {
+      "time": "24.04 08:41",
+      "price": 70499,
+      "cat": "17 PRO 512",
+      "type": "n",
+      "order": 5
     }
   ],
   "iPh 17 Pro 1TB Blue EU | iStore | n": [
@@ -29652,6 +29666,13 @@
     {
       "time": "23.04 00:57",
       "price": 83799,
+      "cat": "17 PRO 1TB",
+      "type": "n",
+      "order": 6
+    },
+    {
+      "time": "24.04 08:41",
+      "price": 84599,
       "cat": "17 PRO 1TB",
       "type": "n",
       "order": 6
@@ -29768,6 +29789,13 @@
     {
       "time": "23.04 00:57",
       "price": 80999,
+      "cat": "17 PRO 1TB",
+      "type": "n",
+      "order": 8
+    },
+    {
+      "time": "24.04 08:41",
+      "price": 81799,
       "cat": "17 PRO 1TB",
       "type": "n",
       "order": 8
@@ -30010,6 +30038,13 @@
       "cat": "17 PRO 512",
       "type": "n",
       "order": 15
+    },
+    {
+      "time": "24.04 08:41",
+      "price": 67599,
+      "cat": "17 PRO 512",
+      "type": "n",
+      "order": 15
     }
   ],
   "iPh 17 Pro 512 White eSim | iStore | n": [
@@ -30170,6 +30205,13 @@
       "cat": "17 PRO 1TB",
       "type": "n",
       "order": 18
+    },
+    {
+      "time": "24.04 08:41",
+      "price": 78699,
+      "cat": "17 PRO 1TB",
+      "type": "n",
+      "order": 18
     }
   ],
   "iPh 17 Pro 1TB White eSim | iStore | n": [
@@ -30235,6 +30277,13 @@
       "cat": "17 PRO 1TB",
       "type": "n",
       "order": 19
+    },
+    {
+      "time": "24.04 08:41",
+      "price": 79699,
+      "cat": "17 PRO 1TB",
+      "type": "n",
+      "order": 19
     }
   ],
   "iPh 17 Pro 1TB Orange eSim | iStore | n": [
@@ -30283,6 +30332,13 @@
     {
       "time": "23.04 00:57",
       "price": 76699,
+      "cat": "17 PRO 1TB",
+      "type": "n",
+      "order": 20
+    },
+    {
+      "time": "24.04 08:41",
+      "price": 76499,
       "cat": "17 PRO 1TB",
       "type": "n",
       "order": 20
@@ -30643,6 +30699,13 @@
       "cat": "17 PM 1TB",
       "type": "n",
       "order": 30
+    },
+    {
+      "time": "24.04 08:41",
+      "price": 87899,
+      "cat": "17 PM 1TB",
+      "type": "n",
+      "order": 30
     }
   ],
   "iPh 17 Pro Max 1TB White EU | iStore | n": [
@@ -30970,6 +31033,13 @@
       "cat": "17 PM 256",
       "type": "n",
       "order": 36
+    },
+    {
+      "time": "24.04 08:41",
+      "price": 61249,
+      "cat": "17 PM 256",
+      "type": "n",
+      "order": 36
     }
   ],
   "iPh 17 Pro Max 256 White eSim | iStore | n": [
@@ -31130,6 +31200,13 @@
       "cat": "17 PM 512",
       "type": "n",
       "order": 39
+    },
+    {
+      "time": "24.04 08:41",
+      "price": 71599,
+      "cat": "17 PM 512",
+      "type": "n",
+      "order": 39
     }
   ],
   "iPh 17 Pro Max 512 White eSim | iStore | n": [
@@ -31236,6 +31313,13 @@
     {
       "time": "22.04 00:53",
       "price": 69999,
+      "cat": "17 PM 512",
+      "type": "n",
+      "order": 41
+    },
+    {
+      "time": "24.04 08:41",
+      "price": 70499,
       "cat": "17 PM 512",
       "type": "n",
       "order": 41
@@ -31373,6 +31457,13 @@
     {
       "time": "22.04 00:53",
       "price": 81999,
+      "cat": "17 PM 1TB",
+      "type": "n",
+      "order": 43
+    },
+    {
+      "time": "24.04 08:41",
+      "price": 81899,
       "cat": "17 PM 1TB",
       "type": "n",
       "order": 43
@@ -31645,6 +31736,13 @@
       "cat": "Air 256",
       "type": "n",
       "order": 192
+    },
+    {
+      "time": "24.04 08:41",
+      "price": 41999,
+      "cat": "Air 256",
+      "type": "n",
+      "order": 192
     }
   ],
   "iPh Air 256 Blue | iStore | n": [
@@ -31905,6 +32003,13 @@
       "cat": "Air 512",
       "type": "n",
       "order": 196
+    },
+    {
+      "time": "24.04 08:41",
+      "price": 51099,
+      "cat": "Air 512",
+      "type": "n",
+      "order": 196
     }
   ],
   "iPh Air 512 Blue | iStore | n": [
@@ -31939,6 +32044,13 @@
     {
       "time": "23.04 00:57",
       "price": 53199,
+      "cat": "Air 512",
+      "type": "n",
+      "order": 197
+    },
+    {
+      "time": "24.04 08:41",
+      "price": 52399,
       "cat": "Air 512",
       "type": "n",
       "order": 197
@@ -32007,6 +32119,13 @@
       "cat": "Air 512",
       "type": "n",
       "order": 198
+    },
+    {
+      "time": "24.04 08:41",
+      "price": 53199,
+      "cat": "Air 512",
+      "type": "n",
+      "order": 198
     }
   ],
   "iPh Air 512 White | iStore | n": [
@@ -32062,6 +32181,13 @@
     {
       "time": "23.04 00:57",
       "price": 53489,
+      "cat": "Air 512",
+      "type": "n",
+      "order": 199
+    },
+    {
+      "time": "24.04 08:41",
+      "price": 53499,
       "cat": "Air 512",
       "type": "n",
       "order": 199
@@ -32224,6 +32350,13 @@
     {
       "time": "23.04 00:57",
       "price": 57999,
+      "cat": "Air 1TB",
+      "type": "n",
+      "order": 203
+    },
+    {
+      "time": "24.04 08:41",
+      "price": 57899,
       "cat": "Air 1TB",
       "type": "n",
       "order": 203
